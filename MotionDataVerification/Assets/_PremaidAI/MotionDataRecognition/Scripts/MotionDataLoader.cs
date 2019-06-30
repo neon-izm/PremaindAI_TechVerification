@@ -21,7 +21,7 @@ namespace PreMaid
             public string lb; //先頭2文字
             public string hb; //末尾2文字
             public int servoValue; //3500から11500まで、7500がセンター
-            public float eulerAngle; //角度を出します。
+            public float eulerAngle; //角度を出します。7500が0で3500が-135度、11500が135度
         }
 
         [System.Serializable]
@@ -155,6 +155,7 @@ namespace PreMaid
                 tmp.hb = servoStrings[i * 3 + 1];
                 tmp.lb = servoStrings[i * 3 + 2];
                 tmp.servoValue = ServoStringToValue(servoStrings[i * 3 + 1], servoStrings[i * 3 + 2]);
+                tmp.eulerAngle = (tmp.servoValue - 7500) * 0.03375f;//0.03375= 135/4000
                 ret.servos.Add(tmp);
             }
 
