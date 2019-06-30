@@ -31,11 +31,53 @@ namespace PreMaid
             public List<Servo> servos = new List<Servo>();
         }
 
+        [SerializeField] private Transform premaidRoot;
+        
+        
         [SerializeField] List<PoseFrame> _frames = new List<PoseFrame>();
 
+        [SerializeField]
+        private ModelJoint[] _joints;
+
+        void ApplyPose(int frameNumber)
+        {
+            if (_frames.Count <= frameNumber)
+            {
+                return;
+            }
+
+            var targetFrame = _frames[frameNumber];
+
+            foreach (var VARIABLE in targetFrame.servos)
+            {
+
+                try
+                {
+
+                    var modelJoint= _joints.First(joint => joint.ServoID == VARIABLE.id);
+                    if (modelJoint != null)
+                    {
+                        modelJoint.SetServoValue(VARIABLE.eulerAngle);
+                    }
+                }
+                catch (Exception e)
+                {
+                    
+                }
+                
+            }
+
+        }
+
+        private int currentFrame = 0;
+        
         // Start is called before the first frame update
         void Start()
         {
+            if (premaidRoot != null)
+            {
+                _joints = premaidRoot.GetComponentsInChildren<ModelJoint>();
+            }
         }
 
         // Update is called once per frame
@@ -44,6 +86,18 @@ namespace PreMaid
             if (Input.GetKeyDown(KeyCode.K))
             {
                 Debug.Log(ServoStringToValue("1D", "4C"));
+            }
+            
+            if (Input.GetKeyDown(KeyCode.RightArrow))
+            {
+                currentFrame++;
+                ApplyPose(currentFrame);
+            }
+            
+            if (Input.GetKeyDown(KeyCode.LeftArrow))
+            {
+                currentFrame--;
+                ApplyPose(currentFrame);
             }
         }
 
