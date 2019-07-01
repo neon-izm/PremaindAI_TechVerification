@@ -463,6 +463,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8c94ca795a46e2145af98c53fc3c7d35, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  currentFrame: 0
   premaidRoot: {fileID: 77950932}
   _frames: []
   _joints: []

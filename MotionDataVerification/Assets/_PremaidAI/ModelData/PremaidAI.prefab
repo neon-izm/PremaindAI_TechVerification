@@ -231,6 +231,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ServoID: 14
+  isInverse: 0
   targetAxis: 0
 --- !u!1 &420326370302203587
 GameObject:
@@ -620,14 +621,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1678176036951909408}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
   m_LocalPosition: {x: -0, y: -0.22, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 2050085080816068966}
   m_Father: {fileID: 2195331473356610767}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!114 &447674688590722883
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -641,6 +642,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ServoID: 0D
+  isInverse: 1
   targetAxis: 1
 --- !u!1 &2404013550870344918
 GameObject:
@@ -779,6 +781,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ServoID: 12
+  isInverse: 0
   targetAxis: 0
 --- !u!1 &3250465905283900631
 GameObject:
@@ -804,7 +807,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3250465905283900631}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
   m_LocalPosition: {x: 0.018, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -812,7 +815,7 @@ Transform:
   - {fileID: 6512614342021187391}
   m_Father: {fileID: 4381757329128285190}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 90}
 --- !u!114 &4503356896789494200
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -826,6 +829,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ServoID: 0B
+  isInverse: 0
   targetAxis: 2
 --- !u!1 &3283253649501304099
 GameObject:
@@ -872,6 +876,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ServoID: 03
+  isInverse: 0
   targetAxis: 0
 --- !u!1 &3289553340770938981
 GameObject:
@@ -919,6 +924,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ServoID: 16
+  isInverse: 0
   targetAxis: 0
 --- !u!1 &3449277367078656234
 GameObject:
@@ -944,7 +950,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3449277367078656234}
-  m_LocalRotation: {x: 7.105412e-15, y: 2.842171e-14, z: 3.8849214e-14, w: 1}
+  m_LocalRotation: {x: 0, y: -0, z: 0.7071068, w: -0.7071068}
   m_LocalPosition: {x: -0.01, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -952,7 +958,7 @@ Transform:
   - {fileID: 210510796539179632}
   m_Father: {fileID: 2214549378986635227}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 270}
 --- !u!114 &2630072654561573512
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -966,6 +972,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ServoID: 09
+  isInverse: 0
   targetAxis: 2
 --- !u!1 &3893772422587883169
 GameObject:
@@ -1012,6 +1019,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ServoID: 05
+  isInverse: 0
   targetAxis: 1
 --- !u!1 &3918359477294286108
 GameObject:
@@ -1150,6 +1158,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ServoID: 11
+  isInverse: 0
   targetAxis: 0
 --- !u!1 &4439452267720613531
 GameObject:
@@ -1176,7 +1185,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4439452267720613531}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.147, y: 0.482, z: 0}
+  m_LocalPosition: {x: 0.107, y: 0.482, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4615706701802906858}
@@ -1196,6 +1205,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ServoID: 04
+  isInverse: 1
   targetAxis: 0
 --- !u!1 &4653802211947866646
 GameObject:
@@ -1221,8 +1231,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4653802211947866646}
-  m_LocalRotation: {x: -0, y: 0.00000038743013, z: -0, w: 1}
-  m_LocalPosition: {x: -0.147, y: 0.482, z: -0}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.11, y: 0.482, z: -0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 2195331473356610767}
@@ -1242,6 +1252,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ServoID: 02
+  isInverse: 0
   targetAxis: 0
 --- !u!1 &4930474003868028739
 GameObject:
@@ -1288,6 +1299,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ServoID: 17
+  isInverse: 0
   targetAxis: 1
 --- !u!1 &5125922142665569761
 GameObject:
@@ -1335,6 +1347,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ServoID: 0E
+  isInverse: 0
   targetAxis: 0
 --- !u!1 &5157263739847130615
 GameObject:
@@ -1564,6 +1577,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ServoID: 0C
+  isInverse: 0
   targetAxis: 2
 --- !u!1 &5841470618994736439
 GameObject:
@@ -1738,6 +1752,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ServoID: 10
+  isInverse: 0
   targetAxis: 0
 --- !u!1 &5841470620052597014
 GameObject:
@@ -1815,6 +1830,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ServoID: 15
+  isInverse: 0
   targetAxis: 1
 --- !u!1 &6078244395907767547
 GameObject:
@@ -1861,6 +1877,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ServoID: 06
+  isInverse: 0
   targetAxis: 1
 --- !u!1 &6274422128623543723
 GameObject:
@@ -1999,6 +2016,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ServoID: 13
+  isInverse: 0
   targetAxis: 0
 --- !u!1 &6668452148582760785
 GameObject:
@@ -2228,6 +2246,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ServoID: 0A
+  isInverse: 0
   targetAxis: 2
 --- !u!1 &6948224563782607595
 GameObject:
@@ -2274,6 +2293,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ServoID: 0F
+  isInverse: 1
   targetAxis: 1
 --- !u!1 &6962071710603427690
 GameObject:
@@ -2775,6 +2795,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ServoID: 1A
+  isInverse: 0
   targetAxis: 2
 --- !u!1 &7971426004404679270
 GameObject:
@@ -2821,6 +2842,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ServoID: 1C
+  isInverse: 0
   targetAxis: 2
 --- !u!1 &8141727752442169121
 GameObject:
@@ -2867,6 +2889,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ServoID: 07
+  isInverse: 0
   targetAxis: 2
 --- !u!1 &8728836848691772321
 GameObject:
@@ -2913,6 +2936,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ServoID: 08
+  isInverse: 0
   targetAxis: 1
 --- !u!1 &8844465757619410773
 GameObject:
@@ -3142,4 +3166,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ServoID: 18
+  isInverse: 0
   targetAxis: 0

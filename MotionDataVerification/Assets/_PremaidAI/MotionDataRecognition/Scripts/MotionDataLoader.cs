@@ -24,11 +24,19 @@ namespace PreMaid
             public float eulerAngle; //角度を出します。7500が0で3500が-135度、11500が135度
         }
 
+        [SerializeField]
+        private int currentFrame = 0;
+
         [System.Serializable]
         //1フレームのポーズ
         public class PoseFrame
         {
+            public string commandLength;//"50"で固定？
+            public string command;//"18"で固定？
+            public string commandPadding;//"00"で固定
+            public string frameWait;//"FF"のことが多い
             public List<Servo> servos = new List<Servo>();
+            public string checkByte;//ここまでの値をxorしたもの
         }
 
         [SerializeField] private Transform premaidRoot;
@@ -62,15 +70,14 @@ namespace PreMaid
                 }
                 catch (Exception e)
                 {
-                    
+                    Debug.Log("some exeption:"+ e);
                 }
                 
             }
 
         }
 
-        private int currentFrame = 0;
-        
+      
         // Start is called before the first frame update
         void Start()
         {
@@ -165,13 +172,14 @@ namespace PreMaid
             //ここからhex文字列の配列からパースしていきます。
             while (seekIndex < tailIndex)
             {
-                if (hexByteArray[seekIndex] == "02" && (seekIndex + 6 < tailIndex) &&
-                    hexByteArray[seekIndex + 3] == "03" &&
-                    hexByteArray[seekIndex + 6] == "04")
+                
+                //50 18 から始まるのがモーションデータ作法
+                if (hexByteArray[seekIndex] == "50" && (seekIndex + 6 < tailIndex) &&
+                    hexByteArray[seekIndex + 1] == "18")
                 {
                     //ガガッとフレームパースしますよ～～
                     //なんも考えずにspanでarray渡そうかな～ 末尾に50 18 が大体ついてそう　25サーボ*3データで75個分を抜き出すと良い？
-                    string[] servoArray = hexByteArray.Skip(seekIndex).Take(25 * 3).ToArray();
+                    string[] servoArray = hexByteArray.Skip(seekIndex).Take(80).ToArray();
                     var parsedFrame = ParseOneFrame(servoArray);
                     if (parsedFrame != null)
                     {
@@ -195,24 +203,29 @@ namespace PreMaid
         /// <returns></returns>
         PoseFrame ParseOneFrame(string[] servoStrings)
         {
-            if (servoStrings.Length != 75)
+            if (servoStrings.Length != 80)
             {
                 Debug.LogError("不正なフレームです");
             }
-
+            
             PoseFrame ret = new PoseFrame();
+            ret.commandLength = servoStrings[0];
+            ret.command = servoStrings[1];
+            ret.commandPadding = servoStrings[2];
+            ret.frameWait = servoStrings[3];
             //25軸だと信じていますよ
             for (int i = 0; i < 25; i++)
             {
                 Servo tmp = new Servo();
-                tmp.id = servoStrings[i * 3];
-                tmp.hb = servoStrings[i * 3 + 1];
-                tmp.lb = servoStrings[i * 3 + 2];
-                tmp.servoValue = ServoStringToValue(servoStrings[i * 3 + 1], servoStrings[i * 3 + 2]);
+                tmp.id = servoStrings[4+i * 3];
+                tmp.hb = servoStrings[4+i * 3 + 1];
+                tmp.lb = servoStrings[4+i * 3 + 2];
+                tmp.servoValue = ServoStringToValue(servoStrings[4+ (i * 3) + 1], servoStrings[4+ (i * 3) + 2]);
                 tmp.eulerAngle = (tmp.servoValue - 7500) * 0.03375f;//0.03375= 135/4000
                 ret.servos.Add(tmp);
             }
-
+            //checkbyte
+            ret.checkByte = servoStrings[79];
             return ret;
         }
 

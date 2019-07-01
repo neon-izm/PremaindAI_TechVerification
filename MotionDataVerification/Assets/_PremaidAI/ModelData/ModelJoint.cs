@@ -22,6 +22,7 @@ namespace PreMaid
             X,Y,Z
         }
 
+        [SerializeField] private bool isInverse = false;
         //もしかして取り付け軸向きのinverseもenum定義した方がいいかも？
         
         [SerializeField] private Axis targetAxis= Axis.X;
@@ -45,13 +46,35 @@ namespace PreMaid
             switch (targetAxis)
             {
                 case Axis.X:
-                    targetLocalRotation.x = angleEulerDegree;
+                    if (isInverse)
+                    {
+                        targetLocalRotation.x += -angleEulerDegree;
+                    }
+                    else
+                    {
+                        targetLocalRotation.x += angleEulerDegree;
+                    }
+
                     break;
                 case Axis.Y:
-                    targetLocalRotation.y = angleEulerDegree;
+                    if (isInverse)
+                    {
+                        targetLocalRotation.y += -angleEulerDegree;
+                    }
+                    else
+                    {
+                        targetLocalRotation.y += angleEulerDegree;
+                    }
                     break;
                 case Axis.Z:
-                    targetLocalRotation.z = angleEulerDegree;
+                    if (isInverse)
+                    {
+                        targetLocalRotation.z += -angleEulerDegree;
+                    }
+                    else
+                    {
+                        targetLocalRotation.z += angleEulerDegree;
+                    }
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
