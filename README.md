@@ -13,6 +13,12 @@ Android\data\com.robotyuenchi.premaidai\
 MotionDataLoadTestScene.unity を開いて*.pmaファイルを読み込み、矢印キーの左右でフレーム移動をします。
 GameView上のプリメイドAIを模した箱なロボットがpmaのサーボ値を元にポーズを取ります
 
+## BT(SPP)経由でUnityEditor上からのプリメイドAIへの既存ポーズ送信
+MotionDataWriterSample.cs にあります。適切にSerialPortを設定して、決め打ちの命令をbyte[]で送る事でAndroidアプリ上と同じように指定ポーズを取らせられます。
+任意ポーズはまだです。
+
+https://twitter.com/izm/status/1146100976455053312
+
 # 現在やっていること
 ## モーションプレビューの誤りを直す
 腕と首はおそらくそれほど間違っていないプレビューですが、足の軸反転やオフセットがあるようです。  
