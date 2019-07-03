@@ -137,32 +137,35 @@ namespace PreMaid
         /// <param name="koma"></param>
         void ApplyPoseByKoma(int koma)
         {
-            int elapsedKoma = 0;
-            PoseFrame prevFrame = null;
+            if (_frames.Count < 1)
+            {
+                // キーフレームが1つもなければ何もしない
+                return;
+            }
+            else if ((_frames.Count == 1) || (koma < 0))
+            {
+                // キーフレームが1つしかないか、指定コマが負なら先頭の姿勢を単にとる
+                ApplyPose(0);
+                return;
+            }
+
+            PoseFrame prevFrame = _frames[0];
             PoseFrame nextFrame = null;
+
+            int elapsedKoma = 0;
             float weight = 0f;
-            int frameNumber;
-            for (frameNumber = 0; frameNumber < _frames.Count; frameNumber++)
+            for (int frameNumber = 1; frameNumber < _frames.Count; frameNumber++)
             {
                 nextFrame = _frames[frameNumber];
 
                 // 次のフレームで指定時刻以上になるなら、ここが求めたいタイミングである
-                if ((elapsedKoma + nextFrame.wait) >= koma) {
-                    if (prevFrame == null)
-                    {
-                        // 先頭フレーム以前ならば、単に先頭フレームの姿勢にする
-                        ApplyPose(frameNumber);
-                        return;
-                    }
-                    else
-                    {
-                        // 2つのコマの途中ならば、重みを求める
-                        weight = Mathf.Clamp01((float)(koma - elapsedKoma) / nextFrame.wait);
-                    }
+                if ((elapsedKoma + prevFrame.wait) >= koma) {
+                    // 2つのコマ間の重みを0～1で求める
+                    weight = Mathf.Clamp01((float)(koma - elapsedKoma) / prevFrame.wait);
                     break;
                 }
 
-                elapsedKoma += nextFrame.wait;
+                elapsedKoma += prevFrame.wait;
                 prevFrame = nextFrame;
             }
 
