@@ -39,7 +39,7 @@ namespace PreMaid
         //適当に抜き出したポーズ
         //まだ動作確認出来ていない
         private string testPose =
-            "50 18 00 0B 02 70 11 03 4C 1D 04 58 1B 05 4C 1D 06 4C 1D 07 4C 1D 08 4C 1D 09 68 22 0A 9B 1D 0B 96 15 0C CE 1D 0D 64 1D 0E 7A 1C 0F FB 28 10 B4 1E 11 5C 2B 12 A8 1B 13 85 11 14 1C 20 15 8B 25 16 7A 1C 17 D9 14 18 B4 1E 1A 24 1D 1C 9A 1A AF FF FF";
+            "50 18 00 06 02 5F 1D 03 4C 1D 04 D5 23 05 4C 1D 06 4C 1D 07 4C 1D 08 4C 1D 09 CE 24 0A A2 1C 0B 44 14 0C F6 1D 0D CF 13 0E E4 1B 0F 9B 25 10 B4 1E 11 47 1D 12 7C 1A 13 A6 0F 14 1C 20 15 04 2B 16 E4 1B 17 D6 13 18 B4 1E 1A 3C 1E 1C 5C 1C AF";
 
         
         // Start is called before the first frame update
@@ -120,15 +120,76 @@ namespace PreMaid
                 serialPort_.Close();
             }
 
+            //指定の1フレームポーズの転送
             if (Input.GetKeyDown(KeyCode.K))
             {
-                Debug.Log(CalcXorString("05 1F 00 01"));
-                Debug.Log(RewriteXorString("05 1F 00 01 FF"));
+                StartCoroutine(TestPosePlay());
+                //Debug.Log(CalcXorString("05 1F 00 01"));
+                //Debug.Log(RewriteXorString("05 1F 00 01 FF"));
             }
             
         }
 
+        
+        /// <summary>
+        /// 無理やり1フレームだけのダンスモーションを転送して再生する
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerator TestPosePlay()
+        {
 
+            float waitSec = 0.01f;
+            
+            byte[] data1 = BuildByteDataFromStringOrder("07 01 00 02 00 02 06");
+            serialPort_.Write(data1, 0, data1.Length);
+            yield return new WaitForSeconds(waitSec);
+            
+            byte[] data2 = BuildByteDataFromStringOrder("07 01 00 08 00 02 0C");
+            serialPort_.Write(data2, 0, data2.Length);
+            yield return new WaitForSeconds(waitSec);
+              
+            byte[] data3 = BuildByteDataFromStringOrder("08 02 00 08 00 FF FF 02");
+            serialPort_.Write(data3, 0, data3.Length);
+            yield return new WaitForSeconds(waitSec);
+            
+            byte[] data4 = BuildByteDataFromStringOrder("04 04 00 00");//フラッシュのライトプロテクト解除？
+            serialPort_.Write(data4, 0, data4.Length);
+            yield return new WaitForSeconds(waitSec);
+            
+            byte[] data5 = BuildByteDataFromStringOrder("5c 1d 00 00 00"); //転送コマンド？
+            serialPort_.Write(data5, 0, data5.Length);
+            yield return new WaitForSeconds(waitSec);
+            
+            byte[] data6 = BuildByteDataFromStringOrder(RewriteXorString(testPose));    //対象のモーション、今回は1個だけ
+            serialPort_.Write(data6, 0, data6.Length);
+            yield return new WaitForSeconds(waitSec);
+            
+            byte[] data7 = BuildByteDataFromStringOrder("04 17 00 13 ff ff 41"); //不明
+            serialPort_.Write(data7, 0, data7.Length);
+            yield return new WaitForSeconds(waitSec);
+            
+            byte[] data8 = BuildByteDataFromStringOrder("05 1E 00 01 1A");
+            serialPort_.Write(data8, 0, data8.Length);
+            yield return new WaitForSeconds(waitSec);
+
+            byte[] data9 = BuildByteDataFromStringOrder("05 1C 00 01 18"); //ベリファイダンプ要請
+            serialPort_.Write(data9, 0, data9.Length);
+            yield return new WaitForSeconds(waitSec);
+            
+            byte[] data10 = BuildByteDataFromStringOrder("08 02 00 08 00 08 00 0A");//モーションデータ転送終了
+            serialPort_.Write(data10, 0, data10.Length);
+            yield return new WaitForSeconds(waitSec);
+
+            byte[] data11 = BuildByteDataFromStringOrder("04 04 00 00");//フラッシュのライトプロテクトを掛ける？
+            serialPort_.Write(data11, 0, data11.Length);
+            yield return new WaitForSeconds(waitSec);
+
+            byte[] data12 = BuildByteDataFromStringOrder("05 1F 00 01 1B");//01番モーション再生
+            serialPort_.Write(data12, 0, data12.Length);
+            yield return new WaitForSeconds(waitSec);
+
+        }
+        
         
         /// <summary>
         /// 末尾のチェックバイトを計算して、正しい値に書き換えます
