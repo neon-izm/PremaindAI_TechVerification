@@ -10,8 +10,10 @@ Android\data\com.robotyuenchi.premaidai\
 
 # 現在できる事
 ## モーションデータの読み込みとプレビュー
-MotionDataLoadTestScene.unity を開いて*.pmaファイルを読み込み、矢印キーの左右でフレーム移動をします。
-GameView上のプリメイドAIを模した箱なロボットがpmaのサーボ値を元にポーズを取ります
+MotionDataLoadTestScene.unity を開いて*.pmaファイルを読み込み、Play/Stopボタンを押すことでモーションを再生します。
+GameView上のプリメイドAIを模した箱なロボットがpmaのサーボ値を元にポーズを取ります。
+
+**再生開始数秒は待機ポーズが入っている事が多いのでロボットが動かないですが、数秒後から動き始めます**
 
 ## BT(SPP)経由でUnityEditor上からのプリメイドAIへの既存ポーズ送信
 MotionDataWriterSample.cs にあります。適切にSerialPortを設定して、決め打ちの命令をbyte[]で送る事でAndroidアプリ上と同じように指定ポーズを取らせられます。
@@ -28,8 +30,6 @@ https://twitter.com/izm/status/1146100976455053312
 ブラックボックス化しているpmaファイルの先頭と末尾はそのままに、中間モーションを削っても再生できることは確認済みです。
 その処理をUnity内で出来るようにしたい
 
-## フレームウェイト値の反映によるリアルタイムモーションプレビュー
-待ち時間を考慮して再生する仕組みを作る
 
 # 動作環境
 - Windows 10
