@@ -157,7 +157,7 @@ namespace PreMaid
                     else
                     {
                         // 2つのコマの途中ならば、重みを求める
-                        weight = Mathf.Clamp01((float)(koma - elapsedKoma) / prevFrame.wait);
+                        weight = Mathf.Clamp01((float)(koma - elapsedKoma) / nextFrame.wait);
                     }
                     break;
                 }
