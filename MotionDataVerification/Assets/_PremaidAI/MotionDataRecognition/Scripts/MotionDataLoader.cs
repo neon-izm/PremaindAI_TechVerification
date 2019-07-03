@@ -37,6 +37,8 @@ namespace PreMaid
             public string frameWait;//"FF"のことが多い
             public List<Servo> servos = new List<Servo>();
             public string checkByte;//ここまでの値をxorしたもの
+
+            public int wait;    // frameWaitの値
         }
 
         [SerializeField] private Transform premaidRoot;
@@ -46,6 +48,27 @@ namespace PreMaid
 
         [SerializeField]
         private ModelJoint[] _joints;
+
+        /// <summary>
+        /// 再生時のFPS（koma per seconds）
+        /// </summary>
+        private float fps = 20f;
+
+        /// <summary>
+        /// モーション再生中は true
+        /// </summary>
+        private bool isPlaying = false;
+
+        /// <summary>
+        /// モーション再生開始時刻
+        /// </summary>
+        private float startedTime = 0f;
+        
+        /// <summary>
+        /// 現在のコマ。再生中は時刻に合わせて増える
+        /// </summary>
+        private int currentKoma = 0;
+
 
         void ApplyPose(int frameNumber)
         {
@@ -61,7 +84,6 @@ namespace PreMaid
 
                 try
                 {
-
                     var modelJoint= _joints.First(joint => joint.ServoID == VARIABLE.id);
                     if (modelJoint != null)
                     {
@@ -77,6 +99,79 @@ namespace PreMaid
 
         }
 
+        void ApplyPose(PoseFrame prevFrame, PoseFrame nextFrame, float weight)
+        {
+            foreach (var prevServo in prevFrame.servos)
+            {
+                float angle = prevServo.eulerAngle;
+
+                string id = prevServo.id;
+                var nextServo = nextFrame.servos.First(servo => servo.id.Equals(id));
+                if (nextServo != null)
+                {
+                    angle = Mathf.LerpAngle(prevServo.eulerAngle, nextServo.eulerAngle, weight);
+                }
+
+                try
+                {
+                    var modelJoint = _joints.FirstOrDefault(joint => joint.ServoID == prevServo.id);
+                    if (modelJoint != null)
+                    {
+                        modelJoint.SetServoValue(angle);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Debug.Log("some exeption:" + e);
+                }
+
+            }
+
+        }
+
+        /// <summary>
+        /// 指定コマ（本当はフレーム）に該当する姿勢を前後の姿勢から補間して返す
+        /// </summary>
+        /// <param name="koma"></param>
+        void ApplyPoseByKoma(int koma)
+        {
+            int elapsedKoma = 0;
+            PoseFrame prevFrame = null;
+            PoseFrame nextFrame = null;
+            float weight = 0f;
+            int frameNumber = 0;
+            for (; frameNumber < _frames.Count; frameNumber++)
+            {
+                nextFrame = _frames[frameNumber];
+                elapsedKoma += nextFrame.wait;
+
+                // 次のフレームで指定時刻以上になるなら、ここが求めたいタイミング
+                if (elapsedKoma >= koma) {
+                    if (prevFrame == null)
+                    {
+                        // 先頭フレーム以下ならば、単に先頭フレームの姿勢にする
+                        ApplyPose(frameNumber);
+                        return;
+                    }
+                    else
+                    {
+                        // 2つのコマの途中ならば、重みを求める
+                        weight = Mathf.Clamp01((float)(koma + nextFrame.wait - elapsedKoma) / prevFrame.wait);
+                    }
+                    break;
+                }
+                prevFrame = nextFrame;
+            }
+
+            // 最後まで指定タイミングが見つからなければ、最終姿勢をとらせる
+            if (prevFrame == nextFrame)
+            {
+                ApplyPose(frameNumber);
+                return;
+            }
+
+            ApplyPose(prevFrame, nextFrame, weight);
+        }
       
         // Start is called before the first frame update
         void Start()
@@ -105,6 +200,30 @@ namespace PreMaid
             {
                 currentFrame--;
                 ApplyPose(currentFrame);
+            }
+
+            if (isPlaying)
+            {
+                currentKoma = (int)((Time.time - startedTime) * fps);
+                ApplyPoseByKoma(currentKoma);
+            }
+        }
+
+        public void PlayButton()
+        {
+            if (isPlaying)
+            {
+                // 停止
+                isPlaying = false;
+                currentKoma = 0;
+                ApplyPose(currentFrame);
+            }
+            else
+            {
+                // 再生開始
+                currentKoma = 0;
+                startedTime = Time.time;
+                isPlaying = true;
             }
         }
 
@@ -213,6 +332,9 @@ namespace PreMaid
             ret.command = servoStrings[1];
             ret.commandPadding = servoStrings[2];
             ret.frameWait = servoStrings[3];
+
+            ret.wait = int.Parse(ret.frameWait, NumberStyles.AllowHexSpecifier);
+
             //25軸だと信じていますよ
             for (int i = 0; i < 25; i++)
             {

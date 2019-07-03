@@ -1,2 +1,6 @@
 MotionDataVerification/Library/
 MotionDataVerification/Temp/
+
+MotionDataVerification/.vs/
+MotionDataVerification/*.csproj
+MotionDataVerification/*.sln
