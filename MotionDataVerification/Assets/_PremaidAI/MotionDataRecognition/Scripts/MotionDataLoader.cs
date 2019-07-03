@@ -50,9 +50,10 @@ namespace PreMaid
         private ModelJoint[] _joints;
 
         /// <summary>
-        /// 再生時のFPS（koma per seconds）
+        /// 再生時のFPS（komas per second）
         /// </summary>
-        private float fps = 20f;
+        [SerializeField]
+        private float fps = 50f;
 
         /// <summary>
         /// モーション再生中は true
@@ -63,10 +64,11 @@ namespace PreMaid
         /// モーション再生開始時刻
         /// </summary>
         private float startedTime = 0f;
-        
+
         /// <summary>
         /// 現在のコマ。再生中は時刻に合わせて増える
         /// </summary>
+        [SerializeField]
         private int currentKoma = 0;
 
 
@@ -139,37 +141,39 @@ namespace PreMaid
             PoseFrame prevFrame = null;
             PoseFrame nextFrame = null;
             float weight = 0f;
-            int frameNumber = 0;
-            for (; frameNumber < _frames.Count; frameNumber++)
+            int frameNumber;
+            for (frameNumber = 0; frameNumber < _frames.Count; frameNumber++)
             {
                 nextFrame = _frames[frameNumber];
-                elapsedKoma += nextFrame.wait;
 
-                // 次のフレームで指定時刻以上になるなら、ここが求めたいタイミング
-                if (elapsedKoma >= koma) {
+                // 次のフレームで指定時刻以上になるなら、ここが求めたいタイミングである
+                if ((elapsedKoma + nextFrame.wait) >= koma) {
                     if (prevFrame == null)
                     {
-                        // 先頭フレーム以下ならば、単に先頭フレームの姿勢にする
+                        // 先頭フレーム以前ならば、単に先頭フレームの姿勢にする
                         ApplyPose(frameNumber);
                         return;
                     }
                     else
                     {
                         // 2つのコマの途中ならば、重みを求める
-                        weight = Mathf.Clamp01((float)(koma + nextFrame.wait - elapsedKoma) / prevFrame.wait);
+                        weight = Mathf.Clamp01((float)(koma - elapsedKoma) / prevFrame.wait);
                     }
                     break;
                 }
+
+                elapsedKoma += nextFrame.wait;
                 prevFrame = nextFrame;
             }
 
             // 最後まで指定タイミングが見つからなければ、最終姿勢をとらせる
             if (prevFrame == nextFrame)
             {
-                ApplyPose(frameNumber);
+                ApplyPose(_frames.Count - 1);
                 return;
             }
 
+            // 2つのキーフレームの間の姿勢をとらせる
             ApplyPose(prevFrame, nextFrame, weight);
         }
       

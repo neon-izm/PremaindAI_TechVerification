@@ -548,6 +548,7 @@ MonoBehaviour:
   premaidRoot: {fileID: 77950932}
   _frames: []
   _joints: []
+  fps: 50
 --- !u!4 &1052369445
 Transform:
   m_ObjectHideFlags: 0
