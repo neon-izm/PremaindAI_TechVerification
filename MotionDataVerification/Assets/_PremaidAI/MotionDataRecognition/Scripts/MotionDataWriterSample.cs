@@ -45,8 +45,33 @@ namespace PreMaid
         // Start is called before the first frame update
         void Start()
         {
-            serialPort_ = new SerialPort(portName, baudRate, Parity.None, 8, StopBits.One);
-            serialPort_.Open();
+            //存在しないシリアルポートにはアクセスしないように
+            var portNames = SerialPort.GetPortNames();
+
+            foreach (var VARIABLE in portNames)
+            {
+                Debug.Log(VARIABLE);
+            }
+            
+            if (portNames.Contains(portName))
+            {
+                try
+                {
+                    serialPort_ = new SerialPort(portName, baudRate, Parity.None, 8, StopBits.One);
+                    serialPort_.Open();
+                }
+                catch (Exception e)
+                {
+                    Debug.LogWarning("シリアルポートOpen失敗しました、ペアリング済みか、プリメイドAIのポートか確認してください");
+                    Console.WriteLine(e);
+                    //throw;
+                }
+                
+            }
+            else
+            {
+                Debug.LogWarning($"指定された{portName}がありません。portNameを書き換えてください");
+            }
         }
 
         // Update is called once per frame
@@ -94,9 +119,59 @@ namespace PreMaid
             {
                 serialPort_.Close();
             }
+
+            if (Input.GetKeyDown(KeyCode.K))
+            {
+                Debug.Log(CalcXorString("05 1F 00 01"));
+                Debug.Log(RewriteXorString("05 1F 00 01 FF"));
+            }
             
         }
 
+
+        
+        /// <summary>
+        /// 末尾のチェックバイトを計算して、正しい値に書き換えます
+        /// 05 1F 00 01 FF を渡したら05 1F 00 01 1Bが返ってきます
+        /// </summary>
+        /// <param name="spaceSplitedByteString"></param>
+        /// <returns></returns>
+        public string RewriteXorString(string spaceSplitedByteString)
+        {
+            var hexBase = BuildByteDataFromStringOrder(spaceSplitedByteString);
+            byte xor= new byte();
+            for (int i = 0; i < hexBase.Length-1; i++)
+            {
+                xor ^= (byte) (hexBase[i]) ;
+            }
+
+            var str = string.Format("{0:X2}", xor);
+            var retString= spaceSplitedByteString.Substring(0, spaceSplitedByteString.Length - 2) ;
+            retString += str;
+            //Debug.Log(str);
+            return retString;
+        }
+        
+        /// <summary>
+        /// 末尾のチェックバイトを計算します
+        /// 05 1F 00 01 を渡したら1Bが返ってきます
+        /// </summary>
+        /// <param name="spaceSplitedByteString"></param>
+        /// <returns></returns>
+        public string CalcXorString(string spaceSplitedByteString)
+        {
+            var hexBase = BuildByteDataFromStringOrder(spaceSplitedByteString);
+            byte xor= new byte();
+            for (int i = 0; i < hexBase.Length; i++)
+            {
+                xor ^= (byte) (hexBase[i]) ;
+            }
+
+            var str = string.Format("{0:X2}", xor);
+            //Debug.Log(str);
+            return str;
+        }
+        
         /// <summary>
         /// byte[]の中身を直接文字列としてDebug.Logに出す
         /// 0xff0x63の場合は、FF63と表示される

@@ -549,6 +549,7 @@ MonoBehaviour:
   _frames: []
   _joints: []
   fps: 50
+  currentKoma: 0
 --- !u!4 &1052369445
 Transform:
   m_ObjectHideFlags: 0
