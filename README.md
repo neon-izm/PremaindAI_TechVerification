@@ -21,6 +21,13 @@ MotionDataWriterSample.cs にあります。適切にSerialPortを設定して�
 
 https://twitter.com/izm/status/1146100976455053312
 
+
+## BT(SPP)経由でUnityEditor上からのプリメイドAIへの任意ポーズ送信
+MotionDataWriterSample.cs にあります。適切にSerialPortを設定して、「1フレームだけのダンスモーション」を生成してダンスを転送→再生　を行う事で任意ポーズをとらせることが出来ます。
+
+https://twitter.com/izm/status/1146586612773470208
+
+
 # 現在やっていること
 ## モーションプレビューの誤りを直す
 腕と首はおそらくそれほど間違っていないプレビューですが、足の軸反転やオフセットがあるようです。  
