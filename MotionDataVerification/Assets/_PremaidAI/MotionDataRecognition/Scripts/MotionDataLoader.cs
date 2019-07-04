@@ -200,17 +200,6 @@ namespace PreMaid
                 ApplyPose(currentFrame);
             }
             
-            if (Input.GetKeyDown(KeyCode.LeftArrow))
-            {
-                currentFrame--;
-                ApplyPose(currentFrame);
-            }
-
-            if (isPlaying)
-            {
-                currentKoma = (int)((Time.time - startedTime) * fps);
-                ApplyPoseByKoma(currentKoma);
-            }
         }
 
         public void PlayButton()
