@@ -17,13 +17,12 @@ GameView上のプリメイドAIを模した箱なロボットがpmaのサーボ�
 
 ## BT(SPP)経由でUnityEditor上からのプリメイドAIへの既存ポーズ送信
 MotionDataWriterSample.cs にあります。適切にSerialPortを設定して、決め打ちの命令をbyte[]で送る事でAndroidアプリ上と同じように指定ポーズを取らせられます。
-任意ポーズはまだです。
 
 https://twitter.com/izm/status/1146100976455053312
 
 
 ## BT(SPP)経由でUnityEditor上からのプリメイドAIへの任意ポーズ送信
-MotionDataWriterSample.cs にあります。適切にSerialPortを設定して、「1フレームだけのダンスモーション」を生成してダンスを転送→再生　を行う事で任意ポーズをとらせることが出来ます。
+MotionDataWriterSample.cs にあります。適切にSerialPortを設定して、「1フレームだけのダンスモーション」を生成してダンスを転送→再生　を行う事で任意ポーズをとらせることが出来ます。この処理を連続で行う事で2-3FPS程度で任意モーションを流し込めると思います。
 
 https://twitter.com/izm/status/1146586612773470208
 
