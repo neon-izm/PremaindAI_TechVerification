@@ -31,6 +31,8 @@ namespace PreMaid
         //1フレームのポーズ
         public class PoseFrame
         {
+            public int frameNumber;
+
             public string commandLength;//"50"で固定？
             public string command;//"18"で固定？
             public string commandPadding;//"00"で固定
@@ -39,6 +41,11 @@ namespace PreMaid
             public string checkByte;//ここまでの値をxorしたもの
 
             public int wait;    // frameWaitの値
+
+            override public string ToString()
+            {
+                return frameNumber.ToString();
+            }
         }
 
         [SerializeField] private Transform premaidRoot;
@@ -70,6 +77,15 @@ namespace PreMaid
         /// </summary>
         [SerializeField]
         private int currentKoma = 0;
+
+        /// <summary>
+        /// 全コマ数
+        /// </summary>
+        private int totalKomas = 0;
+
+        private UnityEngine.Video.VideoPlayer videoPlayer;
+        private UnityEngine.UI.Slider motionSeekSlider;
+        private bool isSliderDraggable = true;
 
 
         void ApplyPose(int frameNumber)
@@ -142,37 +158,46 @@ namespace PreMaid
                 // キーフレームが1つもなければ何もしない
                 return;
             }
-            else if ((_frames.Count == 1) || (koma < 0))
+            else if ((_frames.Count == 1) || (koma < _frames[0].wait))
             {
                 // キーフレームが1つしかないか、指定コマが負なら先頭の姿勢を単にとる
-                ApplyPose(0);
+                currentFrame = 0;
+                ApplyPose(currentFrame);
                 return;
             }
 
             PoseFrame prevFrame = _frames[0];
             PoseFrame nextFrame = null;
+            currentFrame = 0;
 
-            int elapsedKoma = 0;
+            int elapsedKoma = prevFrame.wait;
             float weight = 0f;
             for (int frameNumber = 1; frameNumber < _frames.Count; frameNumber++)
             {
                 nextFrame = _frames[frameNumber];
 
                 // 次のフレームで指定時刻以上になるなら、ここが求めたいタイミングである
-                if ((elapsedKoma + prevFrame.wait) >= koma) {
+                if ((elapsedKoma + nextFrame.wait) >= koma)
+                //if ((elapsedKoma) >= koma)
+                {
                     // 2つのコマ間の重みを0～1で求める
-                    weight = Mathf.Clamp01((float)(koma - elapsedKoma) / prevFrame.wait);
+                    weight = Mathf.Clamp01((float)(koma - elapsedKoma) / nextFrame.wait);
+                    //weight = Mathf.Clamp01((float)(koma + nextFrame.wait - elapsedKoma) / prevFrame.wait);
+                    //weight = 1f;
                     break;
                 }
 
-                elapsedKoma += prevFrame.wait;
+                elapsedKoma += nextFrame.wait;
                 prevFrame = nextFrame;
+
+                currentFrame = frameNumber;
             }
 
             // 最後まで指定タイミングが見つからなければ、最終姿勢をとらせる
             if (prevFrame == nextFrame)
             {
-                ApplyPose(_frames.Count - 1);
+                currentFrame = _frames.Count - 1;
+                ApplyPose(currentFrame);
                 return;
             }
 
@@ -187,6 +212,9 @@ namespace PreMaid
             {
                 _joints = premaidRoot.GetComponentsInChildren<ModelJoint>();
             }
+
+            videoPlayer = FindObjectOfType<UnityEngine.Video.VideoPlayer>();
+            motionSeekSlider = FindObjectOfType<UnityEngine.UI.Slider>();
         }
 
         // Update is called once per frame
@@ -213,14 +241,29 @@ namespace PreMaid
             {
                 currentKoma = (int)((Time.time - startedTime) * fps);
                 ApplyPoseByKoma(currentKoma);
+
+                // スライダーを進ませる
+                if (motionSeekSlider && (totalKomas != 0) && (currentKoma <= totalKomas))
+                {
+                    isSliderDraggable = false;
+                    motionSeekSlider.value = (float)currentKoma / (float)totalKomas;
+                    isSliderDraggable = true;
+                }
             }
         }
 
+        /// <summary>
+        /// 動作を再生／停止
+        /// </summary>
         public void PlayButton()
         {
             if (isPlaying)
             {
                 // 停止
+
+                if (videoPlayer) videoPlayer.Stop();
+                //if (videoPlayer) videoPlayer.Pause();
+
                 isPlaying = false;
                 currentKoma = 0;
                 ApplyPose(currentFrame);
@@ -228,9 +271,25 @@ namespace PreMaid
             else
             {
                 // 再生開始
+
+                if (videoPlayer) videoPlayer.Play();
+
                 currentKoma = 0;
                 startedTime = Time.time;
                 isPlaying = true;
+            }
+        }
+
+        /// <summary>
+        /// 指定のコマに移動
+        /// </summary>
+        /// <param name="koma"></param>
+        public void JumpKoma(float normalizedKoma)
+        {
+            if (isSliderDraggable)
+            {
+                currentKoma = (int)(normalizedKoma * totalKomas);
+                startedTime = Time.time - currentKoma / fps;
             }
         }
 
@@ -257,12 +316,13 @@ namespace PreMaid
         public void LoadPma(string fullPath)
         {
             StreamReader sr = new StreamReader(
-                fullPath);
+                fullPath,
+                new UTF8Encoding(true));
 
             string text = sr.ReadToEnd();
 
             sr.Close();
-            //Debug.Log(text);
+            //Debug.Log(text.Length);
             ParsePma(text);
             return;
         }
@@ -294,6 +354,9 @@ namespace PreMaid
             var seekIndex = headIndex;
             Debug.Log(tailIndex + "個のhexがあります");
             int frameCounter = 0;
+            totalKomas = 0;
+
+            _frames.Clear();
 
             //ここからhex文字列の配列からパースしていきます。
             while (seekIndex < tailIndex)
@@ -309,16 +372,25 @@ namespace PreMaid
                     var parsedFrame = ParseOneFrame(servoArray);
                     if (parsedFrame != null)
                     {
+                        parsedFrame.frameNumber = _frames.Count;
                         _frames.Add(parsedFrame);
+                        totalKomas += parsedFrame.wait;
+                        //Debug.Log(frameCounter + " : " + parsedFrame.frameWait + " : " + parsedFrame.wait);
                     }
 
                     frameCounter++;
                 }
+                //50 18 から始まるのがモーションデータ作法
+                if (hexByteArray[seekIndex] == "50" && (seekIndex + 6 < tailIndex) &&
+                    hexByteArray[seekIndex + 1] == "18")
+                {
 
-                seekIndex++;
+
+                    seekIndex++;
             }
 
-            Debug.Log("合計:" + frameCounter + "個のモーションフレームがありました");
+            Debug.Log("合計:" + frameCounter + "個のキーフレームがありました");
+            Debug.Log("合計:" + totalKomas + "個のフレームがありました");
         }
 
 
