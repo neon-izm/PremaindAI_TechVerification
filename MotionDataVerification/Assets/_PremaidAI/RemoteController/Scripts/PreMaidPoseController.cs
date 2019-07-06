@@ -3,12 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO.Ports;
 using System.Linq;
+using TMPro;
 using UnityEngine;
 
 namespace PreMaid.RemoteController
 {
     /// <summary>
-    /// 普通のラジコンぽく動かすサンプル
+    /// 普通のラジコンぽく動かすサンプルスクリプト
     /// </summary>
     public class PreMaidPoseController : MonoBehaviour
     {
@@ -20,10 +21,17 @@ namespace PreMaid.RemoteController
 
         [SerializeField] private bool _serialPortOpen = false;
 
+
+        private bool _continuousMode = false;
+
+
         //何秒ごとにポーズ指定するか
         private float _poseProcessDelay = 0.5f;
 
         private float _timer = 0.0f;
+
+
+        [SerializeField] private TMPro.TMP_Dropdown _dropdown = null;
 
         // Start is called before the first frame update
         void Start()
@@ -45,39 +53,61 @@ namespace PreMaid.RemoteController
             }
 
             Debug.Log(BuildPoseString());
-            _serialPortOpen = SerialPortOpen();
+            var portNames = SerialPort.GetPortNames();
+
+            if (_dropdown == null)
+            {
+                Debug.LogError("シリアルポートを選択するDropDownが指定されていません");
+                return;
+            }
+
+            List<TMP_Dropdown.OptionData> serialPortNamesList = new List<TMP_Dropdown.OptionData>();
+
+            foreach (var VARIABLE in portNames)
+            {
+                TMP_Dropdown.OptionData optionData = new TMP_Dropdown.OptionData(VARIABLE);
+                serialPortNamesList.Add(optionData);
+
+                Debug.Log(VARIABLE);
+            }
+
+            _dropdown.ClearOptions();
+            _dropdown.AddOptions(serialPortNamesList);
         }
 
+
+        public void SetContinuousMode(bool newValue)
+        {
+            _continuousMode = newValue;
+        }
+
+
+        public void OpenSerialPort()
+        {
+            Debug.Log(_dropdown.options[_dropdown.value].text + "を開きます");
+            
+            _serialPortOpen = SerialPortOpen(_dropdown.options[_dropdown.value].text);
+        }
 
         /// <summary>
         /// シリアルポートを開ける
         /// </summary>
         /// <returns></returns>
-        bool SerialPortOpen()
+        bool SerialPortOpen(string portName)
         {
-            //存在しないシリアルポートにはアクセスしないように
-            var portNames = SerialPort.GetPortNames();
-
-            foreach (var VARIABLE in portNames)
+            try
             {
-                Debug.Log(VARIABLE);
+                _serialPort = new SerialPort(portName, BaudRate, Parity.None, 8, StopBits.One);
+                _serialPort.Open();
+                return true;
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning("シリアルポートOpen失敗しました、ペアリング済みか、プリメイドAIのポートか確認してください");
+                Console.WriteLine(e);
+                return false;
             }
 
-            if (portNames.Contains(portName))
-            {
-                try
-                {
-                    _serialPort = new SerialPort(portName, BaudRate, Parity.None, 8, StopBits.One);
-                    _serialPort.Open();
-                    return true;
-                }
-                catch (Exception e)
-                {
-                    Debug.LogWarning("シリアルポートOpen失敗しました、ペアリング済みか、プリメイドAIのポートか確認してください");
-                    Console.WriteLine(e);
-                    return false;
-                }
-            }
 
             Debug.LogWarning($"指定された{portName}がありません。portNameを書き換えてください");
             return false;
@@ -109,7 +139,7 @@ namespace PreMaid.RemoteController
             }
 
             ret += " FF"; //パリティビットを仮で挿入する;
-            
+
             //パリティビットを計算し直した値にして、文字列を返す
             return PreMaidUtility.RewriteXorString(ret);
         }
@@ -120,10 +150,6 @@ namespace PreMaid.RemoteController
         /// </summary>
         public void ApplyPose()
         {
-            if (_serialPortOpen == false)
-            {
-                _serialPortOpen = SerialPortOpen();
-            }
 
             if (_serialPortOpen == false)
             {
@@ -141,7 +167,7 @@ namespace PreMaid.RemoteController
         /// <returns></returns>
         IEnumerator ApplyPoseCoroutine()
         {
-            float waitSec = 0.04f;//0.03だと送信失敗することがある
+            float waitSec = 0.04f; //0.03だと送信失敗することがある
 
             byte[] data1 = PreMaidUtility.BuildByteDataFromStringOrder("07 01 00 02 00 02 06");
             _serialPort.Write(data1, 0, data1.Length);
@@ -179,11 +205,11 @@ namespace PreMaid.RemoteController
             _serialPort.Write(data8, 0, data8.Length);
             yield return new WaitForSeconds(waitSec);
 
-            
+
             byte[] data9 = PreMaidUtility.BuildByteDataFromStringOrder("05 1C 00 01 18"); //ベリファイダンプ要請
             _serialPort.Write(data9, 0, data9.Length);
             yield return new WaitForSeconds(waitSec);
-            
+
 
             byte[] data10 = PreMaidUtility.BuildByteDataFromStringOrder("08 02 00 08 00 08 00 0A"); //モーションデータ転送終了
             _serialPort.Write(data10, 0, data10.Length);
@@ -207,7 +233,11 @@ namespace PreMaid.RemoteController
                 return;
             }
 
-            return;
+            if (_continuousMode == false)
+            {
+                return;
+            }
+
             _timer += Time.deltaTime;
             if (_timer > _poseProcessDelay)
             {
