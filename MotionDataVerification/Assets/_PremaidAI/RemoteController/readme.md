@@ -1,0 +1,3 @@
+Premaid AI RemoteControllerモジュール
+
+各サーボの値を送るモジュール

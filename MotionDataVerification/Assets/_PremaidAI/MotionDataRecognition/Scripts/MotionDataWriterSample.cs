@@ -85,38 +85,38 @@ namespace PreMaid
             //動作確認にもTポーズというかポーズ終了を送るのは良いこと
             if (Input.GetKeyDown(KeyCode.A))
             {
-                byte[] data = BuildByteDataFromStringOrder(forceTpose);
+                byte[] data = PreMaidUtility.BuildByteDataFromStringOrder(forceTpose);
                 serialPort_.Write(data, 0, data.Length);
                 
-                DumpDebugLogToHex(data);
+                PreMaidUtility.DumpDebugLogToHex(data);
                 
             }
 
             //どうぞ、のポーズを取る
             if (Input.GetKeyDown(KeyCode.B))
             {
-                byte[] data = BuildByteDataFromStringOrder(poseDouzo);
+                byte[] data = PreMaidUtility.BuildByteDataFromStringOrder(poseDouzo);
                 serialPort_.Write(data, 0, data.Length);
                 
-                DumpDebugLogToHex(data);
+                PreMaidUtility.DumpDebugLogToHex(data);
             }
 
             //格納しているダンスモーションを再生する
             if (Input.GetKeyDown(KeyCode.C))
             {
-                byte[] data = BuildByteDataFromStringOrder(startDance);
+                byte[] data = PreMaidUtility.BuildByteDataFromStringOrder(startDance);
                 serialPort_.Write(data, 0, data.Length);
                 
-                DumpDebugLogToHex(data);
+                PreMaidUtility.DumpDebugLogToHex(data);
             }
 
             //まだ動作していない、任意サーボ情報を送るポーズ指定
             if (Input.GetKeyDown(KeyCode.D))
             {
-                byte[] data = BuildByteDataFromStringOrder(testPose);
+                byte[] data = PreMaidUtility.BuildByteDataFromStringOrder(testPose);
                 serialPort_.Write(data, 0, data.Length);
 
-                DumpDebugLogToHex(data);
+                PreMaidUtility.DumpDebugLogToHex(data);
             }
 
             if (Input.GetKeyDown(KeyCode.Q))
@@ -184,51 +184,51 @@ namespace PreMaid
             //直感的には3FPSくらいまではツメられそう。
             float waitSec = 0.05f;
             
-            byte[] data1 = BuildByteDataFromStringOrder("07 01 00 02 00 02 06");
+            byte[] data1 = PreMaidUtility.BuildByteDataFromStringOrder("07 01 00 02 00 02 06");
             serialPort_.Write(data1, 0, data1.Length);
             yield return new WaitForSeconds(waitSec);
             
-            byte[] data2 = BuildByteDataFromStringOrder("07 01 00 08 00 02 0C");
+            byte[] data2 = PreMaidUtility.BuildByteDataFromStringOrder("07 01 00 08 00 02 0C");
             serialPort_.Write(data2, 0, data2.Length);
             yield return new WaitForSeconds(waitSec);
               
-            byte[] data3 = BuildByteDataFromStringOrder("08 02 00 08 00 FF FF 02");
+            byte[] data3 = PreMaidUtility.BuildByteDataFromStringOrder("08 02 00 08 00 FF FF 02");
             serialPort_.Write(data3, 0, data3.Length);
             yield return new WaitForSeconds(waitSec);
             
-            byte[] data4 = BuildByteDataFromStringOrder("04 04 00 00");//フラッシュのライトプロテクト解除？
+            byte[] data4 = PreMaidUtility.BuildByteDataFromStringOrder("04 04 00 00");//フラッシュのライトプロテクト解除？
             serialPort_.Write(data4, 0, data4.Length);
             yield return new WaitForSeconds(waitSec);
             
-            byte[] data5 = BuildByteDataFromStringOrder("5c 1d 00 00 00"); //転送コマンド？
+            byte[] data5 = PreMaidUtility.BuildByteDataFromStringOrder("5c 1d 00 00 00"); //転送コマンド？
             serialPort_.Write(data5, 0, data5.Length);
             yield return new WaitForSeconds(waitSec);
             
-            byte[] data6 = BuildByteDataFromStringOrder(RewriteXorString(pose));    //対象のモーション、今回は1個だけ
+            byte[] data6 = PreMaidUtility.BuildByteDataFromStringOrder(PreMaidUtility.RewriteXorString(pose));    //対象のモーション、今回は1個だけ
             serialPort_.Write(data6, 0, data6.Length);
             yield return new WaitForSeconds(waitSec);
             
-            byte[] data7 = BuildByteDataFromStringOrder("04 17 00 13 ff ff 41"); //不明
+            byte[] data7 = PreMaidUtility.BuildByteDataFromStringOrder("04 17 00 13 ff ff 41"); //不明
             serialPort_.Write(data7, 0, data7.Length);
             yield return new WaitForSeconds(waitSec);
             
-            byte[] data8 = BuildByteDataFromStringOrder("05 1E 00 01 1A");
+            byte[] data8 = PreMaidUtility.BuildByteDataFromStringOrder("05 1E 00 01 1A");
             serialPort_.Write(data8, 0, data8.Length);
             yield return new WaitForSeconds(waitSec);
 
-            byte[] data9 = BuildByteDataFromStringOrder("05 1C 00 01 18"); //ベリファイダンプ要請
+            byte[] data9 = PreMaidUtility.BuildByteDataFromStringOrder("05 1C 00 01 18"); //ベリファイダンプ要請
             serialPort_.Write(data9, 0, data9.Length);
             yield return new WaitForSeconds(waitSec);
             
-            byte[] data10 = BuildByteDataFromStringOrder("08 02 00 08 00 08 00 0A");//モーションデータ転送終了
+            byte[] data10 = PreMaidUtility.BuildByteDataFromStringOrder("08 02 00 08 00 08 00 0A");//モーションデータ転送終了
             serialPort_.Write(data10, 0, data10.Length);
             yield return new WaitForSeconds(waitSec);
 
-            byte[] data11 = BuildByteDataFromStringOrder("04 04 00 00");//フラッシュのライトプロテクトを掛ける？
+            byte[] data11 = PreMaidUtility.BuildByteDataFromStringOrder("04 04 00 00");//フラッシュのライトプロテクトを掛ける？
             serialPort_.Write(data11, 0, data11.Length);
             yield return new WaitForSeconds(waitSec);
 
-            byte[] data12 = BuildByteDataFromStringOrder("05 1F 00 01 1B");//01番モーション再生
+            byte[] data12 = PreMaidUtility.BuildByteDataFromStringOrder("05 1F 00 01 1B");//01番モーション再生
             serialPort_.Write(data12, 0, data12.Length);
             yield return new WaitForSeconds(waitSec);
         }
@@ -242,150 +242,58 @@ namespace PreMaid
 
             float waitSec = 0.05f;
             
-            byte[] data1 = BuildByteDataFromStringOrder("07 01 00 02 00 02 06");
+            byte[] data1 = PreMaidUtility.BuildByteDataFromStringOrder("07 01 00 02 00 02 06");
             serialPort_.Write(data1, 0, data1.Length);
             yield return new WaitForSeconds(waitSec);
             
-            byte[] data2 = BuildByteDataFromStringOrder("07 01 00 08 00 02 0C");
+            byte[] data2 = PreMaidUtility.BuildByteDataFromStringOrder("07 01 00 08 00 02 0C");
             serialPort_.Write(data2, 0, data2.Length);
             yield return new WaitForSeconds(waitSec);
               
-            byte[] data3 = BuildByteDataFromStringOrder("08 02 00 08 00 FF FF 02");
+            byte[] data3 = PreMaidUtility.BuildByteDataFromStringOrder("08 02 00 08 00 FF FF 02");
             serialPort_.Write(data3, 0, data3.Length);
             yield return new WaitForSeconds(waitSec);
             
-            byte[] data4 = BuildByteDataFromStringOrder("04 04 00 00");//フラッシュのライトプロテクト解除？
+            byte[] data4 = PreMaidUtility.BuildByteDataFromStringOrder("04 04 00 00");//フラッシュのライトプロテクト解除？
             serialPort_.Write(data4, 0, data4.Length);
             yield return new WaitForSeconds(waitSec);
             
-            byte[] data5 = BuildByteDataFromStringOrder("5c 1d 00 00 00"); //転送コマンド？
+            byte[] data5 = PreMaidUtility.BuildByteDataFromStringOrder("5c 1d 00 00 00"); //転送コマンド？
             serialPort_.Write(data5, 0, data5.Length);
             yield return new WaitForSeconds(waitSec);
             
-            byte[] data6 = BuildByteDataFromStringOrder(RewriteXorString(testPose));    //対象のモーション、今回は1個だけ
+            byte[] data6 = PreMaidUtility.BuildByteDataFromStringOrder(PreMaidUtility.RewriteXorString(testPose));    //対象のモーション、今回は1個だけ
             serialPort_.Write(data6, 0, data6.Length);
             yield return new WaitForSeconds(waitSec);
             
-            byte[] data7 = BuildByteDataFromStringOrder("04 17 00 13 ff ff 41"); //不明
+            byte[] data7 = PreMaidUtility.BuildByteDataFromStringOrder("04 17 00 13 ff ff 41"); //不明
             serialPort_.Write(data7, 0, data7.Length);
             yield return new WaitForSeconds(waitSec);
             
-            byte[] data8 = BuildByteDataFromStringOrder("05 1E 00 01 1A");
+            byte[] data8 = PreMaidUtility.BuildByteDataFromStringOrder("05 1E 00 01 1A");
             serialPort_.Write(data8, 0, data8.Length);
             yield return new WaitForSeconds(waitSec);
 
-            byte[] data9 = BuildByteDataFromStringOrder("05 1C 00 01 18"); //ベリファイダンプ要請
+            byte[] data9 = PreMaidUtility.BuildByteDataFromStringOrder("05 1C 00 01 18"); //ベリファイダンプ要請
             serialPort_.Write(data9, 0, data9.Length);
             yield return new WaitForSeconds(waitSec);
             
-            byte[] data10 = BuildByteDataFromStringOrder("08 02 00 08 00 08 00 0A");//モーションデータ転送終了
+            byte[] data10 = PreMaidUtility.BuildByteDataFromStringOrder("08 02 00 08 00 08 00 0A");//モーションデータ転送終了
             serialPort_.Write(data10, 0, data10.Length);
             yield return new WaitForSeconds(waitSec);
 
-            byte[] data11 = BuildByteDataFromStringOrder("04 04 00 00");//フラッシュのライトプロテクトを掛ける？
+            byte[] data11 = PreMaidUtility.BuildByteDataFromStringOrder("04 04 00 00");//フラッシュのライトプロテクトを掛ける？
             serialPort_.Write(data11, 0, data11.Length);
             yield return new WaitForSeconds(waitSec);
 
-            byte[] data12 = BuildByteDataFromStringOrder("05 1F 00 01 1B");//01番モーション再生
+            byte[] data12 = PreMaidUtility.BuildByteDataFromStringOrder("05 1F 00 01 1B");//01番モーション再生
             serialPort_.Write(data12, 0, data12.Length);
             yield return new WaitForSeconds(waitSec);
 
         }
         
         
-        /// <summary>
-        /// 末尾のチェックバイトを計算して、正しい値に書き換えます
-        /// 05 1F 00 01 FF を渡したら05 1F 00 01 1Bが返ってきます
-        /// </summary>
-        /// <param name="spaceSplitedByteString"></param>
-        /// <returns></returns>
-        public string RewriteXorString(string spaceSplitedByteString)
-        {
-            var hexBase = BuildByteDataFromStringOrder(spaceSplitedByteString);
-            byte xor= new byte();
-            for (int i = 0; i < hexBase.Length-1; i++)
-            {
-                xor ^= (byte) (hexBase[i]) ;
-            }
-
-            var str = string.Format("{0:X2}", xor);
-            var retString= spaceSplitedByteString.Substring(0, spaceSplitedByteString.Length - 2) ;
-            retString += str;
-            //Debug.Log(str);
-            return retString;
-        }
-        
-        /// <summary>
-        /// 末尾のチェックバイトを計算します
-        /// 05 1F 00 01 を渡したら1Bが返ってきます
-        /// </summary>
-        /// <param name="spaceSplitedByteString"></param>
-        /// <returns></returns>
-        public string CalcXorString(string spaceSplitedByteString)
-        {
-            var hexBase = BuildByteDataFromStringOrder(spaceSplitedByteString);
-            byte xor= new byte();
-            for (int i = 0; i < hexBase.Length; i++)
-            {
-                xor ^= (byte) (hexBase[i]) ;
-            }
-
-            var str = string.Format("{0:X2}", xor);
-            //Debug.Log(str);
-            return str;
-        }
-        
-        /// <summary>
-        /// byte[]の中身を直接文字列としてDebug.Logに出す
-        /// 0xff0x63の場合は、FF63と表示される
-        /// </summary>
-        /// <param name="hex"></param>
-        private static void DumpDebugLogToHex(byte[] hex)
-        {
-            string str = "";
-            for (int i = 0; i < hex.Length; i++) {
-                str += string.Format("{0:X2}", hex[i]);
-            }
-            Debug.Log(str);
-        }
-        
-        /// <summary>
-        /// スペース区切りの文字列からbyte配列を作る。このコードを読む人はこれだけ使ってもらえれば！
-        /// </summary>
-        /// <param name="spaceSplitedByteString"></param>
-        /// <returns></returns>
-        byte[] BuildByteDataFromStringOrder(string spaceSplitedByteString)
-        {
-            var hexString = RemoveWhitespace(spaceSplitedByteString);
-            
-            return HexStringToByteArray(hexString) ;
-        }
-        
-        /// <summary>
-        /// "FF0063"みたいな文字列を0xff,0x00,0x63みたいなbyte配列にする
-        /// </summary>
-        /// <param name="hex"></param>
-        /// <returns></returns>
-        public static byte[] HexStringToByteArray(string hex)
-        {
-            int numberChars = hex.Length;
-            byte[] bytes = new byte[numberChars / 2];
-            for (int i = 0; i < numberChars; i += 2)
-                bytes[i / 2] = Convert.ToByte(hex.Substring(i, 2), 16);
-            return bytes;
-        }
-        
-        /// <summary>
-        /// スペース区切りのモーション文字列をスペース消して返す
-        /// </summary>
-        /// <param name="input"></param>
-        /// <returns></returns>
-        public static string RemoveWhitespace( string input)
-        {
-            return new string(input.ToCharArray()
-                .Where(c => !Char.IsWhiteSpace(c))
-                .ToArray());
-        }
+       
         
        
     }
