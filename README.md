@@ -1,4 +1,4 @@
-# PremaindAI_TechVerification
+﻿# PremaindAI_TechVerification
 プリメイドAIのダンスモーションデータの解析プロジェクトです。
 総サーボ数（自由度）　25軸のヒューマノイドロボットが、値下げによって2万円で手に入るようになった為、とても魅力的なおもちゃです。
 
@@ -45,4 +45,8 @@ https://twitter.com/izm/status/1146586612773470208
 信号解析については以下のgoogle spreadsheet 上で編集中です。  
 
 https://docs.google.com/spreadsheets/d/1c6jqMwkBroCuF74viU_q7dgSQGzacbUW4mJg-957_Rs/edit#gid=2102495394
+
+# 同梱モデルデータについて
+黒イワシ(twitetr:@Schwarz_Sardine)さんよりApache2.0ライセンス下で使用許可を得ています。ここに記して感謝します。
+
 
