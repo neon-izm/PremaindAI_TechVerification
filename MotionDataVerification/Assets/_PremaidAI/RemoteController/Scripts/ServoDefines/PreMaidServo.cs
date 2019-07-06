@@ -11,8 +11,8 @@ namespace PreMaid.RemoteController
     [System.Serializable]
     public class PreMaidServo
     {
-        private readonly int MaxServoValue = 11500;
-        private readonly int MinServoValue = 3500;
+        public readonly int MaxServoValue = 11500;
+        public readonly int MinServoValue = 3500;
 
         //for debug purpose
         [SerializeField] private string servoName;
@@ -172,6 +172,17 @@ namespace PreMaid.RemoteController
             }
         }
 
+        /// <summary>
+        /// LeftShoulderRollとかの文字列を返す
+        /// </summary>
+        /// <returns></returns>
+        public string GetServoName()
+        {
+            string name = Enum.GetName(typeof(PreMaidServo.ServoPosition), _servoPosition);
+
+            return name;
+        }
+        
         /// <summary>
         /// "1C" とか "0F"とかのサーボID文字列を返す
         /// </summary>

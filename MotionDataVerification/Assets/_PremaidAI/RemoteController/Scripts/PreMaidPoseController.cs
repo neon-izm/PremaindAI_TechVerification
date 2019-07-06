@@ -26,12 +26,14 @@ namespace PreMaid.RemoteController
 
 
         //何秒ごとにポーズ指定するか
-        private float _poseProcessDelay = 0.5f;
+        private float _poseProcessDelay = 0.9f;
 
         private float _timer = 0.0f;
 
 
         [SerializeField] private TMPro.TMP_Dropdown _dropdown = null;
+
+        [SerializeField] private ServoUguiController _uguiController = null;
 
         // Start is called before the first frame update
         void Start()
@@ -52,6 +54,9 @@ namespace PreMaid.RemoteController
                           VARIABLE.GetServoIdAndValueString());
             }
 
+            _uguiController.Initialize(_servos);
+            _uguiController.OnChangeValue+= OnChangeValue;
+            
             Debug.Log(BuildPoseString());
             var portNames = SerialPort.GetPortNames();
 
@@ -75,6 +80,18 @@ namespace PreMaid.RemoteController
             _dropdown.AddOptions(serialPortNamesList);
         }
 
+        private void OnChangeValue()
+        {
+            //Debug.Log("値の変更");
+            //Refreshします～
+            var latestValues = _uguiController.GetCurrenSliderValues();
+
+            for (int i = 0; i < _servos.Count; i++)
+            {
+                _servos[i].SetServoValueSafeClamp((int)latestValues[i]);
+            }
+        }
+
 
         public void SetContinuousMode(bool newValue)
         {
@@ -85,7 +102,7 @@ namespace PreMaid.RemoteController
         public void OpenSerialPort()
         {
             Debug.Log(_dropdown.options[_dropdown.value].text + "を開きます");
-            
+
             _serialPortOpen = SerialPortOpen(_dropdown.options[_dropdown.value].text);
         }
 
@@ -150,7 +167,6 @@ namespace PreMaid.RemoteController
         /// </summary>
         public void ApplyPose()
         {
-
             if (_serialPortOpen == false)
             {
                 return;
