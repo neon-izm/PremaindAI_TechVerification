@@ -11,22 +11,20 @@ namespace PreMaid.RemoteController
     [System.Serializable]
     public class PreMaidServo
     {
-        private const int MaxServoValue = 11500;
-        private const int MinServoValue = 3500;
+        private readonly int MaxServoValue = 11500;
+        private readonly int MinServoValue = 3500;
 
         //for debug purpose
-        [SerializeField]
-        private string servoName;
-        
+        [SerializeField] private string servoName;
+
         [SerializeField] private ServoPosition _servoPosition = ServoPosition.RightShoulderPitch;
 
         [SerializeField] private int _servoValue = 7500;
         private int _defaultServoValue = 7500;
 
-        string standPose=   "50 18 00 06 02 4C 1D 03 4C 1D 04 " + " 4C 1D "+
-        "05 4C 1D 06 4C 1D 07 4C 1D 08 4C 1D 09 1C 25 0A 4C 1D 0B 7C 15 0C 4C 1D 0D 4C 1D 0E 4C 1D 0F 4C 1D 10 4C 1D 11 4C 1D 12 4C 1D 13 4C 1D 14 4C 1D 15 4C 1D 16 4C 1D 17 4C 1D 18 4C 1D 1A 4C 1D 1C 4C 1D D9";
+        const string PreMaidAiDefaultStandPose = "50 18 00 06 02 4C 1D 03 4C 1D 04 4C 1D 05 4C 1D 06 4C 1D 07 4C 1D 08 4C 1D 09 1C 25 0A 4C 1D 0B 7C 15 0C 4C 1D 0D 4C 1D 0E 4C 1D 0F 4C 1D 10 4C 1D 11 4C 1D 12 4C 1D 13 4C 1D 14 4C 1D 15 4C 1D 16 4C 1D 17 4C 1D 18 4C 1D 1A 4C 1D 1C 4C 1D D9";
 
-        
+
         /// <summary>
         /// サーボの取り付け位置
         /// </summary>
@@ -69,52 +67,95 @@ namespace PreMaid.RemoteController
             _defaultServoValue = 7500;
             _servoPosition = servoPosition;
             servoName = servoPosition.ToString();
-            
+
+            //TODO:このServoのリミット設定は、大雑把に安全そうなリミットを設定しています。
+            //なので、場合によってはこの値を緩められるか検討するのは可能です。
             switch (_servoPosition)
             {
                 case ServoPosition.RightShoulderPitch:
+                    MaxServoValue = 8700;//8700で後ろ手に組む
+                    MinServoValue = 4000;//4500で正面
                     break;
                 case ServoPosition.HeadPitch:
+                    MaxServoValue = 8000; //うなづいた感じ
+                    MinServoValue = 7300; //上向いた限界
                     break;
                 case ServoPosition.LeftShoulderPitch:
+                    MaxServoValue = 11500; //手が上向いたじょうたい
+                    MinServoValue = 6500; //手を後ろ手に組む
                     break;
                 case ServoPosition.HeadYaw:
+                    MinServoValue = 6600; //左を向いてる
+                    MaxServoValue = 8400; //右を向いてる
                     break;
                 case ServoPosition.RightHipYaw:
+                    MaxServoValue = 7900; //内また気味
+                    MinServoValue = 7000; //外開き
                     break;
                 case ServoPosition.HeadRoll:
+                    MaxServoValue = 7800; //左に首をかしげる
+                    MinServoValue = 7200; //右に首をかしげる
                     break;
                 case ServoPosition.LeftHipYaw:
+                    MinServoValue = 7000; //内また
+                    MaxServoValue = 8000; //外開き
                     break;
                 case ServoPosition.RightShoulderRoll:
-                    //9500
-                    SetServoValue("1C 25");
+                    SetServoValueSafeClamp("1C 25");//9500
+                    MinServoValue = 7500; //Tポーズ
+                    MaxServoValue = 9700; //気を付け
                     break;
                 case ServoPosition.RightHipRoll:
+                    MinServoValue = 7000; // やすめ、肩幅に開く
+                    MaxServoValue = 7700; // 気を付け
                     break;
                 case ServoPosition.LeftShoulderRoll:
-                    //5500
-                    SetServoValue("7C 15");
+                    SetServoValueSafeClamp("7C 15");//5500
+                    MinServoValue = 5200; //気を付け
+                    MaxServoValue = 7300; //Tポーズ
+
                     break;
                 case ServoPosition.LeftHipRoll:
+                    MaxServoValue = 8000; // やすめ、肩幅に開く
+                    MinServoValue = 7300; // 気を付け
                     break;
                 case ServoPosition.RightUpperArmYaw:
+                    MinServoValue = 6000; //手の外ひねり
+                    MaxServoValue = 9000; //手の内ひねり
                     break;
                 case ServoPosition.RightUpperLegPitch:
+                    //シビアですぐこけるよ！！
+                    MaxServoValue = 9000; //のけぞる
+                    MinServoValue = 6000; //前屈
                     break;
                 case ServoPosition.LeftUpperArmYaw:
+                    MinServoValue = 6000; //手の内ひねり
+                    MaxServoValue = 9000; //手の外ひねり
                     break;
                 case ServoPosition.LeftUpperLegPitch:
+                    //シビアですぐこけるよ！！
+                    MaxServoValue = 9000; //前屈
+                    MinServoValue = 6000; //のけぞる
                     break;
                 case ServoPosition.RightLowerArmPitch:
+                    MaxServoValue = 8000; //肘を力こぶ出来る方に曲げる10000とかいけるけど、体に刺さらないように要調整（ほかの腕軸を見てね）
+                    MinServoValue = 7400; //肘を外開き、無理させないでね、もげるよ
                     break;
                 case ServoPosition.RightLowerLegPitch:
+                    MinServoValue = 5000; //膝を曲げる。当然5000とかにするとコケる 
+                    MaxServoValue = 7550; //膝をあり得ない方に曲げる。ほとんど曲がらない
                     break;
                 case ServoPosition.LeftLowerArmPitch:
+                    MaxServoValue = 7600; //肘を外開き、無理させないでね、もげるよ
+                    MinServoValue = 6000; //肘を力こぶ出来る方に曲げる 5000とかいけるけど、体に刺さらないように要調整（ほかの腕軸を見てね）
                     break;
                 case ServoPosition.LeftLowerLegPitch:
+                    MinServoValue = 7450; //膝をあり得ない方に曲げる。ほとんど曲がらない
+                    MaxServoValue = 9000; //膝を曲げる。当然10000とかにするとコケる
                     break;
                 case ServoPosition.RightHandYaw:
+                    MinServoValue = 6000; //手のひらを外回し
+                    MaxServoValue = 9000; //手のひらを内回し
                     break;
                 case ServoPosition.RightFootPitch:
                     break;
@@ -164,7 +205,7 @@ namespace PreMaid.RemoteController
         /// <returns></returns>
         public string GetServoValueString()
         {
-            var tmp = ConvertEndian(_servoValue.ToString("X1"));
+            var tmp = ConvertEndian(_servoValue.ToString("X2"));
 
             return $"{tmp[0]}{tmp[1]} {tmp[2]}{tmp[3]}";
         }
@@ -184,12 +225,16 @@ namespace PreMaid.RemoteController
         /// 外部からサーボの値を入れる3500から11500の間の値
         /// </summary>
         /// <param name="newValue"></param>
-        public void SetServoValue(int newValue)
+        public void SetServoValueSafeClamp(int newValue)
         {
-            if (newValue > MaxServoValue || newValue < MinServoValue)
+            if (newValue > MaxServoValue)
             {
-                throw new ArgumentOutOfRangeException($"サーボの値は{MinServoValue}から{MaxServoValue}の間だけです{newValue}はダメです");
-                return;
+                newValue = MaxServoValue;
+
+            } 
+            if(newValue < MinServoValue)
+            {
+                newValue = MinServoValue;
             }
 
             _servoValue = newValue;
@@ -200,17 +245,16 @@ namespace PreMaid.RemoteController
         /// ちなみに4C 1Dが7500です
         /// </summary>
         /// <param name="newValue">"4C 1D"</param>
-        public void SetServoValue(string spaceSplitedByteString)
+        public void SetServoValueSafeClamp(string spaceSplitedByteString)
         {
             var aaa = ConvertEndian(PreMaidUtility.RemoveWhitespace(spaceSplitedByteString));
             int intValue = int.Parse(aaa, System.Globalization.NumberStyles.HexNumber);
             Debug.Log($"{spaceSplitedByteString} は {intValue} ");
 
-            SetServoValue(intValue);
+            SetServoValueSafeClamp(intValue);
         }
 
 
-    
         //サーボ種類一覧をダンプします
         public static void AllServoPositionDump()
         {

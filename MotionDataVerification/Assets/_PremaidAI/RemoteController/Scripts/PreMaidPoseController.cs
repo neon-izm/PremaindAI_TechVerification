@@ -18,7 +18,12 @@ namespace PreMaid.RemoteController
         private const int BaudRate = 115200;
         private SerialPort _serialPort;
 
-        private bool _serialPortOpen = false;
+        [SerializeField] private bool _serialPortOpen = false;
+
+        //何秒ごとにポーズ指定するか
+        private float _poseProcessDelay = 0.5f;
+
+        private float _timer = 0.0f;
 
         // Start is called before the first frame update
         void Start()
@@ -38,7 +43,9 @@ namespace PreMaid.RemoteController
                 Debug.Log(VARIABLE.GetServoIdString() + "   " + VARIABLE.GetServoId() + "  サーボ数値変換" +
                           VARIABLE.GetServoIdAndValueString());
             }
+
             Debug.Log(BuildPoseString());
+            _serialPortOpen = SerialPortOpen();
         }
 
 
@@ -81,7 +88,7 @@ namespace PreMaid.RemoteController
         /// 現在のサーボ値を適用する1フレームだけのモーションを送る
         /// </summary>
         /// <returns></returns>
-        string BuildPoseString(int speed = 100)
+        string BuildPoseString(int speed = 20)
         {
             if (speed > 255)
             {
@@ -93,13 +100,17 @@ namespace PreMaid.RemoteController
                 speed = 1;
             }
 
-            string ret = "50 18 00 " + speed.ToString("X");
+            //決め打ちのポーズ命令+スピード(小さい方が速くて、255が最大に遅い)
+            string ret = "50 18 00 " + speed.ToString("X2");
+            //そして各サーボぼ値を入れる
             foreach (var VARIABLE in _servos)
             {
                 ret += " " + VARIABLE.GetServoIdAndValueString();
             }
 
-            ret += " FF";//パリティビットを仮で挿入する;
+            ret += " FF"; //パリティビットを仮で挿入する;
+            
+            //パリティビットを計算し直した値にして、文字列を返す
             return PreMaidUtility.RewriteXorString(ret);
         }
 
@@ -118,7 +129,8 @@ namespace PreMaid.RemoteController
             {
                 return;
             }
-            
+
+
             StartCoroutine(ApplyPoseCoroutine());
         }
 
@@ -129,7 +141,7 @@ namespace PreMaid.RemoteController
         /// <returns></returns>
         IEnumerator ApplyPoseCoroutine()
         {
-            float waitSec = 0.02f;
+            float waitSec = 0.04f;//0.03だと送信失敗することがある
 
             byte[] data1 = PreMaidUtility.BuildByteDataFromStringOrder("07 01 00 02 00 02 06");
             _serialPort.Write(data1, 0, data1.Length);
@@ -156,7 +168,7 @@ namespace PreMaid.RemoteController
                 PreMaidUtility.BuildByteDataFromStringOrder(
                     BuildPoseString()); //対象のモーション、今回は1個だけ
             _serialPort.Write(data6, 0, data6.Length);
-            yield return new WaitForSeconds(waitSec*2);
+            yield return new WaitForSeconds(waitSec * 2);
 
 
             byte[] data7 = PreMaidUtility.BuildByteDataFromStringOrder("04 17 00 13 ff ff 41"); //不明
@@ -167,11 +179,11 @@ namespace PreMaid.RemoteController
             _serialPort.Write(data8, 0, data8.Length);
             yield return new WaitForSeconds(waitSec);
 
-            /*
+            
             byte[] data9 = PreMaidUtility.BuildByteDataFromStringOrder("05 1C 00 01 18"); //ベリファイダンプ要請
             _serialPort.Write(data9, 0, data9.Length);
             yield return new WaitForSeconds(waitSec);
-            */
+            
 
             byte[] data10 = PreMaidUtility.BuildByteDataFromStringOrder("08 02 00 08 00 08 00 0A"); //モーションデータ転送終了
             _serialPort.Write(data10, 0, data10.Length);
@@ -190,6 +202,18 @@ namespace PreMaid.RemoteController
         // Update is called once per frame
         void Update()
         {
+            if (_serialPortOpen == false)
+            {
+                return;
+            }
+
+            return;
+            _timer += Time.deltaTime;
+            if (_timer > _poseProcessDelay)
+            {
+                ApplyPose();
+                _timer -= _poseProcessDelay;
+            }
         }
     }
 }
