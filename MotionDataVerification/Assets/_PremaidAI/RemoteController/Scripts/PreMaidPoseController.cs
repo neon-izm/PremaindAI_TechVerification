@@ -26,7 +26,7 @@ namespace PreMaid.RemoteController
 
 
         //何秒ごとにポーズ指定するか
-        private float _poseProcessDelay = 0.9f;
+        private float _poseProcessDelay = 1f;
 
         private float _timer = 0.0f;
 
@@ -96,6 +96,10 @@ namespace PreMaid.RemoteController
         public void SetContinuousMode(bool newValue)
         {
             _continuousMode = newValue;
+            if (newValue)
+            {
+                _timer = 0;
+            }
         }
 
 
@@ -135,7 +139,7 @@ namespace PreMaid.RemoteController
         /// 現在のサーボ値を適用する1フレームだけのモーションを送る
         /// </summary>
         /// <returns></returns>
-        string BuildPoseString(int speed = 20)
+        string BuildPoseString(int speed = 50)
         {
             if (speed > 255)
             {
