@@ -41,11 +41,15 @@ namespace PreMaid
             public string checkByte;//ここまでの値をxorしたもの
 
             public int wait;    // frameWaitの値
+        }
 
-            override public string ToString()
-            {
-                return frameNumber.ToString();
-            }
+        /// <summary>
+        /// データ中のループ情報を保持する構造体
+        /// </summary>
+        private struct Loop
+        {
+            public int startKeyFrameIndex;
+            public int iteration;
         }
 
         [SerializeField] private Transform premaidRoot;
@@ -60,7 +64,7 @@ namespace PreMaid
         /// 再生時のFPS（komas per second）
         /// </summary>
         [SerializeField]
-        private float fps = 50f;
+        private float fps = 66f;
 
         /// <summary>
         /// モーション再生中は true
@@ -287,14 +291,51 @@ namespace PreMaid
         /// </summary>
         public void OpenFileButton()
         {
-            var willOpenPath = VRM.FileDialogForWindows.FileDialog("Open Premaid Motion File", "*.pma");
+            var willOpenPath = VRM.FileDialogForWindows.FileDialog("Open Premaid Motion File", ".pma", ".mp4", ".mov");
 
             if (string.IsNullOrEmpty(willOpenPath))
             {
                 return;
             }
 
-            LoadPma(willOpenPath);
+            string ext = Path.GetExtension(willOpenPath).ToLower();
+
+            if (ext == ".mp4" || ext == ".mov")
+            {
+                LoadVideo(willOpenPath);
+            }
+            else
+            {
+                LoadPma(willOpenPath);
+
+                // 同名の動画があるか検索
+
+                var dir = Path.GetDirectoryName(willOpenPath);
+                var file = Path.GetFileNameWithoutExtension(willOpenPath);
+                var path = Path.Combine(dir, file);
+                if (File.Exists(path + ".mp4"))
+                {
+                    LoadVideo(path + ".mp4");
+                }
+                else if (File.Exists(path + ".mov"))
+                {
+                    LoadVideo(path + ".mov");
+                }
+            }
+        }
+
+        /// <summary>
+        /// 動画読み込み
+        /// </summary>
+        /// <param name="fullPath"></param>
+        private void LoadVideo(string fullPath)
+        {
+            if (!videoPlayer) return;
+
+            videoPlayer.Stop();
+            videoPlayer.url = "file://" + fullPath;
+            videoPlayer.Play();
+            videoPlayer.Pause();
         }
 
 
@@ -345,6 +386,8 @@ namespace PreMaid
             int frameCounter = 0;
             totalKomas = 0;
 
+            var loops = new Stack<Loop>();   // ループ情報。読み込み中に都度都度増減する
+
             _frames.Clear();
 
             //ここからhex文字列の配列からパースしていきます。
@@ -357,7 +400,7 @@ namespace PreMaid
                 {
                     //ガガッとフレームパースしますよ～～
                     //なんも考えずにspanでarray渡そうかな～ 末尾に50 18 が大体ついてそう　25サーボ*3データで75個分を抜き出すと良い？
-                    string[] servoArray = hexByteArray.Skip(seekIndex).Take(80).ToArray();
+                    string[] servoArray = hexByteArray.Skip(seekIndex).Take(0x50).ToArray();
                     var parsedFrame = ParseOneFrame(servoArray);
                     if (parsedFrame != null)
                     {
@@ -368,18 +411,53 @@ namespace PreMaid
                     }
 
                     frameCounter++;
+                    seekIndex += 0x50;
                 }
-                //50 18 から始まるのがモーションデータ作法
-                if (hexByteArray[seekIndex] == "50" && (seekIndex + 6 < tailIndex) &&
-                    hexByteArray[seekIndex + 1] == "18")
+                // ループ始点
+                else if (hexByteArray[seekIndex] == "08" && (seekIndex + 7 < tailIndex) &&
+                    hexByteArray[seekIndex + 1] == "02")
                 {
+                    string[] commandArray = hexByteArray.Skip(seekIndex).Take(0x08).ToArray();
 
+                    Loop loop = new Loop();
+                    loop.iteration = HexToInt(commandArray[5]);  // ここが繰り返し回数？
+                    loop.startKeyFrameIndex = _frames.Count - 1;    // ループ始点となるキーフレーム番号
 
+                    loops.Push(loop);
+
+                    seekIndex += 0x08;
+                }
+                // ループ終点
+                else if (hexByteArray[seekIndex] == "08" && (seekIndex + 7 < tailIndex) &&
+                    hexByteArray[seekIndex + 1] == "07")
+                {
+                    string[] commandArray = hexByteArray.Skip(seekIndex).Take(0x08).ToArray();
+
+                    InterpretLoop(loops.Pop());
+
+                    seekIndex += 0x08;
+                }
+                else
+                {
                     seekIndex++;
                 }
+            }
 
-                Debug.Log("合計:" + frameCounter + "個のキーフレームがありました");
-                Debug.Log("合計:" + totalKomas + "個のフレームがありました");
+            Debug.Log("合計:" + frameCounter + "個のキーフレームがありました");
+            Debug.Log("合計:" + totalKomas + "個のフレームがありました");
+        }
+
+        private void InterpretLoop(Loop loop)
+        {
+            int startIndex = loop.startKeyFrameIndex;
+            int endIndex = _frames.Count - 1;
+            for (int i = 0; i < loop.iteration - 1; i++)    // 1回は元のデータであるので繰り返し回数-1
+            {
+                for (int j = startIndex; j <= endIndex; j++)
+                {
+                    _frames.Add(_frames[j]);
+                    totalKomas += _frames[j].wait;
+                }
             }
         }
 
@@ -401,7 +479,7 @@ namespace PreMaid
             ret.commandPadding = servoStrings[2];
             ret.frameWait = servoStrings[3];
 
-            ret.wait = int.Parse(ret.frameWait, NumberStyles.AllowHexSpecifier);
+            ret.wait = HexToInt(ret.frameWait);
 
             //25軸だと信じていますよ
             for (int i = 0; i < 25; i++)
@@ -417,6 +495,11 @@ namespace PreMaid
             //checkbyte
             ret.checkByte = servoStrings[79];
             return ret;
+        }
+
+        private static int HexToInt(string hex)
+        {
+            return int.Parse(hex, NumberStyles.AllowHexSpecifier);
         }
 
         /// <summary>
