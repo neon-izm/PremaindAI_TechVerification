@@ -1,4 +1,4 @@
-# PremaindAI_TechVerification
+﻿# PremaindAI_TechVerification
 プリメイドAIのダンスモーションデータの解析プロジェクトです。
 総サーボ数（自由度）　25軸のヒューマノイドロボットが、値下げによって2万円で手に入るようになった為、とても魅力的なおもちゃです。
 
@@ -17,9 +17,18 @@ GameView上のプリメイドAIを模した箱なロボットがpmaのサーボ�
 
 ## BT(SPP)経由でUnityEditor上からのプリメイドAIへの既存ポーズ送信
 MotionDataWriterSample.cs にあります。適切にSerialPortを設定して、決め打ちの命令をbyte[]で送る事でAndroidアプリ上と同じように指定ポーズを取らせられます。
-任意ポーズはまだです。
 
 https://twitter.com/izm/status/1146100976455053312
+
+
+## BT(SPP)経由でUnityEditor上からのプリメイドAIへの任意ポーズ送信
+MotionDataWriterSample.cs にあります。適切にSerialPortを設定して、「1フレームだけのダンスモーション」を生成してダンスを転送→再生　を行う事で任意ポーズをとらせることが出来ます。この処理を連続で行う事で2-3FPS程度で任意モーションを流し込めると思います。
+
+https://twitter.com/izm/status/1146586612773470208
+
+## 各サーボのリモコン操作サンプル
+Assets/_PremaidAI/RemoteController/Scenes/RemoteControlSample.unity でスライダからサーボ角を変更してリモコン的に遊べます。
+![]( https://user-images.githubusercontent.com/3115650/60758773-0f8c5f00-a056-11e9-8712-4fad4068ae62.png )
 
 # 現在やっていること
 ## モーションプレビューの誤りを直す
@@ -39,4 +48,8 @@ https://twitter.com/izm/status/1146100976455053312
 信号解析については以下のgoogle spreadsheet 上で編集中です。  
 
 https://docs.google.com/spreadsheets/d/1c6jqMwkBroCuF74viU_q7dgSQGzacbUW4mJg-957_Rs/edit#gid=2102495394
+
+# 同梱モデルデータについて
+黒イワシ(twitetr:@Schwarz_Sardine)さんよりApache2.0ライセンス下で使用許可を得ています。ここに記して感謝します。
+
 
