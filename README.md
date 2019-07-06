@@ -26,6 +26,8 @@ MotionDataWriterSample.cs にあります。適切にSerialPortを設定して�
 
 https://twitter.com/izm/status/1146586612773470208
 
+Assets/_PremaidAI/RemoteController/Scenes/RemoteControlSample.unity でスライダからサーボ角を変更してリモコン的に遊べます。
+
 
 # 現在やっていること
 ## モーションプレビューの誤りを直す
