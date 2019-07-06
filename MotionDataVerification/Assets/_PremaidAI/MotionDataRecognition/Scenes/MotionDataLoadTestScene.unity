@@ -576,6 +576,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ee57daa87c21044784dd39838c8243c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  defaultHeadYaw: 7500
 --- !u!1 &1345171149
 GameObject:
   m_ObjectHideFlags: 0
