@@ -49,8 +49,8 @@ namespace PreMaid
         }
 
         [SerializeField] private Transform premaidRoot;
-        
-        
+
+
         [SerializeField] List<PoseFrame> _frames = new List<PoseFrame>();
 
         [SerializeField]
@@ -102,7 +102,7 @@ namespace PreMaid
 
                 try
                 {
-                    var modelJoint= _joints.First(joint => joint.ServoID == VARIABLE.id);
+                    var modelJoint = _joints.First(joint => joint.ServoID == VARIABLE.id);
                     if (modelJoint != null)
                     {
                         modelJoint.SetServoValue(VARIABLE.eulerAngle);
@@ -110,9 +110,9 @@ namespace PreMaid
                 }
                 catch (Exception e)
                 {
-                    Debug.Log("some exeption:"+ e);
+                    Debug.Log("some exeption:" + e);
                 }
-                
+
             }
 
         }
@@ -204,7 +204,7 @@ namespace PreMaid
             // 2つのキーフレームの間の姿勢をとらせる
             ApplyPose(prevFrame, nextFrame, weight);
         }
-      
+
         // Start is called before the first frame update
         void Start()
         {
@@ -224,8 +224,8 @@ namespace PreMaid
             {
                 Debug.Log(ServoStringToValue("1D", "4C"));
             }
-            
-            
+
+
             if (isPlaying)
             {
                 currentKoma = (int)((Time.time - startedTime) * fps);
@@ -350,7 +350,7 @@ namespace PreMaid
             //ここからhex文字列の配列からパースしていきます。
             while (seekIndex < tailIndex)
             {
-                
+
                 //50 18 から始まるのがモーションデータ作法
                 if (hexByteArray[seekIndex] == "50" && (seekIndex + 6 < tailIndex) &&
                     hexByteArray[seekIndex + 1] == "18")
@@ -376,12 +376,12 @@ namespace PreMaid
 
 
                     seekIndex++;
+                }
+
+                Debug.Log("合計:" + frameCounter + "個のキーフレームがありました");
+                Debug.Log("合計:" + totalKomas + "個のフレームがありました");
             }
-
-            Debug.Log("合計:" + frameCounter + "個のキーフレームがありました");
-            Debug.Log("合計:" + totalKomas + "個のフレームがありました");
         }
-
 
         /// <summary>
         /// 75個のデータを受けて、サーボ情報を調べます。
@@ -394,7 +394,7 @@ namespace PreMaid
             {
                 Debug.LogError("不正なフレームです");
             }
-            
+
             PoseFrame ret = new PoseFrame();
             ret.commandLength = servoStrings[0];
             ret.command = servoStrings[1];
@@ -407,10 +407,10 @@ namespace PreMaid
             for (int i = 0; i < 25; i++)
             {
                 Servo tmp = new Servo();
-                tmp.id = servoStrings[4+i * 3];
-                tmp.hb = servoStrings[4+i * 3 + 1];
-                tmp.lb = servoStrings[4+i * 3 + 2];
-                tmp.servoValue = ServoStringToValue(servoStrings[4+ (i * 3) + 1], servoStrings[4+ (i * 3) + 2]);
+                tmp.id = servoStrings[4 + i * 3];
+                tmp.hb = servoStrings[4 + i * 3 + 1];
+                tmp.lb = servoStrings[4 + i * 3 + 2];
+                tmp.servoValue = ServoStringToValue(servoStrings[4 + (i * 3) + 1], servoStrings[4 + (i * 3) + 2]);
                 tmp.eulerAngle = (tmp.servoValue - 7500) * 0.03375f;//0.03375= 135/4000
                 ret.servos.Add(tmp);
             }
