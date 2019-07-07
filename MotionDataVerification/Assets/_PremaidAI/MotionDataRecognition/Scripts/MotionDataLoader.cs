@@ -64,7 +64,7 @@ namespace PreMaid
         /// 再生時のFPS（komas per second）
         /// </summary>
         [SerializeField]
-        private float fps = 66f;
+        private float fps = 66.67f;
 
         /// <summary>
         /// モーション再生中は true
@@ -131,7 +131,11 @@ namespace PreMaid
                 var nextServo = nextFrame.servos.First(servo => servo.id.Equals(id));
                 if (nextServo != null)
                 {
-                    angle = Mathf.LerpAngle(prevServo.eulerAngle, nextServo.eulerAngle, weight);
+                    // -135～135 [deg] ということだとLeapAngle()は一旦 +180 してから -180 とかしないとダメかも
+                    //angle = Mathf.LerpAngle(prevServo.eulerAngle, nextServo.eulerAngle, weight);
+
+                    // サーボが 360 [deg] 回らないため、単にLerp()で良いのでは
+                    angle = Mathf.Lerp(prevServo.eulerAngle, nextServo.eulerAngle, weight);
                 }
 
                 try
