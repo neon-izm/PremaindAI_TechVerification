@@ -41,16 +41,20 @@ namespace PreMaid
             public string checkByte;//ここまでの値をxorしたもの
 
             public int wait;    // frameWaitの値
+        }
 
-            override public string ToString()
-            {
-                return frameNumber.ToString();
-            }
+        /// <summary>
+        /// データ中のループ情報を保持する構造体
+        /// </summary>
+        private struct Loop
+        {
+            public int startKeyFrameIndex;
+            public int iteration;
         }
 
         [SerializeField] private Transform premaidRoot;
-        
-        
+
+
         [SerializeField] List<PoseFrame> _frames = new List<PoseFrame>();
 
         [SerializeField]
@@ -60,7 +64,7 @@ namespace PreMaid
         /// 再生時のFPS（komas per second）
         /// </summary>
         [SerializeField]
-        private float fps = 50f;
+        private float fps = 66.67f;
 
         /// <summary>
         /// モーション再生中は true
@@ -102,7 +106,7 @@ namespace PreMaid
 
                 try
                 {
-                    var modelJoint= _joints.First(joint => joint.ServoID == VARIABLE.id);
+                    var modelJoint = _joints.First(joint => joint.ServoID == VARIABLE.id);
                     if (modelJoint != null)
                     {
                         modelJoint.SetServoValue(VARIABLE.eulerAngle);
@@ -110,9 +114,9 @@ namespace PreMaid
                 }
                 catch (Exception e)
                 {
-                    Debug.Log("some exeption:"+ e);
+                    Debug.Log("some exeption:" + e);
                 }
-                
+
             }
 
         }
@@ -127,7 +131,11 @@ namespace PreMaid
                 var nextServo = nextFrame.servos.First(servo => servo.id.Equals(id));
                 if (nextServo != null)
                 {
-                    angle = Mathf.LerpAngle(prevServo.eulerAngle, nextServo.eulerAngle, weight);
+                    // -135～135 [deg] ということだとLeapAngle()は一旦 +180 してから -180 とかしないとダメかも
+                    //angle = Mathf.LerpAngle(prevServo.eulerAngle, nextServo.eulerAngle, weight);
+
+                    // サーボが 360 [deg] 回らないため、単にLerp()で良いのでは
+                    angle = Mathf.Lerp(prevServo.eulerAngle, nextServo.eulerAngle, weight);
                 }
 
                 try
@@ -177,17 +185,14 @@ namespace PreMaid
                 nextFrame = _frames[frameNumber];
 
                 // 次のフレームで指定時刻以上になるなら、ここが求めたいタイミングである
-                if ((elapsedKoma + nextFrame.wait) >= koma)
-                //if ((elapsedKoma) >= koma)
+                if ((elapsedKoma + prevFrame.wait) >= koma)
                 {
                     // 2つのコマ間の重みを0～1で求める
-                    weight = Mathf.Clamp01((float)(koma - elapsedKoma) / nextFrame.wait);
-                    //weight = Mathf.Clamp01((float)(koma + nextFrame.wait - elapsedKoma) / prevFrame.wait);
-                    //weight = 1f;
+                    weight = Mathf.Clamp01((float)(koma - elapsedKoma) / prevFrame.wait);
                     break;
                 }
 
-                elapsedKoma += nextFrame.wait;
+                elapsedKoma += prevFrame.wait;
                 prevFrame = nextFrame;
 
                 currentFrame = frameNumber;
@@ -204,7 +209,7 @@ namespace PreMaid
             // 2つのキーフレームの間の姿勢をとらせる
             ApplyPose(prevFrame, nextFrame, weight);
         }
-      
+
         // Start is called before the first frame update
         void Start()
         {
@@ -224,18 +229,7 @@ namespace PreMaid
             {
                 Debug.Log(ServoStringToValue("1D", "4C"));
             }
-            
-            if (Input.GetKeyDown(KeyCode.RightArrow))
-            {
-                currentFrame++;
-                ApplyPose(currentFrame);
-            }
-            
-            if (Input.GetKeyDown(KeyCode.LeftArrow))
-            {
-                currentFrame--;
-                ApplyPose(currentFrame);
-            }
+
 
             if (isPlaying)
             {
@@ -298,14 +292,51 @@ namespace PreMaid
         /// </summary>
         public void OpenFileButton()
         {
-            var willOpenPath = VRM.FileDialogForWindows.FileDialog("Open Premaid Motion File", "*.pma");
+            var willOpenPath = VRM.FileDialogForWindows.FileDialog("Open Premaid Motion File", ".pma", ".mp4", ".mov");
 
             if (string.IsNullOrEmpty(willOpenPath))
             {
                 return;
             }
 
-            LoadPma(willOpenPath);
+            string ext = Path.GetExtension(willOpenPath).ToLower();
+
+            if (ext == ".mp4" || ext == ".mov")
+            {
+                LoadVideo(willOpenPath);
+            }
+            else
+            {
+                LoadPma(willOpenPath);
+
+                // 同名の動画があるか検索
+
+                var dir = Path.GetDirectoryName(willOpenPath);
+                var file = Path.GetFileNameWithoutExtension(willOpenPath);
+                var path = Path.Combine(dir, file);
+                if (File.Exists(path + ".mp4"))
+                {
+                    LoadVideo(path + ".mp4");
+                }
+                else if (File.Exists(path + ".mov"))
+                {
+                    LoadVideo(path + ".mov");
+                }
+            }
+        }
+
+        /// <summary>
+        /// 動画読み込み
+        /// </summary>
+        /// <param name="fullPath"></param>
+        private void LoadVideo(string fullPath)
+        {
+            if (!videoPlayer) return;
+
+            videoPlayer.Stop();
+            videoPlayer.url = "file://" + fullPath;
+            videoPlayer.Play();
+            videoPlayer.Pause();
         }
 
 
@@ -356,19 +387,21 @@ namespace PreMaid
             int frameCounter = 0;
             totalKomas = 0;
 
+            var loops = new Stack<Loop>();   // ループ情報。読み込み中に都度都度増減する
+
             _frames.Clear();
 
             //ここからhex文字列の配列からパースしていきます。
             while (seekIndex < tailIndex)
             {
-                
+
                 //50 18 から始まるのがモーションデータ作法
                 if (hexByteArray[seekIndex] == "50" && (seekIndex + 6 < tailIndex) &&
                     hexByteArray[seekIndex + 1] == "18")
                 {
                     //ガガッとフレームパースしますよ～～
                     //なんも考えずにspanでarray渡そうかな～ 末尾に50 18 が大体ついてそう　25サーボ*3データで75個分を抜き出すと良い？
-                    string[] servoArray = hexByteArray.Skip(seekIndex).Take(80).ToArray();
+                    string[] servoArray = hexByteArray.Skip(seekIndex).Take(0x50).ToArray();
                     var parsedFrame = ParseOneFrame(servoArray);
                     if (parsedFrame != null)
                     {
@@ -379,20 +412,55 @@ namespace PreMaid
                     }
 
                     frameCounter++;
+                    seekIndex += 0x50;
                 }
-                //50 18 から始まるのがモーションデータ作法
-                if (hexByteArray[seekIndex] == "50" && (seekIndex + 6 < tailIndex) &&
-                    hexByteArray[seekIndex + 1] == "18")
+                // ループ始点
+                else if (hexByteArray[seekIndex] == "08" && (seekIndex + 7 < tailIndex) &&
+                    hexByteArray[seekIndex + 1] == "02")
                 {
+                    string[] commandArray = hexByteArray.Skip(seekIndex).Take(0x08).ToArray();
 
+                    Loop loop = new Loop();
+                    loop.iteration = HexToInt(commandArray[5]);  // ここが繰り返し回数？
+                    loop.startKeyFrameIndex = _frames.Count - 1;    // ループ始点となるキーフレーム番号
 
+                    loops.Push(loop);
+
+                    seekIndex += 0x08;
+                }
+                // ループ終点
+                else if (hexByteArray[seekIndex] == "08" && (seekIndex + 7 < tailIndex) &&
+                    hexByteArray[seekIndex + 1] == "07")
+                {
+                    string[] commandArray = hexByteArray.Skip(seekIndex).Take(0x08).ToArray();
+
+                    InterpretLoop(loops.Pop());
+
+                    seekIndex += 0x08;
+                }
+                else
+                {
                     seekIndex++;
+                }
             }
 
             Debug.Log("合計:" + frameCounter + "個のキーフレームがありました");
             Debug.Log("合計:" + totalKomas + "個のフレームがありました");
         }
 
+        private void InterpretLoop(Loop loop)
+        {
+            int startIndex = loop.startKeyFrameIndex;
+            int endIndex = _frames.Count - 1;
+            for (int i = 0; i < loop.iteration - 1; i++)    // 1回は元のデータであるので繰り返し回数-1
+            {
+                for (int j = startIndex; j <= endIndex; j++)
+                {
+                    _frames.Add(_frames[j]);
+                    totalKomas += _frames[j].wait;
+                }
+            }
+        }
 
         /// <summary>
         /// 75個のデータを受けて、サーボ情報を調べます。
@@ -405,29 +473,34 @@ namespace PreMaid
             {
                 Debug.LogError("不正なフレームです");
             }
-            
+
             PoseFrame ret = new PoseFrame();
             ret.commandLength = servoStrings[0];
             ret.command = servoStrings[1];
             ret.commandPadding = servoStrings[2];
             ret.frameWait = servoStrings[3];
 
-            ret.wait = int.Parse(ret.frameWait, NumberStyles.AllowHexSpecifier);
+            ret.wait = HexToInt(ret.frameWait);
 
             //25軸だと信じていますよ
             for (int i = 0; i < 25; i++)
             {
                 Servo tmp = new Servo();
-                tmp.id = servoStrings[4+i * 3];
-                tmp.hb = servoStrings[4+i * 3 + 1];
-                tmp.lb = servoStrings[4+i * 3 + 2];
-                tmp.servoValue = ServoStringToValue(servoStrings[4+ (i * 3) + 1], servoStrings[4+ (i * 3) + 2]);
+                tmp.id = servoStrings[4 + i * 3];
+                tmp.hb = servoStrings[4 + i * 3 + 1];
+                tmp.lb = servoStrings[4 + i * 3 + 2];
+                tmp.servoValue = ServoStringToValue(servoStrings[4 + (i * 3) + 1], servoStrings[4 + (i * 3) + 2]);
                 tmp.eulerAngle = (tmp.servoValue - 7500) * 0.03375f;//0.03375= 135/4000
                 ret.servos.Add(tmp);
             }
             //checkbyte
             ret.checkByte = servoStrings[79];
             return ret;
+        }
+
+        private static int HexToInt(string hex)
+        {
+            return int.Parse(hex, NumberStyles.AllowHexSpecifier);
         }
 
         /// <summary>
