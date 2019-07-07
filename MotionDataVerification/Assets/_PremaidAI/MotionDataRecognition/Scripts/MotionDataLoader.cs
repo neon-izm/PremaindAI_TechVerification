@@ -185,17 +185,14 @@ namespace PreMaid
                 nextFrame = _frames[frameNumber];
 
                 // 次のフレームで指定時刻以上になるなら、ここが求めたいタイミングである
-                if ((elapsedKoma + nextFrame.wait) >= koma)
-                //if ((elapsedKoma) >= koma)
+                if ((elapsedKoma + prevFrame.wait) >= koma)
                 {
                     // 2つのコマ間の重みを0～1で求める
-                    weight = Mathf.Clamp01((float)(koma - elapsedKoma) / nextFrame.wait);
-                    //weight = Mathf.Clamp01((float)(koma + nextFrame.wait - elapsedKoma) / prevFrame.wait);
-                    //weight = 1f;
+                    weight = Mathf.Clamp01((float)(koma - elapsedKoma) / prevFrame.wait);
                     break;
                 }
 
-                elapsedKoma += nextFrame.wait;
+                elapsedKoma += prevFrame.wait;
                 prevFrame = nextFrame;
 
                 currentFrame = frameNumber;
