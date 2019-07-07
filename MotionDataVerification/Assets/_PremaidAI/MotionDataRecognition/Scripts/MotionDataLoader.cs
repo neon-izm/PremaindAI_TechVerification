@@ -87,6 +87,13 @@ namespace PreMaid
         /// </summary>
         private int totalKomas = 0;
 
+        /// <summary>
+        /// 再生開始をこのコマからとする。負の値も可
+        /// 動画との時刻合わせ用
+        /// </summary>
+        [SerializeField]
+        private int firstKoma = 0;
+
         private UnityEngine.Video.VideoPlayer videoPlayer;
         private UnityEngine.UI.Slider motionSeekSlider;
         private bool isSliderDraggable = true;
@@ -185,14 +192,14 @@ namespace PreMaid
                 nextFrame = _frames[frameNumber];
 
                 // 次のフレームで指定時刻以上になるなら、ここが求めたいタイミングである
-                if ((elapsedKoma + prevFrame.wait) >= koma)
+                if ((elapsedKoma + nextFrame.wait) >= koma)
                 {
                     // 2つのコマ間の重みを0～1で求める
-                    weight = Mathf.Clamp01((float)(koma - elapsedKoma) / prevFrame.wait);
+                    weight = Mathf.Clamp01((float)(koma - elapsedKoma) / nextFrame.wait);
                     break;
                 }
 
-                elapsedKoma += prevFrame.wait;
+                elapsedKoma += nextFrame.wait;
                 prevFrame = nextFrame;
 
                 currentFrame = frameNumber;
@@ -268,8 +275,8 @@ namespace PreMaid
 
                 if (videoPlayer) videoPlayer.Play();
 
-                currentKoma = 0;
-                startedTime = Time.time;
+                currentKoma = firstKoma;
+                startedTime = Time.time - ((float)firstKoma / fps);
                 isPlaying = true;
             }
         }
