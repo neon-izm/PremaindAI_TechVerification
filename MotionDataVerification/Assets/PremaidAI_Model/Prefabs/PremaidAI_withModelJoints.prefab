@@ -1864,7 +1864,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ServoID: 06
-  isInverse: 0
+  isInverse: 1
   targetAxis: 1
 --- !u!1 &1174633920729664840
 GameObject:
@@ -2015,7 +2015,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ServoID: 08
-  isInverse: 0
+  isInverse: 1
   targetAxis: 1
 --- !u!1 &1174633920729664844
 GameObject:
