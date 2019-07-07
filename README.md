@@ -28,7 +28,9 @@ https://twitter.com/izm/status/1146586612773470208
 
 ## 各サーボのリモコン操作サンプル
 Assets/_PremaidAI/RemoteController/Scenes/RemoteControlSample.unity でスライダからサーボ角を変更してリモコン的に遊べます。
-![]( https://user-images.githubusercontent.com/3115650/60758773-0f8c5f00-a056-11e9-8712-4fad4068ae62.png )
+
+![premaid_remote](https://user-images.githubusercontent.com/3115650/60763727-7db43e80-a0b5-11e9-859a-88568630d1bb.gif)
+
 
 # 現在やっていること
 ## モーションプレビューの誤りを直す
