@@ -10,10 +10,14 @@ Android\data\com.robotyuenchi.premaidai\
 
 # 現在できる事
 ## モーションデータの読み込みとプレビュー
-MotionDataLoadTestScene.unity を開いて*.pmaファイルを読み込み、Play/Stopボタンを押すことでモーションを再生します。
-GameView上のプリメイドAIを模した箱なロボットがpmaのサーボ値を元にポーズを取ります。
+MotionDataLoadTestWithModel.unity を開いて*.pmaファイルを読み込み、Play/Stopボタンを押すことでモーションを再生します。
+GameView上のプリメイドAIを模したロボットがpmaのサーボ値を元にポーズを取ります。
+
+![dance_preview](https://user-images.githubusercontent.com/3115650/60764234-fcfb3f80-a0c0-11e9-9ae9-88d45da23fc4.gif)
 
 **再生開始数秒は待機ポーズが入っている事が多いのでロボットが動かないですが、数秒後から動き始めます**
+
+
 
 ## BT(SPP)経由でUnityEditor上からのプリメイドAIへの既存ポーズ送信
 MotionDataWriterSample.cs にあります。適切にSerialPortを設定して、決め打ちの命令をbyte[]で送る事でAndroidアプリ上と同じように指定ポーズを取らせられます。
@@ -33,9 +37,6 @@ Assets/_PremaidAI/RemoteController/Scenes/RemoteControlSample.unity でスライ
 
 
 # 現在やっていること
-## モーションプレビューの誤りを直す
-腕と首はおそらくそれほど間違っていないプレビューですが、足の軸反転やオフセットがあるようです。  
-これを直したい
 
 ## 一部フレームを飛ばしたモーションデータの生成
 ブラックボックス化しているpmaファイルの先頭と末尾はそのままに、中間モーションを削っても再生できることは確認済みです。
