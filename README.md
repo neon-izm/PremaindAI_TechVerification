@@ -17,6 +17,10 @@ GameView上のプリメイドAIを模したロボットがpmaのサーボ値を�
 
 **再生開始数秒は待機ポーズが入っている事が多いのでロボットが動かないですが、数秒後から動き始めます**
 
+## 各サーボのリモコン操作サンプル
+Assets/_PremaidAI/RemoteController/Scenes/RemoteControlSample.unity でスライダからサーボ角を変更してリモコン的に遊べます。
+
+![premaid_remote](https://user-images.githubusercontent.com/3115650/60763727-7db43e80-a0b5-11e9-859a-88568630d1bb.gif)
 
 
 ## BT(SPP)経由でUnityEditor上からのプリメイドAIへの既存ポーズ送信
@@ -29,12 +33,6 @@ https://twitter.com/izm/status/1146100976455053312
 MotionDataWriterSample.cs にあります。適切にSerialPortを設定して、「1フレームだけのダンスモーション」を生成してダンスを転送→再生　を行う事で任意ポーズをとらせることが出来ます。この処理を連続で行う事で2-3FPS程度で任意モーションを流し込めると思います。
 
 https://twitter.com/izm/status/1146586612773470208
-
-## 各サーボのリモコン操作サンプル
-Assets/_PremaidAI/RemoteController/Scenes/RemoteControlSample.unity でスライダからサーボ角を変更してリモコン的に遊べます。
-
-![premaid_remote](https://user-images.githubusercontent.com/3115650/60763727-7db43e80-a0b5-11e9-859a-88568630d1bb.gif)
-
 
 # 現在やっていること
 
