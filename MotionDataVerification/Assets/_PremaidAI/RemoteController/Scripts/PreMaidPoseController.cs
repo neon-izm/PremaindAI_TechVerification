@@ -21,7 +21,9 @@ namespace PreMaid.RemoteController
 
         [SerializeField] private bool _serialPortOpen = false;
 
-
+        /// <summary>
+        /// 連続送信モードフラグ、初期値はfalse
+        /// </summary>
         private bool _continuousMode = false;
 
 
@@ -35,6 +37,12 @@ namespace PreMaid.RemoteController
 
         [SerializeField] private ServoUguiController _uguiController = null;
 
+
+        /// <summary>
+        /// 連続送信モードが切り替わったときに呼ばれる
+        /// </summary>
+        public Action<bool> OnContinuousModeChange;
+        
         // Start is called before the first frame update
         void Start()
         {
@@ -93,9 +101,16 @@ namespace PreMaid.RemoteController
         }
 
 
+        /// <summary>
+        /// 連続送信モードを変更する
+        /// 内部的に_continuousModeのboolを直接書き換えるのはこの関数経由にしてください
+        /// </summary>
+        /// <param name="newValue"></param>
         public void SetContinuousMode(bool newValue)
         {
             _continuousMode = newValue;
+            OnContinuousModeChange?.Invoke(_continuousMode);
+            
             if (newValue)
             {
                 _timer = 0;
@@ -198,6 +213,21 @@ namespace PreMaid.RemoteController
         }
 
 
+        /// <summary>
+        /// 全サーボの強制脱力命令
+        /// </summary>
+        public void ForceAllServoStop()
+        {
+            //ここで連続送信モードを停止しないと、脱力後の急なサーボ命令で一気にプリメイドAIが暴れて死ぬ
+            SetContinuousMode(false);
+            
+            string allStop = "50 18 00 06 02 00 00 03 00 00 04 00 00 05 00 00 06 00 00 07 00 00 08 00 00 09 00 00 0A 00 00 0B 00 00 0C 00 00 0D 00 00 0E 00 00 0F 00 00 10 00 00 11 00 00 12 00 00 13 00 00 14 00 00 15 00 00 16 00 00 17 00 00 18 00 00 1A 00 00 1C 00 00 FF";
+            
+            byte[] allServoStopOrder = PreMaidUtility.BuildByteDataFromStringOrder(PreMaidUtility.RewriteXorString(allStop));
+            _serialPort.Write(allServoStopOrder, 0, allServoStopOrder.Length);
+            
+        }
+        
         // Update is called once per frame
         void Update()
         {
