@@ -52,5 +52,12 @@ https://docs.google.com/spreadsheets/d/1c6jqMwkBroCuF74viU_q7dgSQGzacbUW4mJg-957
 
 # 同梱モデルデータについて
 黒イワシ(twitetr:@Schwarz_Sardine)さんよりApache2.0ライセンス下で使用許可を得ています。ここに記して感謝します。
+こちらがリポジトリです。
 
+https://github.com/kuroiwasi/PremaidAI_Model
 
+# Contributors
+- @GOROman … 通信形式解析
+- @kirurobo … モーションプレビュー解析,実装
+- @Schwarz_Sardin … FBXモデル作成
+- @kazzlog … 直接ポーズ送信の発見
