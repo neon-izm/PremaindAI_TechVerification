@@ -33,73 +33,44 @@ namespace PreMaid.RemoteController
         private float _timer = 0.0f;
 
 
-        [SerializeField] private TMPro.TMP_Dropdown _dropdown = null;
 
-        [SerializeField] private ServoUguiController _uguiController = null;
-
+        public Action OnInitializeServoDefines = null;
 
         /// <summary>
         /// 連続送信モードが切り替わったときに呼ばれる
         /// </summary>
         public Action<bool> OnContinuousModeChange;
-        
+
+        public List<PreMaidServo> Servos
+        {
+            get { return _servos; }
+            set { _servos = value; }
+        }
+
         // Start is called before the first frame update
         void Start()
         {
-            _servos.Clear();
-            PreMaidServo.AllServoPositionDump();
+            Servos.Clear();
+            //PreMaidServo.AllServoPositionDump();
             foreach (PreMaidServo.ServoPosition item in Enum.GetValues(typeof(PreMaidServo.ServoPosition)))
             {
                 PreMaidServo servo = new PreMaidServo(item);
 
-                _servos.Add(servo);
+                Servos.Add(servo);
             }
 
             //一覧を出す
-            foreach (var VARIABLE in _servos)
+            foreach (var VARIABLE in Servos)
             {
                 Debug.Log(VARIABLE.GetServoIdString() + "   " + VARIABLE.GetServoId() + "  サーボ数値変換" +
                           VARIABLE.GetServoIdAndValueString());
             }
 
-            _uguiController.Initialize(_servos);
-            _uguiController.OnChangeValue += OnChangeValue;
-
+            
             Debug.Log(BuildPoseString());
-            var portNames = SerialPort.GetPortNames();
+            OnInitializeServoDefines?.Invoke();
 
-            if (_dropdown == null)
-            {
-                Debug.LogError("シリアルポートを選択するDropDownが指定されていません");
-                return;
-            }
-
-            List<TMP_Dropdown.OptionData> serialPortNamesList = new List<TMP_Dropdown.OptionData>();
-
-            foreach (var VARIABLE in portNames)
-            {
-                TMP_Dropdown.OptionData optionData = new TMP_Dropdown.OptionData(VARIABLE);
-                serialPortNamesList.Add(optionData);
-
-                Debug.Log(VARIABLE);
-            }
-
-            _dropdown.ClearOptions();
-            _dropdown.AddOptions(serialPortNamesList);
         }
-
-        private void OnChangeValue()
-        {
-            //Debug.Log("値の変更");
-            //Refreshします～
-            var latestValues = _uguiController.GetCurrenSliderValues();
-
-            for (int i = 0; i < _servos.Count; i++)
-            {
-                _servos[i].SetServoValueSafeClamp((int) latestValues[i]);
-            }
-        }
-
 
         /// <summary>
         /// 連続送信モードを変更する
@@ -108,6 +79,7 @@ namespace PreMaid.RemoteController
         /// <param name="newValue"></param>
         public void SetContinuousMode(bool newValue)
         {
+            Debug.Log("連続送信モード切替 次の値は:"+ newValue);
             _continuousMode = newValue;
             OnContinuousModeChange?.Invoke(_continuousMode);
             
@@ -116,25 +88,21 @@ namespace PreMaid.RemoteController
                 _timer = 0;
             }
         }
-
-
-        public void OpenSerialPort()
-        {
-            Debug.Log(_dropdown.options[_dropdown.value].text + "を開きます");
-
-            _serialPortOpen = SerialPortOpen(_dropdown.options[_dropdown.value].text);
-        }
+        
 
         /// <summary>
-        /// シリアルポートを開ける
+        /// シリアルポートを開く
         /// </summary>
+        /// <param name="portName">"COM4"とか</param>
         /// <returns></returns>
-        bool SerialPortOpen(string portName)
+        public bool OpenSerialPort(string portName)
         {
             try
             {
                 _serialPort = new SerialPort(portName, BaudRate, Parity.None, 8, StopBits.One);
                 _serialPort.Open();
+                Debug.Log("シリアルポート:"+portName+" 接続成功");
+                _serialPortOpen = true;
                 return true;
             }
             catch (Exception e)
@@ -169,7 +137,7 @@ namespace PreMaid.RemoteController
             //決め打ちのポーズ命令+スピード(小さい方が速くて、255が最大に遅い)
             string ret = "50 18 00 " + speed.ToString("X2");
             //そして各サーボぼ値を入れる
-            foreach (var VARIABLE in _servos)
+            foreach (var VARIABLE in Servos)
             {
                 ret += " " + VARIABLE.GetServoIdAndValueString();
             }
@@ -188,6 +156,7 @@ namespace PreMaid.RemoteController
         {
             if (_serialPortOpen == false)
             {
+                Debug.LogWarning("ポーズ指定されたときにシリアルポートが開いていません");
                 return;
             }
             
