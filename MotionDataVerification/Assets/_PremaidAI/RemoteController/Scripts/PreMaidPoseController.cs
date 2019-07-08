@@ -26,7 +26,7 @@ namespace PreMaid.RemoteController
 
 
         //何秒ごとにポーズ指定するか
-        private float _poseProcessDelay = 1f;
+        private float _poseProcessDelay = 0.25f;
 
         private float _timer = 0.0f;
 
@@ -55,8 +55,8 @@ namespace PreMaid.RemoteController
             }
 
             _uguiController.Initialize(_servos);
-            _uguiController.OnChangeValue+= OnChangeValue;
-            
+            _uguiController.OnChangeValue += OnChangeValue;
+
             Debug.Log(BuildPoseString());
             var portNames = SerialPort.GetPortNames();
 
@@ -88,7 +88,7 @@ namespace PreMaid.RemoteController
 
             for (int i = 0; i < _servos.Count; i++)
             {
-                _servos[i].SetServoValueSafeClamp((int)latestValues[i]);
+                _servos[i].SetServoValueSafeClamp((int) latestValues[i]);
             }
         }
 
@@ -175,8 +175,7 @@ namespace PreMaid.RemoteController
             {
                 return;
             }
-
-
+            
             StartCoroutine(ApplyPoseCoroutine());
         }
 
@@ -187,60 +186,14 @@ namespace PreMaid.RemoteController
         /// <returns></returns>
         IEnumerator ApplyPoseCoroutine()
         {
-            float waitSec = 0.04f; //0.03だと送信失敗することがある
-
-            byte[] data1 = PreMaidUtility.BuildByteDataFromStringOrder("07 01 00 02 00 02 06");
-            _serialPort.Write(data1, 0, data1.Length);
-            yield return new WaitForSeconds(waitSec);
-
-            byte[] data2 = PreMaidUtility.BuildByteDataFromStringOrder("07 01 00 08 00 02 0C");
-            _serialPort.Write(data2, 0, data2.Length);
-            yield return new WaitForSeconds(waitSec);
-
-            byte[] data3 = PreMaidUtility.BuildByteDataFromStringOrder("08 02 00 08 00 FF FF 02");
-            _serialPort.Write(data3, 0, data3.Length);
-            yield return new WaitForSeconds(waitSec);
-
-            byte[] data4 = PreMaidUtility.BuildByteDataFromStringOrder("04 04 00 00"); //フラッシュのライトプロテクト解除？
-            _serialPort.Write(data4, 0, data4.Length);
-            yield return new WaitForSeconds(waitSec);
-
-            byte[] data5 = PreMaidUtility.BuildByteDataFromStringOrder("5c 1d 00 00 00"); //転送コマンド？
-            _serialPort.Write(data5, 0, data5.Length);
-            yield return new WaitForSeconds(waitSec);
+            float waitSec = 0.06f; //0.03だと送信失敗することがある
 
             //ここでポーズ情報を取得する
-            byte[] data6 =
+            byte[] willSendPoseBytes =
                 PreMaidUtility.BuildByteDataFromStringOrder(
-                    BuildPoseString()); //対象のモーション、今回は1個だけ
-            _serialPort.Write(data6, 0, data6.Length);
-            yield return new WaitForSeconds(waitSec * 2);
+                    BuildPoseString(80)); //対象のモーション、今回は1個だけ
 
-
-            byte[] data7 = PreMaidUtility.BuildByteDataFromStringOrder("04 17 00 13 ff ff 41"); //不明
-            _serialPort.Write(data7, 0, data7.Length);
-            yield return new WaitForSeconds(waitSec);
-
-            byte[] data8 = PreMaidUtility.BuildByteDataFromStringOrder("05 1E 00 01 1A");
-            _serialPort.Write(data8, 0, data8.Length);
-            yield return new WaitForSeconds(waitSec);
-
-
-            byte[] data9 = PreMaidUtility.BuildByteDataFromStringOrder("05 1C 00 01 18"); //ベリファイダンプ要請
-            _serialPort.Write(data9, 0, data9.Length);
-            yield return new WaitForSeconds(waitSec);
-
-
-            byte[] data10 = PreMaidUtility.BuildByteDataFromStringOrder("08 02 00 08 00 08 00 0A"); //モーションデータ転送終了
-            _serialPort.Write(data10, 0, data10.Length);
-            yield return new WaitForSeconds(waitSec);
-
-            byte[] data11 = PreMaidUtility.BuildByteDataFromStringOrder("04 04 00 00"); //フラッシュのライトプロテクトを掛ける？
-            _serialPort.Write(data11, 0, data11.Length);
-            yield return new WaitForSeconds(waitSec);
-
-            byte[] data12 = PreMaidUtility.BuildByteDataFromStringOrder("05 1F 00 01 1B"); //01番モーション再生
-            _serialPort.Write(data12, 0, data12.Length);
+            _serialPort.Write(willSendPoseBytes, 0, willSendPoseBytes.Length);
             yield return new WaitForSeconds(waitSec);
         }
 
