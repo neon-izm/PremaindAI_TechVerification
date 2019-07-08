@@ -2,8 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO.Ports;
-using System.Linq;
-using TMPro;
 using UnityEngine;
 
 namespace PreMaid.RemoteController

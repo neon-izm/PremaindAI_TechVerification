@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO.Ports;
 using TMPro;
@@ -18,7 +17,7 @@ namespace PreMaid.RemoteController
         private PreMaidPoseController _preMaidPoseController = null;
 
 
-        [SerializeField] private TMPro.TMP_Dropdown dropdown = null;
+        [SerializeField] private TMP_Dropdown dropdown = null;
 
         [SerializeField] private ServoUguiController uguiController = null;
 
@@ -36,7 +35,7 @@ namespace PreMaid.RemoteController
         // Start is called before the first frame update
         void Start()
         {
-            //コントローラの初期化の後に、こちらのGUIを初期化する
+            //コントローラの初期化の後に、こちらのGUIを初期化する、という初期化順制御です
             _preMaidPoseController.OnInitializeServoDefines+= OnInitializeServoDefines;
            
         }
@@ -89,9 +88,9 @@ namespace PreMaid.RemoteController
 
         /// <summary>
         /// 連続送信モードの切り替えを検知したアクション
+        /// 要するに、システム側から連続送信モードを切ったときにGUIのトグルボタンに反映したい、という処理
         /// </summary>
         /// <param name="obj"></param>
-        /// <exception cref="NotImplementedException"></exception>
         private void OnContinuousModeChange(bool obj)
         {
             continuousToggle.isOn = obj;
