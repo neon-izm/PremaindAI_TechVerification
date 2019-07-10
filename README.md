@@ -10,10 +10,18 @@ Android\data\com.robotyuenchi.premaidai\
 
 # 現在できる事
 ## モーションデータの読み込みとプレビュー
-MotionDataLoadTestScene.unity を開いて*.pmaファイルを読み込み、Play/Stopボタンを押すことでモーションを再生します。
-GameView上のプリメイドAIを模した箱なロボットがpmaのサーボ値を元にポーズを取ります。
+MotionDataLoadTestWithModel.unity を開いて*.pmaファイルを読み込み、Play/Stopボタンを押すことでモーションを再生します。
+GameView上のプリメイドAIを模したロボットがpmaのサーボ値を元にポーズを取ります。
+
+![dance_preview](https://user-images.githubusercontent.com/3115650/60764234-fcfb3f80-a0c0-11e9-9ae9-88d45da23fc4.gif)
 
 **再生開始数秒は待機ポーズが入っている事が多いのでロボットが動かないですが、数秒後から動き始めます**
+
+## 各サーボのリモコン操作サンプル
+Assets/_PremaidAI/RemoteController/Scenes/RemoteControlSample.unity でスライダからサーボ角を変更してリモコン的に遊べます。
+
+![premaid_remote](https://user-images.githubusercontent.com/3115650/60763727-7db43e80-a0b5-11e9-859a-88568630d1bb.gif)
+
 
 ## BT(SPP)経由でUnityEditor上からのプリメイドAIへの既存ポーズ送信
 MotionDataWriterSample.cs にあります。適切にSerialPortを設定して、決め打ちの命令をbyte[]で送る事でAndroidアプリ上と同じように指定ポーズを取らせられます。
@@ -26,14 +34,7 @@ MotionDataWriterSample.cs にあります。適切にSerialPortを設定して�
 
 https://twitter.com/izm/status/1146586612773470208
 
-## 各サーボのリモコン操作サンプル
-Assets/_PremaidAI/RemoteController/Scenes/RemoteControlSample.unity でスライダからサーボ角を変更してリモコン的に遊べます。
-![]( https://user-images.githubusercontent.com/3115650/60758773-0f8c5f00-a056-11e9-8712-4fad4068ae62.png )
-
 # 現在やっていること
-## モーションプレビューの誤りを直す
-腕と首はおそらくそれほど間違っていないプレビューですが、足の軸反転やオフセットがあるようです。  
-これを直したい
 
 ## 一部フレームを飛ばしたモーションデータの生成
 ブラックボックス化しているpmaファイルの先頭と末尾はそのままに、中間モーションを削っても再生できることは確認済みです。
@@ -51,5 +52,12 @@ https://docs.google.com/spreadsheets/d/1c6jqMwkBroCuF74viU_q7dgSQGzacbUW4mJg-957
 
 # 同梱モデルデータについて
 黒イワシ(twitetr:@Schwarz_Sardine)さんよりApache2.0ライセンス下で使用許可を得ています。ここに記して感謝します。
+こちらがリポジトリです。
 
+https://github.com/kuroiwasi/PremaidAI_Model
 
+# Contributors
+- @GOROman … 通信形式解析
+- @kirurobo … モーションプレビュー解析,実装
+- @Schwarz_Sardin … FBXモデル作成
+- @kazzlog … 直接ポーズ送信の発見
