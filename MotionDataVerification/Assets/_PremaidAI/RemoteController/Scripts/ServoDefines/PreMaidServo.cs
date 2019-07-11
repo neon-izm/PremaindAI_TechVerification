@@ -19,6 +19,8 @@ namespace PreMaid.RemoteController
 
         [SerializeField] private ServoPosition _servoPosition = ServoPosition.RightShoulderPitch;
 
+        public ServoPosition ServoPositionEnum => _servoPosition;
+
         [SerializeField] private int _servoValue = 7500;
         private int _defaultServoValue = 7500;
 
