@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO.Ports;
 using System.Linq;
 using PreMaid.HumanoidTracer;
 using PreMaid.RemoteController;
+using TMPro;
 using UnityEngine;
 
 namespace PreMaid.HumanoidTracer
@@ -19,6 +21,8 @@ namespace PreMaid.HumanoidTracer
 
         [SerializeField] private HumanoidModelJoint[] _joints;
 
+        [SerializeField] private TMPro.TMP_Dropdown _serialPortsDropdown = null;
+
 
         private bool initialized = false;
 
@@ -32,9 +36,25 @@ namespace PreMaid.HumanoidTracer
         void Start()
         {
             _controller = GetComponent<PreMaid.RemoteController.PreMaidPoseController>();
-            _controller.OpenSerialPort("COM7");
+            List<TMP_Dropdown.OptionData> serialPortNamesList = new List<TMP_Dropdown.OptionData>();
+
+            var portNames = SerialPort.GetPortNames();
 
 
+            foreach (var VARIABLE in portNames)
+            {
+                TMP_Dropdown.OptionData optionData = new TMP_Dropdown.OptionData(VARIABLE);
+                serialPortNamesList.Add(optionData);
+
+                Debug.Log(VARIABLE);
+            }
+
+            _serialPortsDropdown.ClearOptions();
+            _serialPortsDropdown.AddOptions(serialPortNamesList);
+
+
+            //対象のAnimatorにBoneにHumanoidModelJoint.csのアタッチ漏れがあるかもしれない
+            //なので、一旦全部検索して、見つからなかったサーボ情報はspineに全部動的にアタッチする
             Transform spineBone = target.GetBoneTransform(HumanBodyBones.Spine);
             //仮でspineにでも付けておこう
             if (target != null)
@@ -52,11 +72,23 @@ namespace PreMaid.HumanoidTracer
             }
 
             _joints = target.GetComponentsInChildren<HumanoidModelJoint>();
-
-            _controller.SetContinuousMode(true);
-            Invoke(nameof(Apply), 2f);
         }
 
+
+        /// <summary>
+        /// UGUIのOpenボタンを押したときの処理
+        /// </summary>
+        public void Open()
+        {
+            var willOpenSerialPortName = _serialPortsDropdown.options[_serialPortsDropdown.value].text;
+            Debug.Log(willOpenSerialPortName + "を開きます");
+            var openSuccess = _controller.OpenSerialPort(willOpenSerialPortName);
+            if (openSuccess)
+            {
+                _controller.SetContinuousMode(true);
+                Invoke(nameof(Apply), 2f);
+            }
+        }
 
         void Apply()
         {
@@ -79,11 +111,12 @@ namespace PreMaid.HumanoidTracer
         {
             if (Input.GetKeyDown(KeyCode.A))
             {
-                target.SetBool("TestMotion",true);
+                target.SetBool("TestMotion", true);
             }
+
             if (Input.GetKeyDown(KeyCode.B))
             {
-                target.SetBool("TestMotion",false);
+                target.SetBool("TestMotion", false);
             }
         }
 
