@@ -72,6 +72,7 @@ namespace PreMaid.RemoteController
 
             //TODO:このServoのリミット設定は、大雑把に安全そうなリミットを設定しています。
             //なので、場合によってはこの値を緩められるか検討するのは可能です。
+            //4000-11000
             switch (_servoPosition)
             {
                 case ServoPosition.RightShoulderPitch:
@@ -140,7 +141,7 @@ namespace PreMaid.RemoteController
                     MinServoValue = 6000; //のけぞる
                     break;
                 case ServoPosition.RightLowerArmPitch:
-                    MaxServoValue = 8000; //肘を力こぶ出来る方に曲げる10000とかいけるけど、体に刺さらないように要調整（ほかの腕軸を見てね）
+                    MaxServoValue = 11000; //肘を力こぶ出来る方に曲げる10000とかいけるけど、体に刺さらないように要調整（ほかの腕軸を見てね）
                     MinServoValue = 7400; //肘を外開き、無理させないでね、もげるよ
                     break;
                 case ServoPosition.RightLowerLegPitch:
@@ -149,7 +150,7 @@ namespace PreMaid.RemoteController
                     break;
                 case ServoPosition.LeftLowerArmPitch:
                     MaxServoValue = 7600; //肘を外開き、無理させないでね、もげるよ
-                    MinServoValue = 6000; //肘を力こぶ出来る方に曲げる 5000とかいけるけど、体に刺さらないように要調整（ほかの腕軸を見てね）
+                    MinServoValue = 4000; //肘を力こぶ出来る方に曲げる 5000とかいけるけど、体に刺さらないように要調整（ほかの腕軸を見てね）
                     break;
                 case ServoPosition.LeftLowerLegPitch:
                     MinServoValue = 7450; //膝をあり得ない方に曲げる。ほとんど曲がらない
