@@ -79,11 +79,11 @@ namespace PreMaid.HumanoidTracer
         {
             if (Input.GetKeyDown(KeyCode.A))
             {
-                target.SetBool("Walk",true);
+                target.SetBool("TestMotion",true);
             }
             if (Input.GetKeyDown(KeyCode.B))
             {
-                target.SetBool("Walk",false);
+                target.SetBool("TestMotion",false);
             }
         }
 

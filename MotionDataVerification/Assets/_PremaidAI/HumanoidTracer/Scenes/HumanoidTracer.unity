@@ -663,18 +663,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 1340540019, guid: e7ad06672d8eba046ae910584b3e41e0, type: 3}
-      propertyPath: solver.spine.headTarget
-      value: 
-      objectReference: {fileID: 1684336190}
-    - target: {fileID: 1340540019, guid: e7ad06672d8eba046ae910584b3e41e0, type: 3}
-      propertyPath: solver.leftArm.target
-      value: 
-      objectReference: {fileID: 1548822508}
-    - target: {fileID: 1340540019, guid: e7ad06672d8eba046ae910584b3e41e0, type: 3}
-      propertyPath: solver.rightArm.target
-      value: 
-      objectReference: {fileID: 162823666}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e7ad06672d8eba046ae910584b3e41e0, type: 3}
 --- !u!95 &8319883245948824307 stripped
