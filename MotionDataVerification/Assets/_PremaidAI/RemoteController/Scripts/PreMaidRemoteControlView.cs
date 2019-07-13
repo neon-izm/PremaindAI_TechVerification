@@ -35,6 +35,10 @@ namespace PreMaid.RemoteController
         // Start is called before the first frame update
         void Awake()
         {
+            if (_preMaidPoseController == null)
+            {
+                _preMaidPoseController = GetComponent<PreMaidPoseController>();
+            }
             //コントローラの初期化の後に、こちらのGUIを初期化する、という初期化順制御です
             _preMaidPoseController.OnInitializeServoDefines+= OnInitializeServoDefines;
            
