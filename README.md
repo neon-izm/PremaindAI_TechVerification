@@ -23,6 +23,15 @@ Assets/_PremaidAI/RemoteController/Scenes/RemoteControlSample.unity でスライ
 ![premaid_remote](https://user-images.githubusercontent.com/3115650/60763727-7db43e80-a0b5-11e9-859a-88568630d1bb.gif)
 
 
+## Unity Mecanim Animatorのモーション反映
+Assets/_PremaidAI/HumanoidTracer/Scenes/HumanoidTracere.unity  
+Animatorで設定したアニメーション、あるいはVRIKで設定した動きをリアルタイムで反映するサンプルです。
+
+MotionTracePremaidAI_Variant.prefab がサーボ情報設定済みのHumanoid互換のプリメイドAIのCGモデルです。
+
+![premaid_trace](https://user-images.githubusercontent.com/3115650/61169086-3a653e80-a593-11e9-8836-fb726bd9d9f1.gif)
+
+
 ## BT(SPP)経由でUnityEditor上からのプリメイドAIへの既存ポーズ送信
 MotionDataWriterSample.cs にあります。適切にSerialPortを設定して、決め打ちの命令をbyte[]で送る事でAndroidアプリ上と同じように指定ポーズを取らせられます。
 
