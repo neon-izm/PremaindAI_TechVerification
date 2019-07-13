@@ -76,7 +76,7 @@ namespace PreMaid.RemoteController
             switch (_servoPosition)
             {
                 case ServoPosition.RightShoulderPitch:
-                    MaxServoValue = 8700;//8700で後ろ手に組む
+                    MaxServoValue = 10000;//8700で後ろ手に組む
                     MinServoValue = 4000;//4500で正面
                     break;
                 case ServoPosition.HeadPitch:
@@ -84,8 +84,8 @@ namespace PreMaid.RemoteController
                     MinServoValue = 7300; //上向いた限界
                     break;
                 case ServoPosition.LeftShoulderPitch:
-                    MaxServoValue = 11500; //手が上向いたじょうたい
-                    MinServoValue = 6500; //手を後ろ手に組む
+                    MaxServoValue = 10500; //手が上向いたじょうたい
+                    MinServoValue = 4000; //手を後ろ手に組む
                     break;
                 case ServoPosition.HeadYaw:
                     MinServoValue = 6600; //左を向いてる

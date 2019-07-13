@@ -194,7 +194,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   targetServo: 2
   currentServoValue: 0
-  _axis: 0
+  _axis: 1
   inverse: 0
   defaultAngleDegree: 0
   defaultServoPosition: 0
@@ -230,8 +230,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   targetServo: 4
   currentServoValue: 0
-  _axis: 0
-  inverse: 1
+  _axis: 1
+  inverse: 0
   defaultAngleDegree: 0
   defaultServoPosition: 0
 --- !u!114 &8319883245948824309
