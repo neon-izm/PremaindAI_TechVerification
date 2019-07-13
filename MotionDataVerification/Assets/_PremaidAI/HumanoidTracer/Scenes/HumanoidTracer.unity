@@ -193,7 +193,7 @@ GameObject:
   - component: {fileID: 19592678}
   - component: {fileID: 19592677}
   m_Layer: 5
-  m_Name: Text (2)
+  m_Name: TitleLabel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -211,11 +211,11 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 165533872}
-  m_RootOrder: 4
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 20, y: -3.41}
+  m_AnchoredPosition: {x: 20, y: -3.4099731}
   m_SizeDelta: {x: 300, y: 50}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &19592677
@@ -455,11 +455,11 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_Children:
+  - {fileID: 19592676}
   - {fileID: 1518711404}
   - {fileID: 1306860836}
   - {fileID: 467996421}
   - {fileID: 1644539267}
-  - {fileID: 19592676}
   m_Father: {fileID: 200169246}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -773,11 +773,11 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 165533872}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -463, y: 276.99997}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 105, y: -75}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &467996422
@@ -1368,7 +1368,7 @@ GameObject:
   - component: {fileID: 1306860838}
   - component: {fileID: 1306860837}
   m_Layer: 5
-  m_Name: Dropdown
+  m_Name: SerialSelectDropdown
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1389,11 +1389,11 @@ RectTransform:
   - {fileID: 915935035}
   - {fileID: 1640468306}
   m_Father: {fileID: 165533872}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -471, y: 241.99997}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 97, y: -104}
   m_SizeDelta: {x: 160, y: 40}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1306860837
@@ -1587,7 +1587,7 @@ GameObject:
   - component: {fileID: 1518711406}
   - component: {fileID: 1518711405}
   m_Layer: 5
-  m_Name: Button
+  m_Name: OpenButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1606,7 +1606,7 @@ RectTransform:
   m_Children:
   - {fileID: 353476063}
   m_Father: {fileID: 165533872}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
@@ -1915,7 +1915,7 @@ GameObject:
   - component: {fileID: 1644539269}
   - component: {fileID: 1644539268}
   m_Layer: 5
-  m_Name: Text (1)
+  m_Name: Description
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1933,7 +1933,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 165533872}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
@@ -1973,7 +1973,9 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "PreMaidAI_PoseTracer.cs\u306FAnimator\u306E\u5BFE\u8C61\u306E\u52D5\u304D\u3092\n\u30B7\u30EA\u30A2\u30EB\u30DD\u30FC\u30C8\u7D4C\u7531\u3067\u30D7\u30EA\u30E1\u30A4\u30C9AI\u5B9F\u6A5F\u306B\u30EA\u30A2\u30EB\u30BF\u30A4\u30E0(10FPS)\n\u3067\u8EE2\u9001\u3057\u307E\u3059\u3002\n\nVRIK\u3092MotionTracePremaidAI_Variant\u306B\u30A2\u30BF\u30C3\u30C1\u3057\u3066\nHMD\u306E\u5404\u30CE\u30FC\u30C9\u306E\u5272\u308A\u5F53\u3066\u3092\u3059\u308B\u3053\u3068\u3067\n\u4EBA\u306E\u52D5\u304D\u3092\u30C8\u30EC\u30FC\u30B9\u3059\u308B\u30DE\u30B9\u30BF\u30FC\u30B9\u30EC\u30FC\u30D6\u30C7\u30E2\u304C\n\u884C\u3048\u307E\u3059\u3002\n"
+  m_Text: "PreMaidAI_PoseTracer.cs\u306FAnimator\u306E\u5BFE\u8C61\u306E\u52D5\u304D\u3092\n\u30B7\u30EA\u30A2\u30EB\u30DD\u30FC\u30C8\u7D4C\u7531\u3067\u30D7\u30EA\u30E1\u30A4\u30C9AI\u5B9F\u6A5F\u306B\u30EA\u30A2\u30EB\u30BF\u30A4\u30E0(10FPS)\n\u3067\u8EE2\u9001\u3057\u307E\u3059\u3002\n\nVRIK\u3092MotionTracePremaidAI_Variant\u306B\u30A2\u30BF\u30C3\u30C1\u3057\u3066\nHMD\u306E\u5404\u30CE\u30FC\u30C9\u306E\u5272\u308A\u5F53\u3066\u3092\u3059\u308B\u3053\u3068\u3067\n\u4EBA\u306E\u52D5\u304D\u3092\u30C8\u30EC\u30FC\u30B9\u3059\u308B\u30DE\u30B9\u30BF\u30FC\u30B9\u30EC\u30FC\u30D6\u30C7\u30E2\u304C\n\u884C\u3048\u307E\u3059\u3002\n\n\u52D5\u4F5C\u78BA\u8A8D\u3059\u308B\u306B\u306F\u3001\n1.\u30B7\u30EA\u30A2\u30EB\u30DD\u30FC\u30C8\u3092\u9078\u3093\u3067Open\n2.
+    A\u30AD\u30FC\u3067\u30EB\u30FC\u30D7\u306E\u30C6\u30B9\u30C8\u30A2\u30CB\u30E1\u30FC\u30B7\u30E7\u30F3\u3092\u518D\u751F\n3.
+    \u6570\u79D2\u5F8C\u306B\u5F85\u6A5F\u30DD\u30FC\u30BA\u306B\u623B\u308B\n\u3067\u3059\u3002"
 --- !u!222 &1644539269
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2149,7 +2151,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1890419122}
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: 0, y: 0.37, z: 1}
+  m_LocalPosition: {x: 0, y: 0.37, z: 0.72}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}

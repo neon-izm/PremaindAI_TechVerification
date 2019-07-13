@@ -111,13 +111,9 @@ namespace PreMaid.HumanoidTracer
         {
             if (Input.GetKeyDown(KeyCode.A))
             {
-                target.SetBool("TestMotion", true);
+                target.SetTrigger("TestMotion");
             }
 
-            if (Input.GetKeyDown(KeyCode.B))
-            {
-                target.SetBool("TestMotion", false);
-            }
         }
 
         void LateUpdate()
