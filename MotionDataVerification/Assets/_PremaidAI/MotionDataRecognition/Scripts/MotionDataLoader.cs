@@ -291,6 +291,7 @@ namespace PreMaid
             {
                 currentKoma = (int)(normalizedKoma * totalKomas);
                 startedTime = Time.time - currentKoma / fps;
+                ApplyPoseByKoma(currentKoma);
             }
         }
 
