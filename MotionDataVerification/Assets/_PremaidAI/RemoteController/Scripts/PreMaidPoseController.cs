@@ -210,7 +210,6 @@ namespace PreMaid.RemoteController
 
             var readBuffer = new byte[256 * 3];
             var readCount = 0;
-            var index = 0;
             while (_serialPortOpen && _serialPort != null && _serialPort.IsOpen)
             {
                 try
@@ -237,7 +236,7 @@ namespace PreMaid.RemoteController
                     //Debug.LogWarning(e.Message);
                 }
 
-                Thread.Sleep(1);
+                Thread.Sleep(2);
             }
 
             errorQueue.Enqueue("受信スレッド終了");
