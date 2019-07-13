@@ -61,11 +61,8 @@ namespace PreMaid.RemoteController
         ConcurrentQueue<string> errorQueue = new ConcurrentQueue<string>();
 
 
-        private Thread _writeThread;
-        private Thread _readThread;
-
-        object lockObject = new object();
-
+        private Thread _serialPortThread;
+        
         /// <summary>
         /// エディタ再生終了時にシリアルポートの明示的開放をする為のキャンセル用
         /// </summary>
@@ -150,17 +147,12 @@ namespace PreMaid.RemoteController
                 _serialPort.ReadTimeout = 1;
                 Debug.Log("シリアルポート:" + portName + " 接続成功");
                 _serialPortOpen = true;
-                _writeThread = new Thread(WriteThreadFunc)
+                _serialPortThread = new Thread(ReadAndWriteThreadFunc)
                 {
                     IsBackground = true
                 };
-                _writeThread.Start();
+                _serialPortThread.Start();
 
-                _readThread = new Thread(ReadThreadFunc)
-                {
-                    IsBackground = true
-                };
-                _readThread.Start();
                 ShouldNotExit = true;
                 return true;
             }
@@ -187,12 +179,11 @@ namespace PreMaid.RemoteController
             Debug.Log("シリアルポートをクローズします");
             _serialPortOpen = false;
 
-            if (_writeThread != null && _writeThread.IsAlive)
+            if (_serialPortThread != null && _serialPortThread.IsAlive)
             {
-                _writeThread.Join();
+                _serialPortThread.Join();
             }
-
-
+            
             if (_serialPort != null && _serialPort.IsOpen)
             {
                 _serialPort.Close();
@@ -204,21 +195,33 @@ namespace PreMaid.RemoteController
             }
         }
 
-        private void ReadThreadFunc()
+     
+
+        private void ReadAndWriteThreadFunc()
         {
-            Debug.LogWarning("シリアルポート受信スレッド起動");
+            Debug.LogWarning("シリアルポート送信スレッド起動");
 
             var readBuffer = new byte[256 * 3];
             var readCount = 0;
             while (_serialPortOpen && _serialPort != null && _serialPort.IsOpen)
             {
+                //PCから送る予定のキューが入っているかチェック
+                if (sendingQueue.IsEmpty == false)
+                {
+                    var willSendString = string.Empty;
+                    if (sendingQueue.TryDequeue(out willSendString))
+                    {
+                        byte[] willSendBytes =
+                            PreMaidUtility.BuildByteDataFromStringOrder(willSendString);
+
+                        _serialPort.Write(willSendBytes, 0, willSendBytes.Length);
+                    }
+                }
+
                 try
                 {
-                    lock (lockObject)
-                    {
-                        readCount = _serialPort.Read(readBuffer, 0, readBuffer.Length);
-                    }
-
+                    readCount = _serialPort.Read(readBuffer, 0, readBuffer.Length);
+                    
                     if (readCount > 0)
                     {
                         receivedQueue.Enqueue(PreMaidUtility.DumpBytesToHexString(readBuffer, readCount));
@@ -234,34 +237,6 @@ namespace PreMaid.RemoteController
                 {
                     errorQueue.Enqueue(e.Message);
                     //Debug.LogWarning(e.Message);
-                }
-
-                Thread.Sleep(2);
-            }
-
-            errorQueue.Enqueue("受信スレッド終了");
-        }
-
-
-        private void WriteThreadFunc()
-        {
-            Debug.LogWarning("シリアルポート送信スレッド起動");
-
-            while (_serialPortOpen && _serialPort != null && _serialPort.IsOpen)
-            {
-                //PCから送る予定のキューが入っているかチェック
-                if (sendingQueue.IsEmpty == false)
-                {
-                    var willSendString = string.Empty;
-                    if (sendingQueue.TryDequeue(out willSendString))
-                    {
-                        byte[] willSendBytes =
-                            PreMaidUtility.BuildByteDataFromStringOrder(willSendString);
-                        lock (lockObject)
-                        {
-                            _serialPort.Write(willSendBytes, 0, willSendBytes.Length);
-                        }
-                    }
                 }
 
                 Thread.Sleep(1);
