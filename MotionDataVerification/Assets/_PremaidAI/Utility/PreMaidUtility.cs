@@ -68,6 +68,17 @@ namespace PreMaid
             Debug.Log(str);
         }
 
+        public static string DumpBytesToHexString(byte[] hex, int length)
+        {
+            string str = "";
+            for (int i = 0; i < length; i++)
+            {
+                str += string.Format("{0:X2}", hex[i]);
+            }
+
+            return str;
+        }
+        
         /// <summary>
         /// スペース区切りの文字列からbyte配列を作る。このコードを読む人はこれだけ使ってもらえれば！
         /// </summary>
