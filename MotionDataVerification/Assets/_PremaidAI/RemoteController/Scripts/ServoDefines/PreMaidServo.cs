@@ -19,6 +19,8 @@ namespace PreMaid.RemoteController
 
         [SerializeField] private ServoPosition _servoPosition = ServoPosition.RightShoulderPitch;
 
+        public ServoPosition ServoPositionEnum => _servoPosition;
+
         [SerializeField] private int _servoValue = 7500;
         private int _defaultServoValue = 7500;
 
@@ -70,10 +72,11 @@ namespace PreMaid.RemoteController
 
             //TODO:このServoのリミット設定は、大雑把に安全そうなリミットを設定しています。
             //なので、場合によってはこの値を緩められるか検討するのは可能です。
+            //4000-11000
             switch (_servoPosition)
             {
                 case ServoPosition.RightShoulderPitch:
-                    MaxServoValue = 8700;//8700で後ろ手に組む
+                    MaxServoValue = 10000;//8700で後ろ手に組む
                     MinServoValue = 4000;//4500で正面
                     break;
                 case ServoPosition.HeadPitch:
@@ -81,8 +84,8 @@ namespace PreMaid.RemoteController
                     MinServoValue = 7300; //上向いた限界
                     break;
                 case ServoPosition.LeftShoulderPitch:
-                    MaxServoValue = 11500; //手が上向いたじょうたい
-                    MinServoValue = 6500; //手を後ろ手に組む
+                    MaxServoValue = 10500; //手が上向いたじょうたい
+                    MinServoValue = 4000; //手を後ろ手に組む
                     break;
                 case ServoPosition.HeadYaw:
                     MinServoValue = 6600; //左を向いてる
@@ -138,7 +141,7 @@ namespace PreMaid.RemoteController
                     MinServoValue = 6000; //のけぞる
                     break;
                 case ServoPosition.RightLowerArmPitch:
-                    MaxServoValue = 8000; //肘を力こぶ出来る方に曲げる10000とかいけるけど、体に刺さらないように要調整（ほかの腕軸を見てね）
+                    MaxServoValue = 11000; //肘を力こぶ出来る方に曲げる10000とかいけるけど、体に刺さらないように要調整（ほかの腕軸を見てね）
                     MinServoValue = 7400; //肘を外開き、無理させないでね、もげるよ
                     break;
                 case ServoPosition.RightLowerLegPitch:
@@ -147,7 +150,7 @@ namespace PreMaid.RemoteController
                     break;
                 case ServoPosition.LeftLowerArmPitch:
                     MaxServoValue = 7600; //肘を外開き、無理させないでね、もげるよ
-                    MinServoValue = 6000; //肘を力こぶ出来る方に曲げる 5000とかいけるけど、体に刺さらないように要調整（ほかの腕軸を見てね）
+                    MinServoValue = 4000; //肘を力こぶ出来る方に曲げる 5000とかいけるけど、体に刺さらないように要調整（ほかの腕軸を見てね）
                     break;
                 case ServoPosition.LeftLowerLegPitch:
                     MinServoValue = 7450; //膝をあり得ない方に曲げる。ほとんど曲がらない
