@@ -62,7 +62,7 @@ namespace PreMaid.RemoteController
 
 
         private Thread _serialPortThread;
-        
+
         /// <summary>
         /// エディタ再生終了時にシリアルポートの明示的開放をする為のキャンセル用
         /// </summary>
@@ -183,7 +183,7 @@ namespace PreMaid.RemoteController
             {
                 _serialPortThread.Join();
             }
-            
+
             if (_serialPort != null && _serialPort.IsOpen)
             {
                 _serialPort.Close();
@@ -195,7 +195,6 @@ namespace PreMaid.RemoteController
             }
         }
 
-     
 
         private void ReadAndWriteThreadFunc()
         {
@@ -218,10 +217,12 @@ namespace PreMaid.RemoteController
                     }
                 }
 
+
+                //プリメイドAIからの受信チェック
                 try
                 {
                     readCount = _serialPort.Read(readBuffer, 0, readBuffer.Length);
-                    
+
                     if (readCount > 0)
                     {
                         receivedQueue.Enqueue(PreMaidUtility.DumpBytesToHexString(readBuffer, readCount));
@@ -332,31 +333,6 @@ namespace PreMaid.RemoteController
                 }
             }
 
-            //受信バッファ、バイナリで届くので区切りをどうしようか悩み中
-            //一旦、受信始めてから4文字以上で区切り、とします
-            if (receivedQueue.IsEmpty == false)
-            {
-                var receivedString = string.Empty;
-                if (receivedQueue.TryDequeue(out receivedString))
-                {
-                    bufferedString += receivedString;
-
-                    if (bufferedString.Length > 4)
-                    {
-                        if (OnReceivedFromPreMaidAI != null)
-                        {
-                            OnReceivedFromPreMaidAI.Invoke(bufferedString);
-                        }
-                        else
-                        {
-                            Debug.Log(bufferedString);
-                        }
-
-                        bufferedString = string.Empty;
-                    }
-                }
-            }
-
             if (_serialPortOpen == false)
             {
                 return;
@@ -372,6 +348,58 @@ namespace PreMaid.RemoteController
             {
                 ApplyPose();
                 _timer -= _poseProcessDelay;
+            }
+
+            //受信バッファ、バイナリで届くので区切りをどうしようか悩み中
+            //一旦、素朴に先頭に命令長が来るでしょう、というつもりで書きます。
+            if (receivedQueue.IsEmpty == false)
+            {
+                var receivedString = string.Empty;
+                if (receivedQueue.TryDequeue(out receivedString))
+                {
+                    bufferedString += receivedString;
+
+                    if (bufferedString.Length < 2)
+                    {
+                        return;
+                    }
+
+                    int orderLength = PreMaidUtility.HexStringToInt(bufferedString.Substring(0, 2));
+
+                    //先頭0だったら命令ではないと判断して2文字読み捨て
+                    //なぜなら0004051Fみたいな文字列が入っているので
+                    if (orderLength == 0)
+                    {
+                        bufferedString = bufferedString.Substring(2);
+                    }
+                    //命令長が足りないので待つ
+                    else if (orderLength > bufferedString.Length * 2)
+                    {
+                        return;
+                    }
+                    else if (bufferedString.Length >= orderLength * 2)
+                    {
+                        var targetOrder = bufferedString.Substring(0, orderLength * 2);
+                        if (OnReceivedFromPreMaidAI != null)
+                        {
+                            OnReceivedFromPreMaidAI.Invoke(targetOrder);
+                        }
+                        else
+                        {
+                            Debug.Log(targetOrder);
+                        }
+
+                        //まだ余りバッファが有るならツメます
+                        if (orderLength * 2 < bufferedString.Length)
+                        {
+                            bufferedString = bufferedString.Substring(orderLength * 2 + 1);
+                        }
+                        else
+                        {
+                            bufferedString = string.Empty;
+                        }
+                    }
+                }
             }
         }
     }

@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using UnityEngine;
 
 namespace PreMaid
 {
-
-
     public class PreMaidUtility : MonoBehaviour
     {
         /// <summary>
@@ -78,7 +77,22 @@ namespace PreMaid
 
             return str;
         }
-        
+
+        /// <summary>
+        /// "1F"を渡したら25が返ってくるやつ
+        /// </summary>
+        /// <returns></returns>
+        public static int HexStringToInt(string hex)
+        {
+            if (hex.Length > 4)
+            {
+                throw new InvalidOperationException("入力文字数は4文字以内を想定しています");
+            }
+
+            var ret = Int32.Parse(hex, NumberStyles.AllowHexSpecifier);
+            return ret;
+        }
+
         /// <summary>
         /// スペース区切りの文字列からbyte配列を作る。このコードを読む人はこれだけ使ってもらえれば！
         /// </summary>
@@ -98,11 +112,10 @@ namespace PreMaid
         /// <returns></returns>
         public static byte[] HexStringToByteArray(string hex)
         {
-            int numberChars = hex.Length;
-            byte[] bytes = new byte[numberChars / 2];
-            for (int i = 0; i < numberChars; i += 2)
-                bytes[i / 2] = Convert.ToByte(hex.Substring(i, 2), 16);
-            return bytes;
+            return Enumerable.Range(0, hex.Length)
+                .Where(x => x % 2 == 0)
+                .Select(x => Convert.ToByte(hex.Substring(x, 2), 16))
+                .ToArray();
         }
 
         /// <summary>
