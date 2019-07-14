@@ -129,5 +129,20 @@ namespace PreMaid
                 .Where(c => !Char.IsWhiteSpace(c))
                 .ToArray());
         }
+        
+        /// <summary>
+        /// 4C1Dを入れたら1D4Cが返ってくる
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public static string ConvertEndian(string data)
+        {
+            int sValueAsInt = int.Parse(data, System.Globalization.NumberStyles.HexNumber);
+            byte[] bytes = BitConverter.GetBytes(sValueAsInt);
+            string retval = "";
+            foreach (byte b in bytes)
+                retval += b.ToString("X2");
+            return retval.Substring(0, 4);
+        }
     }
 }

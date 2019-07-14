@@ -153,6 +153,8 @@ namespace PreMaid.RemoteController
                 };
                 _serialPortThread.Start();
 
+                InvokeRepeating(nameof(RequestBatteryRemain),2f,2f);
+                
                 ShouldNotExit = true;
                 return true;
             }
@@ -250,7 +252,7 @@ namespace PreMaid.RemoteController
         /// 現在のサーボ値を適用する1フレームだけのモーションを送る
         /// </summary>
         /// <returns></returns>
-        string BuildPoseString(int speed = 50)
+        string BuildPoseString(int speed = 0)
         {
             if (speed > 255)
             {
@@ -288,20 +290,7 @@ namespace PreMaid.RemoteController
                 return;
             }
 
-            StartCoroutine(ApplyPoseCoroutine());
-        }
-
-
-        /// <summary>
-        /// たぶんあとで非同期待ち受けつかう
-        /// </summary>
-        /// <returns></returns>
-        IEnumerator ApplyPoseCoroutine()
-        {
-            float waitSec = 0.06f; //0.03だと送信失敗することがある
-
             sendingQueue.Enqueue(BuildPoseString(80)); //対象のモーション、今回は1個だけ;
-            yield return new WaitForSeconds(waitSec);
         }
 
 
@@ -318,6 +307,37 @@ namespace PreMaid.RemoteController
             sendingQueue.Enqueue(PreMaidUtility.RewriteXorString(allStop)); //ストップ命令を送る
         }
 
+        
+        /// <summary>
+        /// 全サーボの強制脱力命令
+        /// </summary>
+        public void ForceAllServoProperty()
+        {
+            //ここで連続送信モードを停止しないと、脱力後の急なサーボ命令で一気にプリメイドAIが暴れて死ぬ
+
+            string allServo =
+                "36 19 10 10 ";
+
+            for (int i = 0; i < 25; i++)
+            {
+                allServo += "FF FF ";
+            }
+
+            allServo += "FF";
+            sendingQueue.Enqueue(PreMaidUtility.RewriteXorString(allServo)); //ストップ命令を送る
+        }
+
+        /// <summary>
+        /// バッテリー残量の問い合わせ、ハンドリングはPreMaidReceiver.csで行っています
+        /// </summary>
+        public void RequestBatteryRemain()
+        {
+            string batteryRequestOrder = "07 01 00 02 00 02 06";
+            Debug.Log("リクエスト:"+ batteryRequestOrder);
+            sendingQueue.Enqueue(PreMaidUtility.RewriteXorString(batteryRequestOrder)); //バッテリー残量を教えてもらう
+        }
+        
+        
         private string bufferedString = string.Empty;
 
 
@@ -338,16 +358,22 @@ namespace PreMaid.RemoteController
                 return;
             }
 
-            if (_continuousMode == false)
+           
+
+            if (Input.GetKeyDown(KeyCode.Y))
             {
-                return;
+                ForceAllServoProperty();
             }
 
-            _timer += Time.deltaTime;
-            if (_timer > _poseProcessDelay)
+            if (_continuousMode == true)
             {
-                ApplyPose();
-                _timer -= _poseProcessDelay;
+                _timer += Time.deltaTime;
+                if (_timer > _poseProcessDelay)
+                {
+                    ApplyPose();
+                    _timer -= _poseProcessDelay;
+                }
+
             }
 
             //受信バッファ、バイナリで届くので区切りをどうしようか悩み中
@@ -364,6 +390,13 @@ namespace PreMaid.RemoteController
                         return;
                     }
 
+                    //異様にバッファが溜まったら捨てる
+                    if (bufferedString.Length > 100)
+                    {
+                        bufferedString = string.Empty;
+                        return;
+                    }
+                    
                     int orderLength = PreMaidUtility.HexStringToInt(bufferedString.Substring(0, 2));
 
                     //先頭0だったら命令ではないと判断して2文字読み捨て
