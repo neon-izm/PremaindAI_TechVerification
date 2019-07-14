@@ -333,8 +333,21 @@ namespace PreMaid.RemoteController
         public void RequestBatteryRemain()
         {
             string batteryRequestOrder = "07 01 00 02 00 02 06";
-            Debug.Log("リクエスト:"+ batteryRequestOrder);
+            //Debug.Log("リクエスト:"+ batteryRequestOrder);
             sendingQueue.Enqueue(PreMaidUtility.RewriteXorString(batteryRequestOrder)); //バッテリー残量を教えてもらう
+        }
+
+
+        /// <summary>
+        /// たぶんこれでFLASHのダンプが返ってくる
+        /// </summary>
+        /// <param name="page"></param>
+        public void RequestFlashRomDump(int page)
+        {
+            string flashDump = "05 1C 00 "+ string.Format("{0:X2}", page)+" FF";
+            Debug.Log("リクエスト:"+ flashDump);
+            sendingQueue.Enqueue(PreMaidUtility.RewriteXorString(flashDump)); //FLASHの中身を教えてもらう？
+
         }
         
         
@@ -393,6 +406,7 @@ namespace PreMaid.RemoteController
                     //異様にバッファが溜まったら捨てる
                     if (bufferedString.Length > 100)
                     {
+                        Debug.Log("破棄します:"+ bufferedString);
                         bufferedString = string.Empty;
                         return;
                     }
