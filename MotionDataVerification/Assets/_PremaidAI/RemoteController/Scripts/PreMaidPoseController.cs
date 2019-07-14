@@ -144,7 +144,7 @@ namespace PreMaid.RemoteController
             {
                 _serialPort = new SerialPort(portName, BaudRate, Parity.None, 8, StopBits.One);
                 _serialPort.Open();
-                _serialPort.ReadTimeout = 1;//これを明示的に指定してTimeout例外を握りつぶすのがUnity Monoの悲しいお作法っぽい…
+                _serialPort.ReadTimeout = 1; //これを明示的に指定してTimeout例外を握りつぶすのがUnity Monoの悲しいお作法っぽい…
                 Debug.Log("シリアルポート:" + portName + " 接続成功");
                 _serialPortOpen = true;
                 _serialPortThread = new Thread(ReadAndWriteThreadFunc)
@@ -153,8 +153,8 @@ namespace PreMaid.RemoteController
                 };
                 _serialPortThread.Start();
 
-                InvokeRepeating(nameof(RequestBatteryRemain),2f,2f);
-                
+                InvokeRepeating(nameof(RequestBatteryRemain), 2f, 10f);
+
                 ShouldNotExit = true;
                 return true;
             }
@@ -252,17 +252,10 @@ namespace PreMaid.RemoteController
         /// 現在のサーボ値を適用する1フレームだけのモーションを送る
         /// </summary>
         /// <returns></returns>
-        string BuildPoseString(int speed = 0)
+        string BuildPoseString(int speed = 10)
         {
-            if (speed > 255)
-            {
-                speed = 255;
-            }
 
-            if (speed < 1)
-            {
-                speed = 1;
-            }
+            speed = Mathf.Clamp(speed, 1, 255);
 
             //決め打ちのポーズ命令+スピード(小さい方が速くて、255が最大に遅い)
             string ret = "50 18 00 " + speed.ToString("X2");
@@ -307,26 +300,58 @@ namespace PreMaid.RemoteController
             sendingQueue.Enqueue(PreMaidUtility.RewriteXorString(allStop)); //ストップ命令を送る
         }
 
-        
+
         /// <summary>
-        /// 全サーボの強制脱力命令
+        /// 全サーボのストレッチパラメータ指定命令
+        /// 18 19 10 10 3C 18 3C 1C 3C 14 3C 0C 3C 0E 3C 16 3C 1A 3C 12 3C 0A 3C 07
         /// </summary>
-        public void ForceAllServoProperty()
+        public void ForceAllServoStretchProperty(int stretch)
         {
-            //ここで連続送信モードを停止しないと、脱力後の急なサーボ命令で一気にプリメイドAIが暴れて死ぬ
+           
+            var targetStretch =Mathf.Clamp(stretch,1, 127);
 
+            string stretchProp = string.Format("{0:X2}", targetStretch);
+            
+            //0x36=54個なので
+            //最初の3個+ 25サーボ*2パラメータ+ チェックバイト
             string allServo =
-                "36 19 10 10 ";
+                "36 19 10";
 
-            for (int i = 0; i < 25; i++)
+            foreach (var VARIABLE in Servos)
             {
-                allServo += "FF FF ";
+                allServo += " " + VARIABLE.GetServoIdString()+" "+ stretchProp;
             }
-
+            
             allServo += "FF";
-            sendingQueue.Enqueue(PreMaidUtility.RewriteXorString(allServo)); //ストップ命令を送る
+            sendingQueue.Enqueue(PreMaidUtility.RewriteXorString(allServo)); //ストレッチ命令を送る
+            
         }
 
+        /// <summary>
+        /// 全サーボのスピードパラメータ指定命令
+        /// 18 19 10 10 3C 18 3C 1C 3C 14 3C 0C 3C 0E 3C 16 3C 1A 3C 12 3C 0A 3C 07
+        /// </summary>
+        public void ForceAllServoSpeedProperty(int speed)
+        {
+
+            var targetSpeed = Mathf.Clamp(speed,1,127);
+            
+            string speedProp = string.Format("{0:X2}", targetSpeed);
+            
+            //0x36=54個なので
+            //最初の3個+ 25サーボ*2パラメータ+ チェックバイト
+            string allServo =
+                "36 19 00";
+
+            foreach (var VARIABLE in Servos)
+            {
+                allServo += " " + VARIABLE.GetServoIdString()+" "+speedProp;
+            }
+            
+            allServo += "FF";
+            sendingQueue.Enqueue(PreMaidUtility.RewriteXorString(allServo)); //ストレッチ命令を送る
+        }
+        
         /// <summary>
         /// バッテリー残量の問い合わせ、ハンドリングはPreMaidReceiver.csで行っています
         /// </summary>
@@ -344,13 +369,12 @@ namespace PreMaid.RemoteController
         /// <param name="page"></param>
         public void RequestFlashRomDump(int page)
         {
-            string flashDump = "05 1C 00 "+ string.Format("{0:X2}", page)+" FF";
-            Debug.Log("リクエスト:"+ flashDump);
+            string flashDump = "05 1C 00 " + string.Format("{0:X2}", page) + " FF";
+            Debug.Log("リクエスト:" + flashDump);
             sendingQueue.Enqueue(PreMaidUtility.RewriteXorString(flashDump)); //FLASHの中身を教えてもらう？
-
         }
-        
-        
+
+
         private string bufferedString = string.Empty;
 
 
@@ -370,13 +394,7 @@ namespace PreMaid.RemoteController
             {
                 return;
             }
-
-           
-
-            if (Input.GetKeyDown(KeyCode.Y))
-            {
-                ForceAllServoProperty();
-            }
+            
 
             if (_continuousMode == true)
             {
@@ -386,7 +404,6 @@ namespace PreMaid.RemoteController
                     ApplyPose();
                     _timer -= _poseProcessDelay;
                 }
-
             }
 
             //受信バッファ、バイナリで届くので区切りをどうしようか悩み中
@@ -406,11 +423,11 @@ namespace PreMaid.RemoteController
                     //異様にバッファが溜まったら捨てる
                     if (bufferedString.Length > 100)
                     {
-                        Debug.Log("破棄します:"+ bufferedString);
+                        Debug.Log("破棄します:" + bufferedString);
                         bufferedString = string.Empty;
                         return;
                     }
-                    
+
                     int orderLength = PreMaidUtility.HexStringToInt(bufferedString.Substring(0, 2));
 
                     //先頭0だったら命令ではないと判断して2文字読み捨て
