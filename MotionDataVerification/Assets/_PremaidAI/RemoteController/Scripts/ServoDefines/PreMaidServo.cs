@@ -219,7 +219,7 @@ namespace PreMaid.RemoteController
         /// <returns></returns>
         public string GetServoValueString()
         {
-            var tmp = ConvertEndian(_servoValue.ToString("X2"));
+            var tmp = PreMaidUtility.ConvertEndian(_servoValue.ToString("X2"));
 
             return $"{tmp[0]}{tmp[1]} {tmp[2]}{tmp[3]}";
         }
@@ -261,7 +261,7 @@ namespace PreMaid.RemoteController
         /// <param name="newValue">"4C 1D"</param>
         public void SetServoValueSafeClamp(string spaceSplitedByteString)
         {
-            var aaa = ConvertEndian(PreMaidUtility.RemoveWhitespace(spaceSplitedByteString));
+            var aaa = PreMaidUtility.ConvertEndian(PreMaidUtility.RemoveWhitespace(spaceSplitedByteString));
             int intValue = int.Parse(aaa, System.Globalization.NumberStyles.HexNumber);
             Debug.Log($"{spaceSplitedByteString} は {intValue} ");
 
@@ -280,19 +280,6 @@ namespace PreMaid.RemoteController
             }
         }
 
-        /// <summary>
-        /// 4C1Dを入れたら1D4Cが返ってくる
-        /// </summary>
-        /// <param name="data"></param>
-        /// <returns></returns>
-        private static string ConvertEndian(string data)
-        {
-            int sValueAsInt = int.Parse(data, System.Globalization.NumberStyles.HexNumber);
-            byte[] bytes = BitConverter.GetBytes(sValueAsInt);
-            string retval = "";
-            foreach (byte b in bytes)
-                retval += b.ToString("X2");
-            return retval.Substring(0, 4);
-        }
+        
     }
 }

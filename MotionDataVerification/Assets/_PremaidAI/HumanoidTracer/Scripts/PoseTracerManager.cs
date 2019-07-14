@@ -26,8 +26,8 @@ namespace PreMaid.HumanoidTracer
 
         private bool initialized = false;
 
-        //何秒ごとにポーズ指定するか
-        private float _poseProcessDelay = 0.1f;
+        //何秒ごとにポーズ指定するか0.09は安全,0.08は結構失敗が多い
+        private float _poseProcessDelay = 0.09f;
 
         private float _timer = 0.0f;
 
@@ -85,9 +85,17 @@ namespace PreMaid.HumanoidTracer
             var openSuccess = _controller.OpenSerialPort(willOpenSerialPortName);
             if (openSuccess)
             {
-                _controller.SetContinuousMode(true);
-                Invoke(nameof(Apply), 2f);
+                StartCoroutine(PreMaidParamInitilize());
             }
+        }
+
+
+        IEnumerator PreMaidParamInitilize()
+        {
+            yield return new WaitForSeconds(1f);
+            //ここらへんでサーボパラメータ入れたりする
+            _controller.SetContinuousMode(true);
+            Invoke(nameof(Apply), 3f);
         }
 
         void Apply()
@@ -113,7 +121,6 @@ namespace PreMaid.HumanoidTracer
             {
                 target.SetTrigger("TestMotion");
             }
-
         }
 
         void LateUpdate()
