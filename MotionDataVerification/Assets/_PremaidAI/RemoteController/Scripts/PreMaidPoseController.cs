@@ -144,7 +144,7 @@ namespace PreMaid.RemoteController
             {
                 _serialPort = new SerialPort(portName, BaudRate, Parity.None, 8, StopBits.One);
                 _serialPort.Open();
-                _serialPort.ReadTimeout = 1;
+                _serialPort.ReadTimeout = 1;//これを明示的に指定してTimeout例外を握りつぶすのがUnity Monoの悲しいお作法っぽい…
                 Debug.Log("シリアルポート:" + portName + " 接続成功");
                 _serialPortOpen = true;
                 _serialPortThread = new Thread(ReadAndWriteThreadFunc)
