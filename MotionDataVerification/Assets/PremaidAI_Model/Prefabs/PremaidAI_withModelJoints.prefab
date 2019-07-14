@@ -1016,7 +1016,7 @@ MonoBehaviour:
   ServoID: 04
   isInverse: 1
   targetAxis: 0
-  minAngle: -17
+  minAngle: -128.2
   maxAngle: 180
 --- !u!1 &1197211099067182
 GameObject:
@@ -2237,7 +2237,7 @@ MonoBehaviour:
   ServoID: 02
   isInverse: 0
   targetAxis: 0
-  minAngle: -108
+  minAngle: -180
   maxAngle: 128.2
 --- !u!1 &1722650566829252
 GameObject:
