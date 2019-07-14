@@ -346,7 +346,7 @@ namespace PreMaid.RemoteController
         {
             string flashDump = "05 1C 00 "+ string.Format("{0:X2}", page)+" FF";
             Debug.Log("リクエスト:"+ flashDump);
-            sendingQueue.Enqueue(PreMaidUtility.RewriteXorString(flashDump)); //バッテリー残量を教えてもらう
+            sendingQueue.Enqueue(PreMaidUtility.RewriteXorString(flashDump)); //FLASHの中身を教えてもらう？
 
         }
         
