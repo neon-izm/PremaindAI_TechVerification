@@ -13,7 +13,7 @@ namespace PreMaid
             PreMaidIKController controller = (PreMaidIKController)target;
 
 
-            if (controller.priorJoint == PreMaidIKController.Arm.PriorJoint.Elbow)
+            if (controller.priorJoint == PreMaidIKController.ArmIK.PriorJoint.Elbow)
             {
                 if (!controller.leftHandTarget || !controller.rightHandTarget || !controller.leftElbowTarget || !controller.rightElbowTarget) return;
 
@@ -44,6 +44,17 @@ namespace PreMaid
                 {
                     controller.leftHandTarget.position = leftWristPos;
                     controller.rightHandTarget.position = rightWristPos;
+                }
+            }
+
+            if (controller.headTarget)
+            {
+                EditorGUI.BeginChangeCheck();
+                Vector3 headTargetPos = Handles.PositionHandle(controller.headTarget.position, Quaternion.identity);
+
+                if (EditorGUI.EndChangeCheck())
+                {
+                    controller.headTarget.position = headTargetPos;
                 }
             }
         }

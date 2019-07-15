@@ -8,8 +8,68 @@ namespace PreMaid
     {
         private ModelJoint[] _joints;
 
+        /// <summary>
+        /// 頭部のIKソルバ
+        /// </summary>
+        public class HeadIK
+        {
+            private Transform baseTransform;
+            public ModelJoint neckYaw;
+            public ModelJoint headPitch;
+            public ModelJoint headRoll;     // 所謂萌軸
 
-        public class Arm
+            public Transform headTarget;
+
+            public void Initialize()
+            {
+                baseTransform = neckYaw.transform.parent;
+
+                // 目標点が無ければ自動生成
+                if (!headTarget)
+                {
+                    const float distance = 0.3f;
+                    var obj = new GameObject("HeadTarget");
+                    headTarget = obj.transform;
+                    headTarget.parent = baseTransform;
+                    headTarget.position = neckYaw.transform.position + baseTransform.rotation * Vector3.forward * distance;
+                }
+            }
+
+            public void ApplyIK()
+            {
+                if (!headTarget) return;
+
+                Quaternion invBaseRotation = Quaternion.Inverse(baseTransform.rotation);
+                Vector3 gazeVec = invBaseRotation * (headTarget.position - headRoll.transform.position);
+
+                Quaternion lookAtRot = Quaternion.LookRotation(gazeVec);
+                Vector3 eular = lookAtRot.eulerAngles;
+                Debug.Log(eular);
+                float yaw = eular.y - (eular.y > 180f ? 360f : 0f);
+                float pitch = eular.x - (eular.x > 180f ? 360f : 0f);
+
+                neckYaw.SetServoValue(yaw);
+                headPitch.SetServoValue(pitch);
+            }
+
+            public void DrawGizmos()
+            {
+                const float gizmoRadius = 0.005f;
+
+                Gizmos.color = Color.red;
+
+                if (headTarget)
+                {
+                    Gizmos.DrawLine(headRoll.transform.position, headTarget.position);
+                    Gizmos.DrawSphere(headTarget.position, gizmoRadius);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 腕のIKソルバ
+        /// </summary>
+        public class ArmIK
         {
             private Transform baseTransform;
             public ModelJoint shoulderPitch;
@@ -233,9 +293,9 @@ namespace PreMaid
 
             public void DrawGizmos()
             {
-                float gizmoRadius = 0.01f;
+                float gizmoRadius = 0.005f;
 
-                if (priorJoint == Arm.PriorJoint.Elbow)
+                if (priorJoint == ArmIK.PriorJoint.Elbow)
                 {
                     Gizmos.color = Color.red;
 
@@ -246,7 +306,7 @@ namespace PreMaid
                     }
                 }
 
-                if (priorJoint == Arm.PriorJoint.Elbow)
+                if (priorJoint == ArmIK.PriorJoint.Elbow)
                 {
                     Gizmos.color = Color.yellow;
                 }
@@ -280,11 +340,15 @@ namespace PreMaid
         [Tooltip("右手肘目標です。未指定ならば自動生成します")]
         public Transform rightElbowTarget;
 
-        private Arm leftArm;
-        private Arm rightArm;
+        [Tooltip("頭部目標です。未指定ならば自動生成します")]
+        public Transform headTarget;
+
+        private ArmIK leftArm;
+        private ArmIK rightArm;
+        private HeadIK headIK;
 
         [Tooltip("IKの基準を何に置くかです")]
-        public Arm.PriorJoint priorJoint = Arm.PriorJoint.Elbow;
+        public ArmIK.PriorJoint priorJoint = ArmIK.PriorJoint.Elbow;
 
         // Start is called before the first frame update
         void Start()
@@ -300,7 +364,7 @@ namespace PreMaid
                 _joints = premaidRoot.GetComponentsInChildren<ModelJoint>();
             }
 
-            leftArm = new Arm();
+            leftArm = new ArmIK();
             leftArm.isRightSide = false;
             leftArm.shoulderPitch = GetJointById("04");
             leftArm.upperArmRoll = GetJointById("0B");
@@ -314,7 +378,7 @@ namespace PreMaid
             leftElbowTarget = leftArm.elbowTarget;
             leftHandTarget = leftArm.handTarget;
 
-            rightArm = new Arm();
+            rightArm = new ArmIK();
             rightArm.isRightSide = true;
             rightArm.shoulderPitch = GetJointById("02");
             rightArm.upperArmRoll = GetJointById("09");
@@ -328,6 +392,14 @@ namespace PreMaid
             rightElbowTarget = rightArm.elbowTarget;
             rightHandTarget = rightArm.handTarget;
 
+
+            headIK = new HeadIK();
+            headIK.neckYaw = GetJointById("05");
+            headIK.headPitch = GetJointById("03");
+            headIK.headRoll = GetJointById("07");
+            headIK.headTarget = headTarget;
+            headIK.Initialize();
+            headTarget = headIK.headTarget;
         }
 
         ModelJoint GetJointById(string servoId)
@@ -349,12 +421,14 @@ namespace PreMaid
             rightArm.priorJoint = priorJoint;
             rightArm.ApplyIK();
 
+            headIK.ApplyIK();
         }
 
         private void OnDrawGizmos()
         {
             if (leftArm != null) leftArm.DrawGizmos();
             if (rightArm != null) rightArm.DrawGizmos();
+            if (headIK != null) headIK.DrawGizmos();
         }
     }
 }
