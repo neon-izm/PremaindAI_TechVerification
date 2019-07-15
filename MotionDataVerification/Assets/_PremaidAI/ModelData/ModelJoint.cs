@@ -39,6 +39,13 @@ namespace PreMaid
         [SerializeField]
         private float maxAngle = 135f; // 11500
 
+        /// <summary>
+        /// 現在の角度指令値[deg]
+        /// 参照専用
+        /// </summary>
+        [SerializeField]
+        private float currentAngle = 0f;
+
         // 初期ローカル姿勢
         Quaternion initialLocalRotation = Quaternion.identity;
 
@@ -116,31 +123,36 @@ namespace PreMaid
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         public void SetServoValue(float angleEulerDegree)
         {
-            float angle = Mathf.Clamp(angleEulerDegree, minAngle, maxAngle);
+            float targetAngle = angleEulerDegree % 360f;
+            if (targetAngle > 180f) targetAngle -= 360f;
+            if (targetAngle < -180f) targetAngle += 360f;
 
-            // 可動範囲オーバー時にデバッグ出力
-            if (angle != angleEulerDegree)
-            {
-                ////if (ServoID.Equals("02") || ServoID.Equals("04") || ServoID.Equals("15") || ServoID.Equals("17"))
-                //if (true)
-                //{
-                //    if (angleEulerDegree < minAngle)
-                //    {
-                //        minAngle = angleEulerDegree;
-                //        //Debug.Log(string.Format("{0} - Angle: {1} Min: {2}", name, angleEulerDegree, minAngle));
-                //    }
-                //    else if (angleEulerDegree > maxAngle)
-                //    {
-                //        maxAngle = angleEulerDegree;
-                //        //Debug.Log(string.Format("{0} - Angle: {1} Max: {2}", name, angleEulerDegree, maxAngle));
-                //    }
-                //    angle = angleEulerDegree;
-                //}
-                //else
-                //{
-                //    Debug.Log(string.Format("{0} - Angle: {1} Min: {2} Max: {3}", name, angleEulerDegree, minAngle, maxAngle));
-                //}
-            }
+            float angle = Mathf.Clamp(targetAngle, minAngle, maxAngle);
+            currentAngle = targetAngle;
+
+            //// 可動範囲オーバー時にデバッグ出力
+            //if (angle != angleEulerDegree)
+            //{
+            //    //if (ServoID.Equals("02") || ServoID.Equals("04") || ServoID.Equals("15") || ServoID.Equals("17"))
+            //    if (true)
+            //    {
+            //        if (angleEulerDegree < minAngle)
+            //        {
+            //            minAngle = angleEulerDegree;
+            //            //Debug.Log(string.Format("{0} - Angle: {1} Min: {2}", name, angleEulerDegree, minAngle));
+            //        }
+            //        else if (angleEulerDegree > maxAngle)
+            //        {
+            //            maxAngle = angleEulerDegree;
+            //            //Debug.Log(string.Format("{0} - Angle: {1} Max: {2}", name, angleEulerDegree, maxAngle));
+            //        }
+            //        angle = angleEulerDegree;
+            //    }
+            //    else
+            //    {
+            //        Debug.Log(string.Format("{0} - Angle: {1} Min: {2} Max: {3}", name, angleEulerDegree, minAngle, maxAngle));
+            //    }
+            //}
 
             transform.localRotation = initialLocalRotation * Quaternion.AngleAxis(angle, localServoAxis);
         }
