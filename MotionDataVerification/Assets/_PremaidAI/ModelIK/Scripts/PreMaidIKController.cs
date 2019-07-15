@@ -44,7 +44,6 @@ namespace PreMaid
 
                 Quaternion lookAtRot = Quaternion.LookRotation(gazeVec);
                 Vector3 eular = lookAtRot.eulerAngles;
-                Debug.Log(eular);
                 float yaw = eular.y - (eular.y > 180f ? 360f : 0f);
                 float pitch = eular.x - (eular.x > 180f ? 360f : 0f);
 
@@ -293,7 +292,7 @@ namespace PreMaid
 
             public void DrawGizmos()
             {
-                float gizmoRadius = 0.005f;
+                float gizmoRadius = 0.01f;
 
                 if (priorJoint == ArmIK.PriorJoint.Elbow)
                 {
