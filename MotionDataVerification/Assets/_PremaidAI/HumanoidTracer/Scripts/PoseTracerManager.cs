@@ -9,22 +9,23 @@ using TMPro;
 using UnityEngine;
 
 namespace PreMaid.HumanoidTracer
-
 {
-    [RequireComponent(typeof(PreMaid.RemoteController.PreMaidPoseController))]
+    /// <summary>
+    /// MecanimというかHumanoidのアバターからモーションを実機に反映するスクリプト
+    /// </summary>
+    [RequireComponent(typeof(PreMaid.RemoteController.PreMaidController))]
     [DefaultExecutionOrder(11001)] //after VRIK calclate
     public class PoseTracerManager : MonoBehaviour
     {
-        private PreMaid.RemoteController.PreMaidPoseController _controller;
+        private PreMaid.RemoteController.PreMaidController _controller;
 
         [SerializeField] private Animator target;
 
         [SerializeField] private HumanoidModelJoint[] _joints;
 
         [SerializeField] private TMPro.TMP_Dropdown _serialPortsDropdown = null;
-
-
-        private bool initialized = false;
+        
+        private bool _initialized = false;
 
         //何秒ごとにポーズ指定するか0.09は安全,0.08は結構失敗が多い
         private float _poseProcessDelay = 0.09f;
@@ -35,7 +36,7 @@ namespace PreMaid.HumanoidTracer
         // Start is called before the first frame update
         void Start()
         {
-            _controller = GetComponent<PreMaid.RemoteController.PreMaidPoseController>();
+            _controller = GetComponent<PreMaid.RemoteController.PreMaidController>();
             List<TMP_Dropdown.OptionData> serialPortNamesList = new List<TMP_Dropdown.OptionData>();
 
             var portNames = SerialPort.GetPortNames();
@@ -94,7 +95,6 @@ namespace PreMaid.HumanoidTracer
         {
             yield return new WaitForSeconds(1f);
             //ここらへんでサーボパラメータ入れたりする
-            _controller.SetContinuousMode(true);
             Invoke(nameof(Apply), 3f);
         }
 
@@ -108,10 +108,10 @@ namespace PreMaid.HumanoidTracer
                 servos.Find(x => x.ServoPositionEnum == VARIABLE.TargetServo).SetServoValueSafeClamp((int) servoValue);
             }
 
-            _controller.ApplyPose();
-            if (initialized == false)
+            _controller.ApplyPoseAllServos();
+            if (_initialized == false)
             {
-                initialized = true;
+                _initialized = true;
             }
         }
 
@@ -125,7 +125,7 @@ namespace PreMaid.HumanoidTracer
 
         void LateUpdate()
         {
-            if (initialized == false)
+            if (_initialized == false)
             {
                 return;
             }
