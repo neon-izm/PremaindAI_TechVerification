@@ -67,6 +67,6 @@ https://github.com/kuroiwasi/PremaidAI_Model
 
 # Contributors
 - @GOROman … 通信形式解析
-- @kirurobo … モーションプレビュー解析,実装
+- @kirurobo … モーションプレビュー解析,実装, 独自Arm,LookAtIK実装
 - @Schwarz_Sardin … FBXモデル作成
 - @kazzlog … 直接ポーズ送信の発見, バッテリー残量問い合わせの発見,サーボのストレッチ、スピードパラメータ制御の発見
