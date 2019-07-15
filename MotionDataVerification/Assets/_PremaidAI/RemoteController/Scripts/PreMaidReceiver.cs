@@ -51,6 +51,19 @@ namespace PreMaid.RemoteController
                     }
 
                     break;
+                //モーション転送結果
+                case "18":
+                    if (receivedString == "0418001C")
+                    {
+                        
+                    }
+                    else
+                    {
+                        Debug.Log("PoseError:"+ receivedString);
+                    }
+
+                    break;
+                    
                 default:
                     Debug.Log(receivedString);
                     break;
