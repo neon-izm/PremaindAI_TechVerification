@@ -8,14 +8,14 @@ namespace PreMaid.RemoteController
     /// <summary>
     /// プリメイドAIからの受信命令を解析するスクリプト
     /// </summary>
-    [RequireComponent(typeof(PreMaidPoseController))]
+    [RequireComponent(typeof(PreMaidController))]
     public class PreMaidReceiver : MonoBehaviour
     {
-        private PreMaidPoseController _preMaidPoseController = null;
+        private PreMaidController _preMaidPoseController = null;
         // Start is called before the first frame update
         void Start()
         {
-            _preMaidPoseController = GetComponent<PreMaidPoseController>();
+            _preMaidPoseController = GetComponent<PreMaidController>();
             _preMaidPoseController.OnReceivedFromPreMaidAI+= OnReceivedFromPreMaidAi;
         }
 

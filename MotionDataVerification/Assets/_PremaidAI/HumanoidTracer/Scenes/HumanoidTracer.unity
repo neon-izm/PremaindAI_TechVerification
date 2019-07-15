@@ -537,9 +537,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 200169246}
-  - component: {fileID: 200169245}
   - component: {fileID: 200169244}
   - component: {fileID: 200169247}
+  - component: {fileID: 200169245}
   m_Layer: 0
   m_Name: PreMaidAI_PoseTracer
   m_TagString: Untagged
@@ -571,7 +571,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 200169243}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ba0e83b5464ed9342b7c3d91875731ff, type: 3}
+  m_Script: {fileID: 11500000, guid: 2701842d06a24c44ca385e25e8f77ef6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _servos: []
