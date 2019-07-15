@@ -151,6 +151,8 @@ MonoBehaviour:
   ServoID: 12
   isInverse: 1
   targetAxis: 0
+  minAngle: -82
+  maxAngle: 0
 --- !u!1 &1007385218716848
 GameObject:
   m_ObjectHideFlags: 0
@@ -603,6 +605,8 @@ MonoBehaviour:
   ServoID: 15
   isInverse: 0
   targetAxis: 0
+  minAngle: -49
+  maxAngle: 193
 --- !u!1 &1123327164904058
 GameObject:
   m_ObjectHideFlags: 0
@@ -754,6 +758,8 @@ MonoBehaviour:
   ServoID: 11
   isInverse: 1
   targetAxis: 2
+  minAngle: -13
+  maxAngle: 123
 --- !u!1 &1158053568523628
 GameObject:
   m_ObjectHideFlags: 0
@@ -1010,6 +1016,8 @@ MonoBehaviour:
   ServoID: 04
   isInverse: 1
   targetAxis: 0
+  minAngle: -128.2
+  maxAngle: 180
 --- !u!1 &1197211099067182
 GameObject:
   m_ObjectHideFlags: 0
@@ -1058,6 +1066,8 @@ MonoBehaviour:
   ServoID: 0A
   isInverse: 1
   targetAxis: 2
+  minAngle: -24
+  maxAngle: 15
 --- !u!1 &1270387445672608
 GameObject:
   m_ObjectHideFlags: 0
@@ -1211,6 +1221,8 @@ MonoBehaviour:
   ServoID: 10
   isInverse: 1
   targetAxis: 0
+  minAngle: -16
+  maxAngle: 52
 --- !u!1 &1293722861444386
 GameObject:
   m_ObjectHideFlags: 0
@@ -1497,6 +1509,8 @@ MonoBehaviour:
   ServoID: 1C
   isInverse: 1
   targetAxis: 2
+  minAngle: -41
+  maxAngle: 10
 --- !u!1 &1358430598648790
 GameObject:
   m_ObjectHideFlags: 0
@@ -1574,6 +1588,8 @@ MonoBehaviour:
   ServoID: 0E
   isInverse: 0
   targetAxis: 0
+  minAngle: -52
+  maxAngle: 16
 --- !u!1 &1425968035220696
 GameObject:
   m_ObjectHideFlags: 0
@@ -1656,6 +1672,8 @@ MonoBehaviour:
   ServoID: 0B
   isInverse: 1
   targetAxis: 2
+  minAngle: -93.7
+  maxAngle: -4.1
 --- !u!1 &1465438222175130
 GameObject:
   m_ObjectHideFlags: 0
@@ -1703,6 +1721,8 @@ MonoBehaviour:
   ServoID: 06
   isInverse: 1
   targetAxis: 1
+  minAngle: -30
+  maxAngle: 37
 --- !u!1 &1490695214511820
 GameObject:
   m_ObjectHideFlags: 0
@@ -1780,6 +1800,8 @@ MonoBehaviour:
   ServoID: 0D
   isInverse: 0
   targetAxis: 0
+  minAngle: -128.7
+  maxAngle: 134.3
 --- !u!1 &1532179397188176
 GameObject:
   m_ObjectHideFlags: 0
@@ -1963,6 +1985,8 @@ MonoBehaviour:
   ServoID: 08
   isInverse: 1
   targetAxis: 1
+  minAngle: -30
+  maxAngle: 37
 --- !u!1 &1563714723513678
 GameObject:
   m_ObjectHideFlags: 0
@@ -2115,6 +2139,8 @@ MonoBehaviour:
   ServoID: 07
   isInverse: 0
   targetAxis: 2
+  minAngle: -22
+  maxAngle: 28.6
 --- !u!1 &1648484941613568
 GameObject:
   m_ObjectHideFlags: 0
@@ -2162,6 +2188,8 @@ MonoBehaviour:
   ServoID: 1A
   isInverse: 1
   targetAxis: 2
+  minAngle: -10
+  maxAngle: 41
 --- !u!1 &1666772332270190
 GameObject:
   m_ObjectHideFlags: 0
@@ -2209,6 +2237,8 @@ MonoBehaviour:
   ServoID: 02
   isInverse: 0
   targetAxis: 0
+  minAngle: -180
+  maxAngle: 128.2
 --- !u!1 &1722650566829252
 GameObject:
   m_ObjectHideFlags: 0
@@ -2749,6 +2779,8 @@ MonoBehaviour:
   ServoID: 17
   isInverse: 1
   targetAxis: 0
+  minAngle: -203
+  maxAngle: 49
 --- !u!1 &1825221674716828
 GameObject:
   m_ObjectHideFlags: 0
@@ -3110,6 +3142,8 @@ MonoBehaviour:
   ServoID: 0F
   isInverse: 1
   targetAxis: 0
+  minAngle: -60
+  maxAngle: 108
 --- !u!1 &1882269851910476
 GameObject:
   m_ObjectHideFlags: 0
@@ -3262,6 +3296,8 @@ MonoBehaviour:
   ServoID: 05
   isInverse: 0
   targetAxis: 1
+  minAngle: -75
+  maxAngle: 75
 --- !u!1 &1936238253859368
 GameObject:
   m_ObjectHideFlags: 0
@@ -3414,6 +3450,8 @@ MonoBehaviour:
   ServoID: 0C
   isInverse: 1
   targetAxis: 2
+  minAngle: -15
+  maxAngle: 24
 --- !u!1 &1968923863145502
 GameObject:
   m_ObjectHideFlags: 0
@@ -3565,6 +3603,8 @@ MonoBehaviour:
   ServoID: 09
   isInverse: 1
   targetAxis: 2
+  minAngle: 4.1
+  maxAngle: 97.3
 --- !u!1 &1973764243709488
 GameObject:
   m_ObjectHideFlags: 0
@@ -3612,6 +3652,8 @@ MonoBehaviour:
   ServoID: 13
   isInverse: 1
   targetAxis: 2
+  minAngle: -123
+  maxAngle: 13
 --- !u!1 &1990200252646862
 GameObject:
   m_ObjectHideFlags: 0
@@ -3659,6 +3701,8 @@ MonoBehaviour:
   ServoID: 14
   isInverse: 0
   targetAxis: 0
+  minAngle: 0
+  maxAngle: 82
 --- !u!1 &1997557372765684
 GameObject:
   m_ObjectHideFlags: 0
@@ -3811,6 +3855,8 @@ MonoBehaviour:
   ServoID: 16
   isInverse: 0
   targetAxis: 0
+  minAngle: -35
+  maxAngle: 18
 --- !u!1 &7102321179654700250
 GameObject:
   m_ObjectHideFlags: 0
@@ -3858,6 +3904,8 @@ MonoBehaviour:
   ServoID: 18
   isInverse: 1
   targetAxis: 0
+  minAngle: -18
+  maxAngle: 35
 --- !u!1 &8406972422284024112
 GameObject:
   m_ObjectHideFlags: 0
@@ -3905,3 +3953,5 @@ MonoBehaviour:
   ServoID: 03
   isInverse: 0
   targetAxis: 0
+  minAngle: -10.2
+  maxAngle: 23.6

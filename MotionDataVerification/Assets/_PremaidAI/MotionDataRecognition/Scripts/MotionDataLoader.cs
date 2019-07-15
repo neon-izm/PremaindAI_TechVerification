@@ -267,6 +267,8 @@ namespace PreMaid
 
                 isPlaying = false;
                 currentKoma = 0;
+
+                // 停止中はキーフレーム単位の姿勢合わせ状態にしておく
                 ApplyPose(currentFrame);
             }
             else

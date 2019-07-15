@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using UnityEngine;
 
 namespace PreMaid
 {
-
-
     public class PreMaidUtility : MonoBehaviour
     {
         /// <summary>
@@ -68,6 +67,32 @@ namespace PreMaid
             Debug.Log(str);
         }
 
+        public static string DumpBytesToHexString(byte[] hex, int length)
+        {
+            string str = "";
+            for (int i = 0; i < length; i++)
+            {
+                str += string.Format("{0:X2}", hex[i]);
+            }
+
+            return str;
+        }
+
+        /// <summary>
+        /// "1F"を渡したら25が返ってくるやつ
+        /// </summary>
+        /// <returns></returns>
+        public static int HexStringToInt(string hex)
+        {
+            if (hex.Length > 4)
+            {
+                throw new InvalidOperationException("入力文字数は4文字以内を想定しています");
+            }
+
+            var ret = Int32.Parse(hex, NumberStyles.AllowHexSpecifier);
+            return ret;
+        }
+
         /// <summary>
         /// スペース区切りの文字列からbyte配列を作る。このコードを読む人はこれだけ使ってもらえれば！
         /// </summary>
@@ -87,11 +112,10 @@ namespace PreMaid
         /// <returns></returns>
         public static byte[] HexStringToByteArray(string hex)
         {
-            int numberChars = hex.Length;
-            byte[] bytes = new byte[numberChars / 2];
-            for (int i = 0; i < numberChars; i += 2)
-                bytes[i / 2] = Convert.ToByte(hex.Substring(i, 2), 16);
-            return bytes;
+            return Enumerable.Range(0, hex.Length)
+                .Where(x => x % 2 == 0)
+                .Select(x => Convert.ToByte(hex.Substring(x, 2), 16))
+                .ToArray();
         }
 
         /// <summary>
@@ -104,6 +128,21 @@ namespace PreMaid
             return new string(input.ToCharArray()
                 .Where(c => !Char.IsWhiteSpace(c))
                 .ToArray());
+        }
+        
+        /// <summary>
+        /// 4C1Dを入れたら1D4Cが返ってくる
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public static string ConvertEndian(string data)
+        {
+            int sValueAsInt = int.Parse(data, System.Globalization.NumberStyles.HexNumber);
+            byte[] bytes = BitConverter.GetBytes(sValueAsInt);
+            string retval = "";
+            foreach (byte b in bytes)
+                retval += b.ToString("X2");
+            return retval.Substring(0, 4);
         }
     }
 }
