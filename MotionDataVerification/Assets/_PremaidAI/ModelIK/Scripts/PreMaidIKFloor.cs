@@ -67,7 +67,6 @@ namespace PreMaid.IKSample
                         obj.transform.rotation = robotRoot.rotation;
                         obj.transform.parent = floorTransform;
 
-                        Debug.Log(obj.name);
                         ikController.leftFootTarget = obj.transform;
                     }
 
@@ -79,7 +78,6 @@ namespace PreMaid.IKSample
                         obj.transform.rotation = robotRoot.rotation;
                         obj.transform.parent = floorTransform;
 
-                        Debug.Log(obj.name);
                         ikController.rightFootTarget = obj.transform;
                     }
 
