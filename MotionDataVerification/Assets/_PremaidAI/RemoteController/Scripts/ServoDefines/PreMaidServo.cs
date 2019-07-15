@@ -263,7 +263,7 @@ namespace PreMaid.RemoteController
         {
             var aaa = PreMaidUtility.ConvertEndian(PreMaidUtility.RemoveWhitespace(spaceSplitedByteString));
             int intValue = int.Parse(aaa, System.Globalization.NumberStyles.HexNumber);
-            Debug.Log($"{spaceSplitedByteString} は {intValue} ");
+            //Debug.Log($"{spaceSplitedByteString} は {intValue} ");
 
             SetServoValueSafeClamp(intValue);
         }

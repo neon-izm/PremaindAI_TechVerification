@@ -3,11 +3,12 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO.Ports;
+using System.Linq;
 using System.Threading;
 using UnityEngine;
-
 #if UNITY_EDITOR
 using UnityEditor;
+
 #endif
 
 
@@ -20,17 +21,18 @@ namespace PreMaid.RemoteController
     public class PreMaidController : MonoBehaviour
     {
         [SerializeField] List<PreMaidServo> _servos = new List<PreMaidServo>();
-        
+
         private string portName = "COM7";
         private const int BaudRate = 115200;
         private SerialPort _serialPort;
-        
+
         [SerializeField] private bool _serialPortOpen = false;
+
         public bool SerialPortOpen
         {
             get { return _serialPortOpen; }
         }
-        
+
         /// <summary>
         /// シリアルポート経由で受信した命令を受けるアクション
         /// </summary>
@@ -38,17 +40,18 @@ namespace PreMaid.RemoteController
 
         public Action OnInitializeServoDefines = null;
 
-        
+
         public List<PreMaidServo> Servos
         {
             get { return _servos; }
             set { _servos = value; }
         }
 
-       
 
         /// <summary>
         /// プリメイドAIに命令を送るときはここにEnqueueする
+        /// スペース区切りの命令文字列を入れることを想定しています
+        /// 例："50 18 00 06 02 00 00 03 00 00 04 00 00 05 00 00 06 00 00 07 00 00 08 00 00 09 00 00 0A 00 00 0B 00 00 0C 00 00 0D 00 00 0E 00 00 0F 00 00 10 00 00 11 00 00 12 00 00 13 00 00 14 00 00 15 00 00 16 00 00 17 00 00 18 00 00 1A 00 00 1C 00 00 FF";
         /// </summary>
         ConcurrentQueue<string> sendingQueue = new ConcurrentQueue<string>();
 
@@ -63,7 +66,7 @@ namespace PreMaid.RemoteController
         /// </summary>
         ConcurrentQueue<string> errorQueue = new ConcurrentQueue<string>();
 
-        
+
         /// <summary>
         /// シリアルポート用のスレッド
         /// </summary>
@@ -94,7 +97,6 @@ namespace PreMaid.RemoteController
             }
 
 
-           
             OnInitializeServoDefines?.Invoke();
 #if UNITY_EDITOR
             EditorApplication.playModeStateChanged += OnChangedPlayMode;
@@ -102,7 +104,7 @@ namespace PreMaid.RemoteController
 #endif
         }
 
-        
+
 #if UNITY_EDITOR
         //プレイモードが変更された
         private void OnChangedPlayMode(PlayModeStateChange state)
@@ -122,8 +124,8 @@ namespace PreMaid.RemoteController
             }
         }
 #endif
-        
-         /// <summary>
+
+        /// <summary>
         /// シリアルポートを開く
         /// </summary>
         /// <param name="portName">"COM4"とか</param>
@@ -248,8 +250,6 @@ namespace PreMaid.RemoteController
         /// <returns></returns>
         string BuildPoseStringAll(int speed = 10)
         {
-
-            
             speed = Mathf.Clamp(speed, 1, 255);
 
             //決め打ちのポーズ命令+スピード(小さい方が速くて、255が最大に遅い)
@@ -289,7 +289,6 @@ namespace PreMaid.RemoteController
             return PreMaidUtility.RewriteXorString(ret);
         }
 
-        
 
         /// <summary>
         /// 現在のサーボ値を適用してシリアル通信でプリメイドAI実機に送る
@@ -319,10 +318,44 @@ namespace PreMaid.RemoteController
             sendingQueue.Enqueue(BuildPoseStringAll(10)); //対象のモーション、今回は1個だけ;
         }
 
-         /// <summary>
+
+        /// <summary>
+        /// 指定されたサーボ値を適用してシリアル通信でプリメイドAI実機に送る
+        /// </summary>
+        public void ApplyPoseFromServos(IEnumerable<PreMaidServo> servos, int speed = 10)
+        {
+            if (SerialPortOpen == false)
+            {
+                Debug.LogWarning("ポーズ指定されたときにシリアルポートが開いていません");
+                return;
+            }
+
+            speed = Mathf.Clamp(speed, 1, 255);
+
+            int servoNum = servos.Count();
+            int orderLen = servoNum * 3 + 5; //命令長はサーボ個数が1個だったら0x08, サーボ個数が25個だったら0x50(80)になる
+
+            //決め打ちのポーズ命令+スピード(小さい方が速くて、255が最大に遅い)
+            string ret = orderLen.ToString("X2") + " 18 00 " + speed.ToString("X2");
+            //そして各サーボぼ値を入れる
+            foreach (var VARIABLE in servos)
+            {
+                ret += " " + VARIABLE.GetServoIdAndValueString();
+            }
+
+            ret += " FF"; //パリティビットを仮で挿入する;
+
+            //パリティビットを計算し直した値にして、文字列を返す
+            ret = PreMaidUtility.RewriteXorString(ret);
+
+            sendingQueue.Enqueue(ret); //対象のモーション、今回は1個だけ;
+        }
+
+
+        /// <summary>
         /// 全サーボの強制脱力命令
         /// </summary>
-        public void ForceAllServoStop(bool disconnect=true)
+        public void ForceAllServoStop(bool disconnect = true)
         {
             //ここで連続送信モードを停止しないと、脱力後の急なサーボ命令で一気にプリメイドAIが暴れて死ぬ
             //なので、普段はついでにシリアルポートも切る
@@ -427,7 +460,7 @@ namespace PreMaid.RemoteController
             {
                 return;
             }
-            
+
             //受信バッファ、バイナリで届くので区切りをどうしようか悩み中
             //一旦、素朴に先頭に命令長が来るでしょう、というつもりで書きます。
             if (receivedQueue.IsEmpty == false)
@@ -487,7 +520,6 @@ namespace PreMaid.RemoteController
                     }
                 }
             }
-
         }
     }
 }

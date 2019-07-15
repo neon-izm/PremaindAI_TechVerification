@@ -2,8 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO.Ports;
-using System.Linq;
-using PreMaid.HumanoidTracer;
 using PreMaid.RemoteController;
 using TMPro;
 using UnityEngine;
@@ -12,6 +10,9 @@ namespace PreMaid.HumanoidTracer
 {
     /// <summary>
     /// MecanimというかHumanoidのアバターからモーションを実機に反映するスクリプト
+    /// 仮説として、全サーボ情報を送ると結構応答性が悪い（10FPS程度）ので、
+    /// キーフレームを1秒ごと+差分フレームを送る
+    /// これで1個や2個しかサーボが動かないモーションだと応答性がよくなる、はず
     /// </summary>
     [RequireComponent(typeof(PreMaid.RemoteController.PreMaidController))]
     [DefaultExecutionOrder(11001)] //after VRIK calclate
@@ -24,15 +25,20 @@ namespace PreMaid.HumanoidTracer
         [SerializeField] private HumanoidModelJoint[] _joints;
 
         [SerializeField] private TMPro.TMP_Dropdown _serialPortsDropdown = null;
-        
+
         private bool _initialized = false;
 
-        //何秒ごとにポーズ指定するか0.09は安全,0.08は結構失敗が多い
-        private float _poseProcessDelay = 0.09f;
+        //差分フレームタイマー
+        private float coolTime = 0f;
 
-        private float _timer = 0.0f;
+        //キーフレームは1秒ごとに打つ
+        private float keyFrameTimer = 0f;
+
+        List<PreMaidServo> latestServos = new List<PreMaidServo>();
 
 
+        [SerializeField] private int currentFPS = 0;
+        
         // Start is called before the first frame update
         void Start()
         {
@@ -95,20 +101,86 @@ namespace PreMaid.HumanoidTracer
         {
             yield return new WaitForSeconds(1f);
             //ここらへんでサーボパラメータ入れたりする
-            Invoke(nameof(Apply), 3f);
+            Invoke(nameof(ApplyMecanimPoseWithDiff), 3f);
         }
 
-        void Apply()
+        /// <summary>
+        /// 現在のAnimatorについているサーボの値を参照しながら差分だけ送る
+        /// </summary>
+        void ApplyMecanimPoseWithDiff()
         {
             var servos = _controller.Servos;
 
+            List<PreMaidServo> orders = new List<PreMaidServo>();
+
             foreach (var VARIABLE in _joints)
             {
-                var servoValue = VARIABLE.CurrentServoValue();
-                servos.Find(x => x.ServoPositionEnum == VARIABLE.TargetServo).SetServoValueSafeClamp((int) servoValue);
+                var mecanimServoValue = VARIABLE.CurrentServoValue();
+
+                var servo = servos.Find(x => x.ServoPositionEnum == VARIABLE.TargetServo);
+
+                int premaidServoValue = servo.GetServoValue();
+
+                //20以上サーボの値が変わってたら命令とする
+                //50とかでもいいかも
+                if (Mathf.Abs(mecanimServoValue - premaidServoValue) > 40)
+                {
+                    servo.SetServoValueSafeClamp((int) mecanimServoValue);
+                    PreMaidServo tmp = new PreMaidServo(VARIABLE.TargetServo);
+                    tmp.SetServoValueSafeClamp((int) mecanimServoValue);
+                    orders.Add(tmp);
+                }
             }
 
-            _controller.ApplyPoseAllServos();
+            //ここでordersに差分だけ送れます
+            coolTime = orders.Count * 0.005f; //25個あると0.08くらい、1個だと0.01くらいのクールタイムが良い
+
+            if (orders.Count > 0)
+            {
+                currentFPS++;
+                //Debug.Log("Servo Num:" + orders.Count);
+                _controller.ApplyPoseFromServos(orders, Mathf.Clamp(orders.Count*2,10,40));
+            }
+
+            if (_initialized == false)
+            {
+                _initialized = true;
+            }
+        }
+
+        /// <summary>
+        /// 現在のAnimatorについているサーボの値を参照しながら全て送る
+        /// </summary>
+        void ApplyMecanimPoseAll()
+        {
+            var servos = _controller.Servos;
+
+            List<PreMaidServo> orders = new List<PreMaidServo>();
+
+            foreach (var VARIABLE in _joints)
+            {
+                var mecanimServoValue = VARIABLE.CurrentServoValue();
+
+                var servo = servos.Find(x => x.ServoPositionEnum == VARIABLE.TargetServo);
+
+                int premaidServoValue = servo.GetServoValue();
+
+
+                servo.SetServoValueSafeClamp((int) mecanimServoValue);
+                PreMaidServo tmp = new PreMaidServo(VARIABLE.TargetServo);
+                tmp.SetServoValueSafeClamp((int) mecanimServoValue);
+                orders.Add(tmp);
+            }
+
+            //ここでordersに差分だけ送れます
+            coolTime = 0.09f; //25個あると0.08くらい、1個だと0.01くらいのクールタイムが良い
+
+            keyFrameTimer = 1f;
+            Debug.Log("全フレーム転送 :" + orders.Count+" FPS:"+currentFPS);
+            _controller.ApplyPoseFromServos(orders, 40);
+
+            currentFPS = 0;
+
             if (_initialized == false)
             {
                 _initialized = true;
@@ -130,11 +202,19 @@ namespace PreMaid.HumanoidTracer
                 return;
             }
 
-            _timer += Time.deltaTime;
-            if (_timer > _poseProcessDelay)
+            coolTime -= Time.deltaTime;
+            keyFrameTimer -= Time.deltaTime;
+            if (coolTime <= 0)
             {
-                Apply();
-                _timer -= _poseProcessDelay;
+                
+                if (keyFrameTimer <= 0)
+                {
+                    ApplyMecanimPoseAll();
+                }
+                else
+                {
+                    ApplyMecanimPoseWithDiff();
+                }
             }
         }
     }
