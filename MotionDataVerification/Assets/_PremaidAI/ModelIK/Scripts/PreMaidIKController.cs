@@ -667,7 +667,7 @@ namespace PreMaid
 
 
         // Update is called once per frame
-        void Update()
+        void LateUpdate()
         {
             leftLegIK.ApplyIK();
             rightLegIK.ApplyIK();

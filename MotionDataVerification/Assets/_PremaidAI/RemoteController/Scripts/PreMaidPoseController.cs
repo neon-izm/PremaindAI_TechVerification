@@ -53,9 +53,6 @@ namespace PreMaid.RemoteController
         }
 
 
-        private string bufferedString = string.Empty;
-
-
         // Update is called once per frame
         void Update()
         {
