@@ -123,7 +123,7 @@ namespace PreMaid.HumanoidTracer
 
                 //20以上サーボの値が変わってたら命令とする
                 //50とかでもいいかも
-                if (Mathf.Abs(mecanimServoValue - premaidServoValue) > 40)
+                if (Mathf.Abs(mecanimServoValue - premaidServoValue) > 10)
                 {
                     servo.SetServoValueSafeClamp((int) mecanimServoValue);
                     PreMaidServo tmp = new PreMaidServo(VARIABLE.TargetServo);
@@ -176,7 +176,7 @@ namespace PreMaid.HumanoidTracer
             coolTime = 0.09f; //25個あると0.08くらい、1個だと0.01くらいのクールタイムが良い
 
             keyFrameTimer = 1f;
-            Debug.Log("全フレーム転送 :" + orders.Count+" FPS:"+currentFPS);
+            //Debug.Log("全フレーム転送 :" + orders.Count+" FPS:"+currentFPS);
             _controller.ApplyPoseFromServos(orders, 40);
 
             currentFPS = 0;
@@ -207,13 +207,13 @@ namespace PreMaid.HumanoidTracer
             if (coolTime <= 0)
             {
                 
-                if (keyFrameTimer <= 0)
+                //if (keyFrameTimer <= 0)
                 {
                     ApplyMecanimPoseAll();
                 }
-                else
+                //else
                 {
-                    ApplyMecanimPoseWithDiff();
+                  //  ApplyMecanimPoseWithDiff();
                 }
             }
         }

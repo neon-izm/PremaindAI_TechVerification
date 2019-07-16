@@ -89,13 +89,14 @@ namespace PreMaid.RemoteController
                 Servos.Add(servo);
             }
 
-            //一覧を出す
+            /*
+            //一覧を出して確認するときはここのコメントアウトを外す
             foreach (var VARIABLE in Servos)
             {
                 Debug.Log(VARIABLE.GetServoIdString() + "   " + VARIABLE.GetServoId() + "  サーボ数値変換" +
                           VARIABLE.GetServoIdAndValueString());
             }
-
+            */
 
             OnInitializeServoDefines?.Invoke();
 #if UNITY_EDITOR
