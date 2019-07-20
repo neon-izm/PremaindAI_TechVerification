@@ -24,8 +24,7 @@ namespace PreMaid
             public float eulerAngle; //角度を出します。7500が0で3500が-135度、11500が135度
         }
 
-        [SerializeField]
-        private int currentFrame = 0;
+        [SerializeField] private int currentFrame = 0;
 
         [System.Serializable]
         //1フレームのポーズ
@@ -33,14 +32,14 @@ namespace PreMaid
         {
             public int frameNumber;
 
-            public string commandLength;//"50"で固定？
-            public string command;//"18"で固定？
-            public string commandPadding;//"00"で固定
-            public string frameWait;//"FF"のことが多い
+            public string commandLength; //"50"で固定？
+            public string command; //"18"で固定？
+            public string commandPadding; //"00"で固定
+            public string frameWait; //"FF"のことが多い
             public List<Servo> servos = new List<Servo>();
-            public string checkByte;//ここまでの値をxorしたもの
+            public string checkByte; //ここまでの値をxorしたもの
 
-            public int wait;    // frameWaitの値
+            public int wait; // frameWaitの値
         }
 
         /// <summary>
@@ -57,14 +56,12 @@ namespace PreMaid
 
         [SerializeField] List<PoseFrame> _frames = new List<PoseFrame>();
 
-        [SerializeField]
-        private ModelJoint[] _joints;
+        [SerializeField] private ModelJoint[] _joints;
 
         /// <summary>
         /// 再生時のFPS（komas per second）
         /// </summary>
-        [SerializeField]
-        private float fps = 66.67f;
+        [SerializeField] private float fps = 66.67f;
 
         /// <summary>
         /// モーション再生中は true
@@ -79,8 +76,7 @@ namespace PreMaid
         /// <summary>
         /// 現在のコマ。再生中は時刻に合わせて増える
         /// </summary>
-        [SerializeField]
-        private int currentKoma = 0;
+        [SerializeField] private int currentKoma = 0;
 
         /// <summary>
         /// 全コマ数
@@ -91,8 +87,7 @@ namespace PreMaid
         /// 再生開始をこのコマからとする。負の値も可
         /// 動画との時刻合わせ用
         /// </summary>
-        [SerializeField]
-        private int firstKoma = 0;
+        [SerializeField] private int firstKoma = 0;
 
         private UnityEngine.Video.VideoPlayer videoPlayer;
         private UnityEngine.UI.Slider motionSeekSlider;
@@ -110,7 +105,6 @@ namespace PreMaid
 
             foreach (var VARIABLE in targetFrame.servos)
             {
-
                 try
                 {
                     var modelJoint = _joints.First(joint => joint.ServoID == VARIABLE.id);
@@ -123,9 +117,7 @@ namespace PreMaid
                 {
                     Debug.Log("some exeption:" + e);
                 }
-
             }
-
         }
 
         void ApplyPose(PoseFrame prevFrame, PoseFrame nextFrame, float weight)
@@ -157,9 +149,7 @@ namespace PreMaid
                 {
                     Debug.Log("some exeption:" + e);
                 }
-
             }
-
         }
 
         /// <summary>
@@ -195,7 +185,7 @@ namespace PreMaid
                 if ((elapsedKoma + nextFrame.wait) >= koma)
                 {
                     // 2つのコマ間の重みを0～1で求める
-                    weight = Mathf.Clamp01((float)(koma - elapsedKoma) / nextFrame.wait);
+                    weight = Mathf.Clamp01((float) (koma - elapsedKoma) / nextFrame.wait);
                     break;
                 }
 
@@ -240,14 +230,14 @@ namespace PreMaid
 
             if (isPlaying)
             {
-                currentKoma = (int)((Time.time - startedTime) * fps);
+                currentKoma = (int) ((Time.time - startedTime) * fps);
                 ApplyPoseByKoma(currentKoma);
 
                 // スライダーを進ませる
                 if (motionSeekSlider && (totalKomas != 0) && (currentKoma <= totalKomas))
                 {
                     isSliderDraggable = false;
-                    motionSeekSlider.value = (float)currentKoma / (float)totalKomas;
+                    motionSeekSlider.value = (float) currentKoma / (float) totalKomas;
                     isSliderDraggable = true;
                 }
             }
@@ -278,7 +268,7 @@ namespace PreMaid
                 if (videoPlayer) videoPlayer.Play();
 
                 currentKoma = firstKoma;
-                startedTime = Time.time - ((float)firstKoma / fps);
+                startedTime = Time.time - ((float) firstKoma / fps);
                 isPlaying = true;
             }
         }
@@ -291,7 +281,7 @@ namespace PreMaid
         {
             if (isSliderDraggable)
             {
-                currentKoma = (int)(normalizedKoma * totalKomas);
+                currentKoma = (int) (normalizedKoma * totalKomas);
                 startedTime = Time.time - currentKoma / fps;
                 ApplyPoseByKoma(currentKoma);
             }
@@ -302,6 +292,11 @@ namespace PreMaid
         /// </summary>
         public void OpenFileButton()
         {
+#if UNITY_EDITOR_OSX
+
+            Debug.LogError("Mac OS currently not supported this function");
+            return;
+#else
             var willOpenPath = VRM.FileDialogForWindows.FileDialog("Open Premaid Motion File", ".pma", ".mp4", ".mov");
 
             if (string.IsNullOrEmpty(willOpenPath))
@@ -333,6 +328,7 @@ namespace PreMaid
                     LoadVideo(path + ".mov");
                 }
             }
+#endif
         }
 
         /// <summary>
@@ -397,14 +393,13 @@ namespace PreMaid
             int frameCounter = 0;
             totalKomas = 0;
 
-            var loops = new Stack<Loop>();   // ループ情報。読み込み中に都度都度増減する
+            var loops = new Stack<Loop>(); // ループ情報。読み込み中に都度都度増減する
 
             _frames.Clear();
 
             //ここからhex文字列の配列からパースしていきます。
             while (seekIndex < tailIndex)
             {
-
                 //50 18 から始まるのがモーションデータ作法
                 if (hexByteArray[seekIndex] == "50" && (seekIndex + 6 < tailIndex) &&
                     hexByteArray[seekIndex + 1] == "18")
@@ -426,13 +421,13 @@ namespace PreMaid
                 }
                 // ループ始点
                 else if (hexByteArray[seekIndex] == "08" && (seekIndex + 7 < tailIndex) &&
-                    hexByteArray[seekIndex + 1] == "02")
+                         hexByteArray[seekIndex + 1] == "02")
                 {
                     string[] commandArray = hexByteArray.Skip(seekIndex).Take(0x08).ToArray();
 
                     Loop loop = new Loop();
-                    loop.iteration = HexToInt(commandArray[5]);  // ここが繰り返し回数？
-                    loop.startKeyFrameIndex = _frames.Count - 1;    // ループ始点となるキーフレーム番号
+                    loop.iteration = HexToInt(commandArray[5]); // ここが繰り返し回数？
+                    loop.startKeyFrameIndex = _frames.Count - 1; // ループ始点となるキーフレーム番号
 
                     loops.Push(loop);
 
@@ -440,7 +435,7 @@ namespace PreMaid
                 }
                 // ループ終点
                 else if (hexByteArray[seekIndex] == "08" && (seekIndex + 7 < tailIndex) &&
-                    hexByteArray[seekIndex + 1] == "07")
+                         hexByteArray[seekIndex + 1] == "07")
                 {
                     string[] commandArray = hexByteArray.Skip(seekIndex).Take(0x08).ToArray();
 
@@ -462,7 +457,7 @@ namespace PreMaid
         {
             int startIndex = loop.startKeyFrameIndex;
             int endIndex = _frames.Count - 1;
-            for (int i = 0; i < loop.iteration - 1; i++)    // 1回は元のデータであるので繰り返し回数-1
+            for (int i = 0; i < loop.iteration - 1; i++) // 1回は元のデータであるので繰り返し回数-1
             {
                 for (int j = startIndex; j <= endIndex; j++)
                 {
@@ -500,9 +495,10 @@ namespace PreMaid
                 tmp.hb = servoStrings[4 + i * 3 + 1];
                 tmp.lb = servoStrings[4 + i * 3 + 2];
                 tmp.servoValue = ServoStringToValue(servoStrings[4 + (i * 3) + 1], servoStrings[4 + (i * 3) + 2]);
-                tmp.eulerAngle = (tmp.servoValue - 7500) * 0.03375f;//0.03375= 135/4000
+                tmp.eulerAngle = (tmp.servoValue - 7500) * 0.03375f; //0.03375= 135/4000
                 ret.servos.Add(tmp);
             }
+
             //checkbyte
             ret.checkByte = servoStrings[79];
             return ret;
