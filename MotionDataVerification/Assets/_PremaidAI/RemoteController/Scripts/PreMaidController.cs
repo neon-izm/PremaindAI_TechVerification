@@ -230,6 +230,8 @@ namespace PreMaid.RemoteController
                 //プリメイドAIからの受信チェック
                 try
                 {
+                    
+                    //本当はここのカウントもバッファ溜めつつ見た方が良い…
                     readCount = _serialPort.Read(readBuffer, 0, readBuffer.Length);
 
                     if (readCount > 0)
