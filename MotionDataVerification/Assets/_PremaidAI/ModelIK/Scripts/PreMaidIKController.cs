@@ -490,7 +490,12 @@ namespace PreMaid
                 else
                 {
                     a1 = Mathf.Atan2(dx.x, -xo15.y + dx.y) * Mathf.Rad2Deg;
-                    a5 = -a1;
+                    a5 = -a1;   // 今の所、足元の向きは垂直に限定で a1 の逆としている
+
+                    float len15x = Mathf.Acos(a1 * Mathf.Deg2Rad) * (-xo15.y + dx.y);
+                    float len15z = Mathf.Sqrt(len15x * len15x + dx.z * dx.z);
+
+                    float a15z = Mathf.Acos((-xo15.y + dx.y) / len15z);
 
                     //float len15 = dx.x / Mathf.Sin(a1 * Mathf.Deg2Rad); // 屈伸した状態での x1-x5 間長さ // sinだと a1==0 のとき失敗する
                     float len15 = (-xo15.y + dx.y) / Mathf.Cos(a1 * Mathf.Deg2Rad); // 屈伸した状態での x1-x5 間長さ
