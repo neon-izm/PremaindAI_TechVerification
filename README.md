@@ -31,6 +31,10 @@ MotionTracePremaidAI_Variant.prefab がサーボ情報設定済みのHumanoid互
 
 ![premaid_trace](https://user-images.githubusercontent.com/3115650/61169086-3a653e80-a593-11e9-8836-fb726bd9d9f1.gif)
 
+## マスタースレーブシステムデモ
+MasterSlaveSystem.unity
+![master_slave](https://user-images.githubusercontent.com/3115650/61320956-8b9c5900-a845-11e9-9578-00d1973acd3c.gif)
+
 
 ## BT(SPP)経由でUnityEditor上からのプリメイドAIへの既存ポーズ送信
 MotionDataWriterSample.cs にあります。適切にSerialPortを設定して、決め打ちの命令をbyte[]で送る事でAndroidアプリ上と同じように指定ポーズを取らせられます。

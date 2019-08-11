@@ -89,13 +89,14 @@ namespace PreMaid.RemoteController
                 Servos.Add(servo);
             }
 
-            //一覧を出す
+            /*
+            //一覧を出して確認するときはここのコメントアウトを外す
             foreach (var VARIABLE in Servos)
             {
                 Debug.Log(VARIABLE.GetServoIdString() + "   " + VARIABLE.GetServoId() + "  サーボ数値変換" +
                           VARIABLE.GetServoIdAndValueString());
             }
-
+            */
 
             OnInitializeServoDefines?.Invoke();
 #if UNITY_EDITOR
@@ -200,6 +201,10 @@ namespace PreMaid.RemoteController
 
             var readBuffer = new byte[256 * 3];
             var readCount = 0;
+            var sendingCache = string.Empty; //送信失敗時に連続送信する
+
+            //バースト転送モード
+            bool burstMode = false;
             while (SerialPortOpen && _serialPort != null && _serialPort.IsOpen)
             {
                 //PCから送る予定のキューが入っているかチェック
@@ -208,6 +213,12 @@ namespace PreMaid.RemoteController
                     var willSendString = string.Empty;
                     if (sendingQueue.TryDequeue(out willSendString))
                     {
+                        if (burstMode)
+                        {
+                            burstMode = false;
+                        }
+
+                        sendingCache = willSendString;
                         byte[] willSendBytes =
                             PreMaidUtility.BuildByteDataFromStringOrder(willSendString);
 
@@ -219,17 +230,30 @@ namespace PreMaid.RemoteController
                 //プリメイドAIからの受信チェック
                 try
                 {
+                    
+                    //本当はここのカウントもバッファ溜めつつ見た方が良い…
                     readCount = _serialPort.Read(readBuffer, 0, readBuffer.Length);
 
                     if (readCount > 0)
                     {
-                        receivedQueue.Enqueue(PreMaidUtility.DumpBytesToHexString(readBuffer, readCount));
+                        var receivedString = PreMaidUtility.DumpBytesToHexString(readBuffer, readCount);
+                        //ポーズ送信失敗したらバーストモードに入る
+                        if (receivedString.IndexOf("180814") >= 0)
+                        {
+                            burstMode = true;
+                        }
+
+                        if (receivedString.IndexOf("18001C") >= 0 && burstMode == true)
+                        {
+                            burstMode = false;
+                        }
+
+                        receivedQueue.Enqueue(receivedString);
                     }
                 }
+                //UnityのSerialPortの実装がタコなのでここでTimeout例外を握りつぶす必要があります
                 catch (TimeoutException tEx)
                 {
-                    //errorQueue.Enqueue("TimeOut Exception:" + tEx.Message);
-                    //Thread.Sleep(1);
                     continue;
                 }
                 catch (System.Exception e)
@@ -239,6 +263,16 @@ namespace PreMaid.RemoteController
                 }
 
                 Thread.Sleep(1);
+                //送信失敗してた場合、無理矢理にキャッシュしてた最後のポーズ命令を連続送信する
+                //これで遅延を最小限にする
+                if (burstMode)
+                {
+                    Thread.Sleep(5);
+                    byte[] willSendBytes =
+                        PreMaidUtility.BuildByteDataFromStringOrder(sendingCache);
+
+                    _serialPort.Write(willSendBytes, 0, willSendBytes.Length);
+                }
             }
 
             Debug.LogWarning("exit thread");
