@@ -143,31 +143,17 @@ namespace PreMaid
             currentAngle = targetAngle;
             currentServoValue = Mathf.Round(angle * 29.6296296296f + defaultServoPosition); //29.6296296296 = 4000/135
 
-            //// 可動範囲オーバー時にデバッグ出力
-            //if (angle != angleEulerDegree)
-            //{
-            //    //if (ServoID.Equals("02") || ServoID.Equals("04") || ServoID.Equals("15") || ServoID.Equals("17"))
-            //    if (true)
-            //    {
-            //        if (angleEulerDegree < minAngle)
-            //        {
-            //            minAngle = angleEulerDegree;
-            //            //Debug.Log(string.Format("{0} - Angle: {1} Min: {2}", name, angleEulerDegree, minAngle));
-            //        }
-            //        else if (angleEulerDegree > maxAngle)
-            //        {
-            //            maxAngle = angleEulerDegree;
-            //            //Debug.Log(string.Format("{0} - Angle: {1} Max: {2}", name, angleEulerDegree, maxAngle));
-            //        }
-            //        angle = angleEulerDegree;
-            //    }
-            //    else
-            //    {
-            //        Debug.Log(string.Format("{0} - Angle: {1} Min: {2} Max: {3}", name, angleEulerDegree, minAngle, maxAngle));
-            //    }
-            //}
-
             transform.localRotation = initialLocalRotation * Quaternion.AngleAxis(angle, localServoAxis);
+        }
+
+        /// <summary>
+        /// 外部からサーボ指令値を指定する
+        /// </summary>
+        /// <param name="servoValue"></param>
+        public void SetServoPosition(float servoValue)
+        {
+            float angle = (servoValue - defaultServoPosition) * 135f / 4000f;
+            SetServoValue(angle);
         }
     }
 }

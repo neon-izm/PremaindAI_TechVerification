@@ -81,8 +81,10 @@ namespace PreMaid.RemoteController
         void Start()
         {
             Servos.Clear();
+
             //PreMaidServo.AllServoPositionDump();
-            foreach (PreMaidServo.ServoPosition item in Enum.GetValues(typeof(PreMaidServo.ServoPosition)))
+            //foreach (PreMaidServo.ServoPosition item in Enum.GetValues(typeof(PreMaidServo.ServoPosition)))
+            foreach (PreMaidServo.ServoPosition item in PreMaidServo.servoPositions)
             {
                 PreMaidServo servo = new PreMaidServo(item);
 
