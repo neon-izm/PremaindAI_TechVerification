@@ -73,19 +73,20 @@ namespace PreMaid.RemoteController
             //TODO:このServoのリミット設定は、大雑把に安全そうなリミットを設定しています。
             //なので、場合によってはこの値を緩められるか検討するのは可能です。
             //4000-11000
+            //肩回りShoulderPitchは配線の関係で腕を後ろに回すと断線する恐れがあります。
             switch (_servoPosition)
             {
                 case ServoPosition.RightShoulderPitch:
-                    MaxServoValue = 10000;//8700で後ろ手に組む
-                    MinServoValue = 4000;//4500で正面
+                    MaxServoValue = 7500;//手を下ろした状態
+                    MinServoValue = 2500;//バンザイ
                     break;
                 case ServoPosition.HeadPitch:
                     MaxServoValue = 8000; //うなづいた感じ
                     MinServoValue = 7300; //上向いた限界
                     break;
                 case ServoPosition.LeftShoulderPitch:
-                    MaxServoValue = 10500; //手が上向いたじょうたい
-                    MinServoValue = 4000; //手を後ろ手に組む
+                    MaxServoValue = 12500; //バンザイ
+                    MinServoValue = 7500; ///手を下ろした状態
                     break;
                 case ServoPosition.HeadYaw:
                     MinServoValue = 6600; //左を向いてる
@@ -123,8 +124,8 @@ namespace PreMaid.RemoteController
                     MinServoValue = 7300; // 気を付け
                     break;
                 case ServoPosition.RightUpperArmYaw:
-                    MinServoValue = 6000; //手の外ひねり
-                    MaxServoValue = 9000; //手の内ひねり
+                    MinServoValue = 5000; //手の外ひねり
+                    MaxServoValue = 8000; //手の内ひねり
                     break;
                 case ServoPosition.RightUpperLegPitch:
                     //シビアですぐこけるよ！！
@@ -132,8 +133,8 @@ namespace PreMaid.RemoteController
                     MinServoValue = 6000; //前屈
                     break;
                 case ServoPosition.LeftUpperArmYaw:
-                    MinServoValue = 6000; //手の内ひねり
-                    MaxServoValue = 9000; //手の外ひねり
+                    MinServoValue = 7000; //手の内ひねり
+                    MaxServoValue = 10000; //手の外ひねり
                     break;
                 case ServoPosition.LeftUpperLegPitch:
                     //シビアですぐこけるよ！！
