@@ -59,6 +59,38 @@ namespace PreMaid.RemoteController
             LeftFootRoll = 0x1C, //足首ロールL
         }
 
+        /// <summary>
+        /// サーボ一覧の表示順定義
+        /// </summary>
+        public static ServoPosition[] servoPositions =
+        {
+            ServoPosition.HeadYaw,              //頭ヨー
+            ServoPosition.HeadRoll,             /*萌え軸*/
+            ServoPosition.HeadPitch,            //頭ピッチ
+            ServoPosition.RightShoulderPitch,   //肩ピッチR
+            ServoPosition.RightShoulderRoll,    //肩ロールR
+            ServoPosition.RightUpperArmYaw,     //上腕ヨーR
+            ServoPosition.RightLowerArmPitch,   //肘ピッチR
+            ServoPosition.RightHandYaw,         //手首ヨーR
+            ServoPosition.LeftShoulderPitch,    //肩ピッチL
+            ServoPosition.LeftShoulderRoll,     //肩ロールL
+            ServoPosition.LeftUpperArmYaw,      //上腕ヨーL
+            ServoPosition.LeftLowerArmPitch,    //肘ピッチL
+            ServoPosition.LeftHandYaw,          //手首ヨーL
+            ServoPosition.RightHipYaw,          //ヒップヨーR
+            ServoPosition.RightHipRoll,         //ヒップロールR
+            ServoPosition.RightUpperLegPitch,   //腿ピッチR
+            ServoPosition.RightLowerLegPitch,   //膝ピッチR
+            ServoPosition.RightFootPitch,       //足首ピッチR
+            ServoPosition.RightFootRoll,        //足首ロールR
+            ServoPosition.LeftHipYaw,           //ヒップヨーL
+            ServoPosition.LeftHipRoll,          //ヒップロールL
+            ServoPosition.LeftUpperLegPitch,    //腿ピッチL
+            ServoPosition.LeftLowerLegPitch,    //肘ピッチL
+            ServoPosition.LeftFootPitch,        //足首ピッチL
+            ServoPosition.LeftFootRoll,         //足首ロールL
+        };
+
         //初期値指定なしのコンストラクタは禁止します
         private PreMaidServo()
         {
@@ -186,14 +218,14 @@ namespace PreMaid.RemoteController
 
             return name;
         }
-        
+
         /// <summary>
         /// "1C" とか "0F"とかのサーボID文字列を返す
         /// </summary>
         /// <returns></returns>
         public string GetServoIdString()
         {
-            return ((int) _servoPosition).ToString("X2");
+            return ((int)_servoPosition).ToString("X2");
         }
 
         /// <summary>
@@ -202,7 +234,7 @@ namespace PreMaid.RemoteController
         /// <returns></returns>
         public int GetServoId()
         {
-            return (int) _servoPosition;
+            return (int)_servoPosition;
         }
 
         /// <summary>
@@ -246,8 +278,8 @@ namespace PreMaid.RemoteController
             {
                 newValue = MaxServoValue;
 
-            } 
-            if(newValue < MinServoValue)
+            }
+            if (newValue < MinServoValue)
             {
                 newValue = MinServoValue;
             }
@@ -277,10 +309,10 @@ namespace PreMaid.RemoteController
             {
                 string name = Enum.GetName(typeof(PreMaidServo.ServoPosition), item);
 
-                Debug.Log($"{name} val: {(int) item}  raw val:{((int) item).ToString("X2")}");
+                Debug.Log($"{name} val: {(int)item}  raw val:{((int)item).ToString("X2")}");
             }
         }
 
-        
+
     }
 }
