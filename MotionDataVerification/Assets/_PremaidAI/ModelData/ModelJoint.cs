@@ -44,7 +44,19 @@ namespace PreMaid
         /// 参照専用
         /// </summary>
         [SerializeField]
-        private float currentAngle = 0f;
+        public float currentAngle = 0f;
+
+        /// <summary>
+        /// サーボでの角度指令値
+        /// 参照専用
+        /// </summary>
+        public float currentServoValue = 0f;
+
+        /// <summary>
+        /// ホームポジションでの角度指令値
+        /// </summary>
+        [SerializeField]
+        private float defaultServoPosition = 7500f;
 
         // 初期ローカル姿勢
         Quaternion initialLocalRotation = Quaternion.identity;
@@ -129,6 +141,7 @@ namespace PreMaid
 
             float angle = Mathf.Clamp(targetAngle, minAngle, maxAngle);
             currentAngle = targetAngle;
+            currentServoValue = Mathf.Round(angle * 29.6296296296f + defaultServoPosition); //29.6296296296 = 4000/135
 
             //// 可動範囲オーバー時にデバッグ出力
             //if (angle != angleEulerDegree)
