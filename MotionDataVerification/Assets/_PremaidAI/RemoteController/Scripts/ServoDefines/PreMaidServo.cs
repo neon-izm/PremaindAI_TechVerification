@@ -161,8 +161,9 @@ namespace PreMaid.RemoteController
                     break;
                 case ServoPosition.RightUpperLegPitch:
                     //シビアですぐこけるよ！！
+                    //7500が通常姿勢
                     MaxServoValue = 9000; //のけぞる
-                    MinServoValue = 6000; //前屈
+                    MinServoValue = 5000; //前屈
                     break;
                 case ServoPosition.LeftUpperArmYaw:
                     MinServoValue = 7000; //手の内ひねり
@@ -170,7 +171,8 @@ namespace PreMaid.RemoteController
                     break;
                 case ServoPosition.LeftUpperLegPitch:
                     //シビアですぐこけるよ！！
-                    MaxServoValue = 9000; //前屈
+                    //7500が通常姿勢
+                    MaxServoValue = 10000; //前屈
                     MinServoValue = 6000; //のけぞる
                     break;
                 case ServoPosition.RightLowerArmPitch:
