@@ -61,8 +61,9 @@ namespace PreMaid
             {
                 try
                 {
-                    serialPort_ = new SerialPort(portName, baudRate, Parity.None, 8, StopBits.One);
+                    serialPort_ = new SerialPort(" \\\\.\\"+portName, baudRate, Parity.None, 8, StopBits.One);
                     serialPort_.Open();
+                    Debug.Log("シリアルポート:" + serialPort_.PortName + " 接続成功");
                 }
                 catch (Exception e)
                 {
