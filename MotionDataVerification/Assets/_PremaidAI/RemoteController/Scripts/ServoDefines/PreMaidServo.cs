@@ -161,8 +161,9 @@ namespace PreMaid.RemoteController
                     break;
                 case ServoPosition.RightUpperLegPitch:
                     //シビアですぐこけるよ！！
+                    //7500が通常姿勢
                     MaxServoValue = 9000; //のけぞる
-                    MinServoValue = 6000; //前屈
+                    MinServoValue = 5000; //前屈
                     break;
                 case ServoPosition.LeftUpperArmYaw:
                     MinServoValue = 7000; //手の内ひねり
@@ -170,7 +171,8 @@ namespace PreMaid.RemoteController
                     break;
                 case ServoPosition.LeftUpperLegPitch:
                     //シビアですぐこけるよ！！
-                    MaxServoValue = 9000; //前屈
+                    //7500が通常姿勢
+                    MaxServoValue = 10000; //前屈
                     MinServoValue = 6000; //のけぞる
                     break;
                 case ServoPosition.RightLowerArmPitch:
@@ -190,18 +192,28 @@ namespace PreMaid.RemoteController
                     MaxServoValue = 9000; //膝を曲げる。当然10000とかにするとコケる
                     break;
                 case ServoPosition.RightHandYaw:
-                    MinServoValue = 6000; //手のひらを外回し
-                    MaxServoValue = 9000; //手のひらを内回し
+                    MinServoValue = 6000;  //手のひらを外回し
+                    MaxServoValue = 12000; //手のひらを内回し
                     break;
                 case ServoPosition.RightFootPitch:
+                    MinServoValue = 5800; //つま先を膝に向ける
+                    MaxServoValue = 8200; //つま先伸ばす
                     break;
                 case ServoPosition.LeftHandYaw:
+                    MinServoValue = 3000; //手のひらを内回し
+                    MaxServoValue = 9000; //手のひらを外回し
                     break;
                 case ServoPosition.LeftFootPitch:
+                    MinServoValue = 6800; //つま先伸ばす
+                    MaxServoValue = 9200; //つま先を膝に向ける
                     break;
                 case ServoPosition.RightFootRoll:
+                    MinServoValue = 6700; //外側に曲げる
+                    MaxServoValue = 8700; //内側に曲げる
                     break;
                 case ServoPosition.LeftFootRoll:
+                    MinServoValue = 6300; //内側に曲げる
+                    MaxServoValue = 8300; //外側に曲げる
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(servoPosition), servoPosition, null);

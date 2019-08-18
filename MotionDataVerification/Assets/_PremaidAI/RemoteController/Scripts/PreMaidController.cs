@@ -137,10 +137,10 @@ namespace PreMaid.RemoteController
         {
             try
             {
-                _serialPort = new SerialPort(portName, BaudRate, Parity.None, 8, StopBits.One);
+                _serialPort = new SerialPort("\\\\.\\" + portName, BaudRate, Parity.None, 8, StopBits.One);
                 _serialPort.Open();
                 _serialPort.ReadTimeout = 1; //これを明示的に指定してTimeout例外を握りつぶすのがUnity Monoの悲しいお作法っぽい…
-                Debug.Log("シリアルポート:" + portName + " 接続成功");
+                Debug.Log("シリアルポート:" + _serialPort.PortName + " 接続成功");
                 _serialPortOpen = true;
                 _serialPortThread = new Thread(ReadAndWriteThreadFunc)
                 {
@@ -351,7 +351,7 @@ namespace PreMaid.RemoteController
                 return;
             }
 
-            sendingQueue.Enqueue(BuildPoseStringAll(10)); //対象のモーション、今回は1個だけ;
+            sendingQueue.Enqueue(BuildPoseStringAll(1)); //対象のモーション、今回は1個だけ (SPD=1 は脱力からの復帰暫定対策)
         }
 
 

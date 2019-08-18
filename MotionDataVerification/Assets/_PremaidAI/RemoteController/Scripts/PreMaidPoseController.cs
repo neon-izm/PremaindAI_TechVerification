@@ -16,7 +16,7 @@ namespace PreMaid.RemoteController
 
 
         //何秒ごとにポーズ指定するか
-        private float _poseProcessDelay = 0.02f;
+        private float _poseProcessDelay = 0.1f;
 
         private float _timer = 0.0f;
 
@@ -61,7 +61,7 @@ namespace PreMaid.RemoteController
                 _timer += Time.deltaTime;
                 if (_timer > _poseProcessDelay)
                 {
-                    _controller.ApplyPose();
+                    _controller.ApplyPoseAllServos();
                     _timer -= _poseProcessDelay;
                 }
             }
