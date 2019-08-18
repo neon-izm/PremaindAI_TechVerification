@@ -27,42 +27,30 @@ namespace PreMaid.IKSample
                 {
                     ModelJoint[] joints = robotRoot.GetComponentsInChildren<ModelJoint>();
 
-                    Transform leftFootEnd = null;
-                    Transform rightFootEnd = null;
+                    Transform leftFoot = null;
+                    Transform rightFoot = null;
 
                     foreach (var joint in joints)
                     {
                         if (joint.ServoID.Equals("1C"))
                         {
                             // 左足関節が見つかった
-                            if (joint.transform.childCount < 1)
-                            {
-                                leftFootEnd = joint.transform;
-                            }
-                            else
-                            {
-                                leftFootEnd = joint.transform.GetChild(0);
-                            }
+                            leftFoot = joint.transform;
                         }
                         else if (joint.ServoID.Equals("1A"))
                         {
-                            // 右足関節が見つかった
-                            if (joint.transform.childCount < 1)
-                            {
-                                rightFootEnd = joint.transform;
-                            }
-                            else
-                            {
-                                rightFootEnd = joint.transform.GetChild(0);
-                            }
+                            rightFoot = joint.transform;
                         }
                     }
 
 
-                    if (leftFootEnd)
+                    if (leftFoot)
                     {
+                        var pos = leftFoot.position;
+                        pos.y = floorTransform.position.y;
+
                         var obj = new GameObject("LeftFootTarget");
-                        obj.transform.position = leftFootEnd.position;
+                        obj.transform.position = pos;
                         //obj.transform.rotation = leftFootEnd.rotation;
                         obj.transform.rotation = robotRoot.rotation;
                         obj.transform.parent = floorTransform;
@@ -70,10 +58,13 @@ namespace PreMaid.IKSample
                         ikController.leftFootTarget = obj.transform;
                     }
 
-                    if (rightFootEnd)
+                    if (rightFoot)
                     {
+                        var pos = rightFoot.position;
+                        pos.y = floorTransform.position.y;
+
                         var obj = new GameObject("RightFootTarget");
-                        obj.transform.position = rightFootEnd.position;
+                        obj.transform.position = pos;
                         //obj.transform.rotation = rightFootEnd.rotation;
                         obj.transform.rotation = robotRoot.rotation;
                         obj.transform.parent = floorTransform;

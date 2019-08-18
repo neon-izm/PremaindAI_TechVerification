@@ -22,32 +22,40 @@ namespace PreMaid
             X, Y, Z
         }
 
-        [SerializeField] private bool isInverse = false;
+        [SerializeField]
+        public bool isInverse = false;
         //もしかして取り付け軸向きのinverseもenum定義した方がいいかも？
 
-        [SerializeField] private Axis targetAxis = Axis.X;
+        [SerializeField]
+        public Axis targetAxis = Axis.X;
 
         /// <summary>
         /// サーボ可動範囲の最小値[deg]
         /// </summary>
         [SerializeField]
-        private float minAngle = -135f; // 3500
+        public float minAngle = -135f; // 3500
 
         /// <summary>
         /// サーボ可動範囲の最大値[deg]
         /// </summary>
         [SerializeField]
-        private float maxAngle = 135f; // 11500
+        public float maxAngle = 135f; // 11500
 
         /// <summary>
-        /// 現在の角度指令値[deg]
+        /// 最大速度[deg/s] これを越えた場合は、この角速度で徐々に目標まで移動させる
+        /// </summary>
+        [SerializeField]
+        public float maxSpeed = 180f;
+
+        /// <summary>
+        /// 現在の角度[deg]
         /// 参照専用
         /// </summary>
         [SerializeField]
         public float currentAngle = 0f;
 
         /// <summary>
-        /// サーボでの角度指令値
+        /// 現在の角度指令値[サーボ用単位]
         /// 参照専用
         /// </summary>
         public float currentServoValue = 0f;
@@ -56,7 +64,12 @@ namespace PreMaid
         /// ホームポジションでの角度指令値
         /// </summary>
         [SerializeField]
-        private float defaultServoPosition = 7500f;
+        public float defaultServoPosition = 7500f;
+
+        /// <summary>
+        /// 目標とする角度[deg] maxSpeedを超えない範囲でcurrentAngleがこれに追従する
+        /// </summary>
+        private float targetAngle = 0f;
 
         // 初期ローカル姿勢
         Quaternion initialLocalRotation = Quaternion.identity;
@@ -107,6 +120,11 @@ namespace PreMaid
             //maxAngle = 0f;
         }
 
+        private void FixedUpdate()
+        {
+            UpdateServo();
+        }
+
         /// <summary>
         /// モデルのルートには Animator があると仮定して、ルートのTransformを探す
         /// </summary>
@@ -135,15 +153,31 @@ namespace PreMaid
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         public void SetServoValue(float angleEulerDegree)
         {
-            float targetAngle = angleEulerDegree % 360f;
-            if (targetAngle > 180f) targetAngle -= 360f;
-            if (targetAngle < -180f) targetAngle += 360f;
+            float angle = angleEulerDegree % 360f;
+            if (angle > 180f) angle -= 360f;
+            if (angle < -180f) angle += 360f;
 
-            float angle = Mathf.Clamp(targetAngle, minAngle, maxAngle);
-            currentAngle = targetAngle;
-            currentServoValue = Mathf.Round(angle * 29.6296296296f + defaultServoPosition); //29.6296296296 = 4000/135
+            angle = Mathf.Clamp(angle, minAngle, maxAngle);
+            targetAngle = angle;
+        }
 
-            transform.localRotation = initialLocalRotation * Quaternion.AngleAxis(angle, localServoAxis);
+        /// <summary>
+        /// 最高速度内でサーボ角度とTranformを動かす
+        /// </summary>
+        void UpdateServo()
+        {
+            if (!Mathf.Approximately(targetAngle, currentAngle))
+            {
+                float angle = targetAngle - currentAngle;
+                float speed = Mathf.Abs(angle) / Time.deltaTime;
+                if (speed > maxSpeed)
+                {
+                    angle *= maxSpeed / speed;
+                }
+                currentAngle += angle;
+                currentServoValue = Mathf.Round(currentAngle * 29.6296296296f + defaultServoPosition); //29.6296296296 = 4000/135
+                transform.localRotation = initialLocalRotation * Quaternion.AngleAxis(currentAngle, localServoAxis);
+            }
         }
 
         /// <summary>
@@ -154,6 +188,32 @@ namespace PreMaid
         {
             float angle = (servoValue - defaultServoPosition) * 135f / 4000f;
             SetServoValue(angle);
+        }
+
+
+        /// <summary>
+        /// 指定IDのModelJointを取得
+        /// </summary>
+        /// <param name="servoId">"0C"などのサーボID</param>
+        /// <returns></returns>
+        public static ModelJoint GetJointById(string servoId, ref ModelJoint[] joints)
+        {
+            foreach (var joint in joints)
+            {
+                if (joint.ServoID.Equals(servoId)) return joint;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// 指定IDのModelJointを取得
+        /// </summary>
+        /// <param name="servoNo">0x0C などのサーボID</param>
+        /// <returns></returns>
+        public static ModelJoint GetJointById(int servoNo, ref ModelJoint[] joints)
+        {
+            string servoId = servoNo.ToString("X2");
+            return GetJointById(servoId, ref joints);
         }
     }
 }
