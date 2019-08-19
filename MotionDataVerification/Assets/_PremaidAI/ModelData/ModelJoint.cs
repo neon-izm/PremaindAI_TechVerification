@@ -122,7 +122,8 @@ namespace PreMaid
 
         private void FixedUpdate()
         {
-            UpdateServo();
+            // maxSpeedが0でなければ、ここでサーボ角を更新
+            if (maxSpeed > 0f) UpdateServo();
         }
 
         /// <summary>
@@ -159,10 +160,28 @@ namespace PreMaid
 
             angle = Mathf.Clamp(angle, minAngle, maxAngle);
             targetAngle = angle;
+
+            // maxSpeedが0なら（念のため負でも）ここで瞬間的に目標角にする
+            if (maxSpeed <= 0f)
+            {
+                currentAngle = targetAngle;
+                UpdateCurrentServoTransform();
+            }
         }
 
         /// <summary>
-        /// 最高速度内でサーボ角度とTranformを動かす
+        /// 実際にTranformにcurrentAngleを反映させる
+        /// また、currentServoValueもここで更新
+        /// ※ 本来は currentAngle をプロパティにして set メソッドで行えると良い内容
+        /// </summary>
+        private void UpdateCurrentServoTransform()
+        {
+            currentServoValue = Mathf.Round(currentAngle * 29.6296296296f + defaultServoPosition); //29.6296296296 = 4000/135
+            transform.localRotation = initialLocalRotation * Quaternion.AngleAxis(currentAngle, localServoAxis);
+        }
+
+        /// <summary>
+        /// 最高速度内でサーボ角を更新
         /// </summary>
         void UpdateServo()
         {
@@ -175,8 +194,7 @@ namespace PreMaid
                     angle *= maxSpeed / speed;
                 }
                 currentAngle += angle;
-                currentServoValue = Mathf.Round(currentAngle * 29.6296296296f + defaultServoPosition); //29.6296296296 = 4000/135
-                transform.localRotation = initialLocalRotation * Quaternion.AngleAxis(currentAngle, localServoAxis);
+                UpdateCurrentServoTransform();
             }
         }
 
