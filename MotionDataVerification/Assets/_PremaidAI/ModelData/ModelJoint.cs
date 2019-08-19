@@ -233,5 +233,18 @@ namespace PreMaid
             string servoId = servoNo.ToString("X2");
             return GetJointById(servoId, ref joints);
         }
+
+        /// <summary>
+        /// 存在するすべてのModelJointの最大角速度を一律にセット
+        /// </summary>
+        /// <param name="speed">最大角速度[deg/s]</param>
+        public static void SetAllJointsMaxSpeed(float speed)
+        {
+            var joints = GameObject.FindObjectsOfType<ModelJoint>();
+            foreach (var joint in joints)
+            {
+                joint.maxSpeed = speed;
+            }
+        }
     }
 }
