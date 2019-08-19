@@ -42,7 +42,7 @@ namespace PreMaid
         public float maxAngle = 135f; // 11500
 
         /// <summary>
-        /// 最大速度[deg/s] これを越えた場合は、この角速度で徐々に目標まで移動させる
+        /// 最大速度[deg/s]。ゼロだと速度制限なしとする
         /// </summary>
         [SerializeField]
         public float maxSpeed = 180f;
