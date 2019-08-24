@@ -152,11 +152,11 @@ namespace PreMaid
         /// </summary>
         /// <param name="angleEulerDegree"></param>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
-        public void SetServoValue(float angleEulerDegree)
+        public float SetServoValue(float angleEulerDegree)
         {
             float angle = angleEulerDegree % 360f;
             if (angle > 180f) angle -= 360f;
-            if (angle < -180f) angle += 360f;
+            if (angle <= -180f) angle += 360f;
 
             angle = Mathf.Clamp(angle, minAngle, maxAngle);
             targetAngle = angle;
@@ -167,6 +167,7 @@ namespace PreMaid
                 currentAngle = targetAngle;
                 UpdateCurrentServoTransform();
             }
+            return targetAngle;
         }
 
         /// <summary>

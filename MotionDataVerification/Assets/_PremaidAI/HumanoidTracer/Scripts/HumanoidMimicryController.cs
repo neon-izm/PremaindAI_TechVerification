@@ -76,6 +76,10 @@ namespace PreMaid.HumanoidTracer
         /// </summary>
         private Dictionary<HumanBodyBones, Quaternion> invOrgRotations = new Dictionary<HumanBodyBones, Quaternion>();
 
+        // 上半身、下半身それぞれの根本となるボーン（モデルによってはChestが無かったりするため変数としておく）
+        private HumanBodyBones upperBodyRootBone = HumanBodyBones.Chest;
+        private HumanBodyBones lowerBodyRootBone = HumanBodyBones.Hips;
+
 
         // Start is called before the first frame update
         void Start()
@@ -143,8 +147,10 @@ namespace PreMaid.HumanoidTracer
                 servos.Add(servoNo, joint);
 
                 // 開発用に、いったん制限なしとする
-                joint.minAngle = -180f;
+                joint.minAngle = -179f;
                 joint.maxAngle = 180f;
+                if (joint.minAngle > 0f) joint.minAngle = 0f;   // 開発用。Tポーズだと上腕が0degのため
+                if (joint.maxAngle < 0f) joint.maxAngle = 0f;   // 開発用。Tポーズだと上腕が0degのため
             }
             //Debug.Log(servoId + " " + joint.name);
         }
@@ -158,32 +164,56 @@ namespace PreMaid.HumanoidTracer
 
             if (!sourceHumanoid) return;
 
-            var rootTr = sourceHumanoid.GetBoneTransform(HumanBodyBones.Hips);
-            Quaternion invRootRot = Quaternion.Inverse(rootTr.rotation);
-            Quaternion invRot;
+            Quaternion invRootRot, invParentRot, invRot;
+            Transform parentTransform;
+
+            invRootRot = Quaternion.Inverse(sourceHumanoid.transform.rotation);
+
+            // 上半身の基部
+            upperBodyRootBone = HumanBodyBones.Chest;
+            parentTransform = sourceHumanoid.GetBoneTransform(upperBodyRootBone);
+            if (!parentTransform)
+            {
+                upperBodyRootBone = HumanBodyBones.Spine;
+                parentTransform = sourceHumanoid.GetBoneTransform(upperBodyRootBone);
+            }
+            if (!parentTransform)
+            {
+                upperBodyRootBone = HumanBodyBones.Hips;
+                parentTransform = sourceHumanoid.GetBoneTransform(upperBodyRootBone);
+            }
+            AddInvOriginalRotation(upperBodyRootBone, invRootRot);
+            invParentRot = Quaternion.Inverse(parentTransform.rotation);
+            Debug.Log("InvRootRot: " + invRootRot + "  InvParentRot: " + invParentRot);
 
             // 頭部
-            AddInvOriginalRotation(HumanBodyBones.Head, invRootRot);
+            AddInvOriginalRotation(HumanBodyBones.Head, invParentRot);
 
             // 右腕部
-            invRot = AddInvOriginalRotation(HumanBodyBones.RightUpperArm, invRootRot);
-            invRot = AddInvOriginalRotation(HumanBodyBones.RightLowerArm, invRot);
+            invRot = AddInvOriginalRotation(HumanBodyBones.RightUpperArm, invParentRot);
+            invRot = AddInvOriginalRotation(HumanBodyBones.RightLowerArm, invParentRot);
             invRot = AddInvOriginalRotation(HumanBodyBones.RightHand, invRot);
 
             // 左腕部
-            invRot = AddInvOriginalRotation(HumanBodyBones.LeftUpperArm, invRootRot);
-            invRot = AddInvOriginalRotation(HumanBodyBones.LeftLowerArm, invRot);
+            invRot = AddInvOriginalRotation(HumanBodyBones.LeftUpperArm, invParentRot);
+            invRot = AddInvOriginalRotation(HumanBodyBones.LeftLowerArm, invParentRot);
             invRot = AddInvOriginalRotation(HumanBodyBones.LeftHand, invRot);
 
+            // 下半身の基部
+            lowerBodyRootBone = HumanBodyBones.Spine;
+            parentTransform = sourceHumanoid.GetBoneTransform(lowerBodyRootBone);
+            invParentRot = Quaternion.Inverse(parentTransform.rotation);
+            //AddInvOriginalRotation(lowerBodyRootBone, invRootRot);
+
             // 右脚部
-            invRot = AddInvOriginalRotation(HumanBodyBones.RightUpperLeg, invRootRot);
-            invRot = AddInvOriginalRotation(HumanBodyBones.RightLowerLeg, invRot);
-            invRot = AddInvOriginalRotation(HumanBodyBones.RightFoot, invRot);
+            invRot = AddInvOriginalRotation(HumanBodyBones.RightUpperLeg, invParentRot);
+            invRot = AddInvOriginalRotation(HumanBodyBones.RightLowerLeg, invParentRot);
+            invRot = AddInvOriginalRotation(HumanBodyBones.RightFoot, invParentRot);
 
             // 左脚部
-            invRot = AddInvOriginalRotation(HumanBodyBones.LeftUpperLeg, invRootRot);
-            invRot = AddInvOriginalRotation(HumanBodyBones.LeftLowerLeg, invRot);
-            invRot = AddInvOriginalRotation(HumanBodyBones.LeftFoot, invRot);
+            invRot = AddInvOriginalRotation(HumanBodyBones.LeftUpperLeg, invParentRot);
+            invRot = AddInvOriginalRotation(HumanBodyBones.LeftLowerLeg, invParentRot);
+            invRot = AddInvOriginalRotation(HumanBodyBones.LeftFoot, invParentRot);
         }
 
         /// <summary>
@@ -193,10 +223,12 @@ namespace PreMaid.HumanoidTracer
         Quaternion AddInvOriginalRotation(HumanBodyBones bone, Quaternion invParentRotation)
         {
             Transform tr = sourceHumanoid.GetBoneTransform(bone);
-            //Quaternion rot = invParentRotation * tr.rotation;
-            Quaternion rot = tr.rotation * invParentRotation;
+            Quaternion rot = invParentRotation * tr.rotation;
+            //Quaternion rot = tr.rotation * invParentRotation;
             //Quaternion invRot = Quaternion.Inverse(invParentRotation) * Quaternion.Inverse(tr.rotation);
             Quaternion invRot = Quaternion.Inverse(rot);
+            //invRot = Quaternion.Inverse(tr.rotation);
+            //invRot = Quaternion.Inverse(invParentRotation) * tr.rotation;
             invOrgRotations.Add(bone, invRot);
             return Quaternion.Inverse(tr.rotation);
         }
@@ -238,11 +270,52 @@ namespace PreMaid.HumanoidTracer
             q.Normalize();
             float angle = Mathf.Acos(q.w) * 2.0f * Mathf.Rad2Deg * direction;
 
-            joint.SetServoValue(angle);
-            var actualAngle = joint.currentAngle; // 制限後の角度[deg]
+            var actualAngle = joint.SetServoValue(angle);
 
             return rot * Quaternion.Inverse(q);
             //return rot * Quaternion.Inverse(Quaternion.AngleAxis(actualAngle, axis);
+        }
+
+        /// <summary>
+        /// Quaternion で渡された姿勢のうち、X, Y, Z 軸いずれか周り成分を抽出してサーボ角に反映します
+        /// </summary>
+        /// <param name="rot">目標姿勢</param>
+        /// <param name="joint">指定サーボ</param>
+        /// <returns>回転させた軸成分を除いた残りの回転 Quaternion</returns>
+        Quaternion ApplyPartialRotation(Quaternion rot, Quaternion invRot, ModelJoint joint)
+        {
+            Quaternion q = rot;
+            Vector3 axis = Vector3.right;
+            float direction = (joint.isInverse ? -1f : 1f);     // 逆転なら-1
+            switch (joint.targetAxis)
+            {
+                case ModelJoint.Axis.X:
+                    q.y = q.z = 0;
+                    if (q.x < 0) direction = -direction;
+                    axis = Vector3.right;
+                    break;
+                case ModelJoint.Axis.Y:
+                    q.x = q.z = 0;
+                    if (q.y < 0) direction = -direction;
+                    axis = Vector3.up;
+                    break;
+                case ModelJoint.Axis.Z:
+                    q.x = q.y = 0;
+                    if (q.z < 0) direction = -direction;
+                    axis = Vector3.forward;
+                    break;
+            }
+            if (q.w == 0 && q.x == 0 && q.y == 0 && q.z == 0)
+            {
+                Debug.Log("Joint: " + joint.name + " rotation N/A");
+                q = Quaternion.identity;
+            }
+            q.Normalize();
+            float angle = Mathf.Acos(q.w) * 2.0f * Mathf.Rad2Deg * direction;
+
+            var actualAngle = joint.SetServoValue(angle);
+
+            return Quaternion.Inverse(Quaternion.AngleAxis(actualAngle / direction, axis)) * invRot;
         }
 
         /// <summary>
@@ -268,13 +341,22 @@ namespace PreMaid.HumanoidTracer
                     axis = Vector3.forward;
                     break;
             }
-            joint.SetServoValue(angle * direction);
-            var actualAngle = joint.currentAngle; // 制限後の角度[deg]
+            var actualAngle = joint.SetServoValue(angle * direction);
 
-            q = Quaternion.AngleAxis(angle, axis);
-            //return rot * Quaternion.Inverse(q);
+            //q = Quaternion.AngleAxis(angle, axis);
+            q = Quaternion.AngleAxis(actualAngle / direction, axis);    // 角度制限を考慮
             return Quaternion.Inverse(q) * rot;
-            //return rot * Quaternion.Inverse(Quaternion.AngleAxis(actualAngle, axis);
+        }
+
+        /// <summary>
+        /// 指定角度がほぼゼロならばtrue
+        /// </summary>
+        /// <param name="angle"></param>
+        /// <returns></returns>
+        bool IsAngleApproximatelyZero(float angle)
+        {
+            const float threshold = 1.0f;   // これ未満ならほぼ0と見做す角度[deg]
+            return (Mathf.Abs(angle) < threshold);
         }
 
         /// <summary>
@@ -286,23 +368,29 @@ namespace PreMaid.HumanoidTracer
 
             HumanBodyBones bone;    // 対象ボーン
             Transform tr;           // 対象Transformの作業用変数
+            Transform parentTransform;          // 対象の親Transform
             Quaternion rot;         // 相対姿勢の作業用変数
 
             var rootTr = sourceHumanoid.GetBoneTransform(HumanBodyBones.Hips);
-            Quaternion invRootRot = Quaternion.Inverse(rootTr.rotation);
+            Quaternion invParentRot = Quaternion.Inverse(rootTr.rotation);
             Quaternion invRot;
 
             Vector3 euler;
-            Vector3 tmpPos;
+            Vector3 xt;
+
+            // 頭部と両腕の親は Chest とする
+            parentTransform= sourceHumanoid.GetBoneTransform(upperBodyRootBone);
+            invParentRot = Quaternion.Inverse(parentTransform.rotation);
 
             // 頭部姿勢を反映
             bone = HumanBodyBones.Head;
             tr = sourceHumanoid.GetBoneTransform(bone);
-            rot = invRootRot * tr.rotation * invOrgRotations[bone];
+            //rot = invParentRot * tr.rotation * invOrgRotations[bone];
+            rot = invOrgRotations[bone] * invParentRot * tr.rotation;
             rot = ApplyPartialRotation(rot, servos[ServoPosition.HeadYaw]);
             rot = ApplyPartialRotation(rot, servos[ServoPosition.HeadRoll]);
             rot = ApplyPartialRotation(rot, servos[ServoPosition.HeadPitch]);
-            //euler = MathfUtility.QuaternionToEuler(rot, MathfUtility.RotationOrder.YZX);
+            //euler = MathfUtility.QuaternionToEuler(rot, MathfUtility.RotationOrder.XZY);
             //rot = ApplyDirectRotation(rot, euler.y, servos[ServoPosition.HeadYaw]);
             //rot = ApplyDirectRotation(rot, euler.z, servos[ServoPosition.HeadRoll]);
             //rot = ApplyDirectRotation(rot, euler.x, servos[ServoPosition.HeadPitch]);
@@ -310,102 +398,140 @@ namespace PreMaid.HumanoidTracer
             // 右上腕姿勢を反映
             bone = HumanBodyBones.RightUpperArm;
             tr = sourceHumanoid.GetBoneTransform(bone);
-            rot = invRootRot * tr.rotation * invOrgRotations[bone];
-            euler = MathfUtility.QuaternionToEuler(rot, MathfUtility.RotationOrder.XZY);
-            rot = ApplyDirectRotation(rot, euler.x, servos[ServoPosition.RightShoulderPitch]);
-            rot = ApplyDirectRotation(rot, euler.z, servos[ServoPosition.RightShoulderRoll]);
-            //rot = ApplyDirectRotation(rot, euler.y, servos[ServoPosition.RightUpperArmYaw]);
-            invRot = Quaternion.Inverse(tr.rotation);
+            rot = invParentRot * tr.rotation * invOrgRotations[bone];
+            xt = rot * Vector3.right;
+            euler.x = -Mathf.Atan2(xt.z, -xt.y) * Mathf.Rad2Deg;
+            euler.z = -Mathf.Atan2(Mathf.Sqrt(xt.y * xt.y + xt.z * xt.z), xt.x) * Mathf.Rad2Deg;
+            euler.y = 0f;
+            if (IsAngleApproximatelyZero(euler.z))
+            {
+                euler.x = servos[ServoPosition.RightShoulderPitch].currentAngle;    // 上腕が真横に伸びた状態ならば、肩は今の姿勢をキープ
+            }
+            invRot = Quaternion.identity;
+            invRot = ApplyDirectRotation(invRot, euler.x, servos[ServoPosition.RightShoulderPitch]);
+            invRot = ApplyDirectRotation(invRot, euler.z, servos[ServoPosition.RightShoulderRoll]);
 
             // 右前腕姿勢を反映
             bone = HumanBodyBones.RightLowerArm;
             tr = sourceHumanoid.GetBoneTransform(bone);
-            //rot = invRot * tr.rotation * invOrgRotations[bone];
-            //rot = ApplyPartialRotation(rot, servos[ServoPosition.RightLowerArmPitch]);
-            rot = invRootRot * tr.rotation * invOrgRotations[bone];
-            euler = MathfUtility.QuaternionToEuler(rot, MathfUtility.RotationOrder.XZY);
-            rot = ApplyDirectRotation(rot, euler.x, servos[ServoPosition.RightUpperArmYaw]);
-            rot = ApplyDirectRotation(rot, euler.z, servos[ServoPosition.RightLowerArmPitch]);
-            invRot = Quaternion.Inverse(tr.rotation);
+            rot = invRot * invParentRot * tr.rotation * invOrgRotations[bone];
+            //rot = invParentRot * tr.rotation * invOrgRotations[bone];
+            xt = rot * Vector3.right;
+            euler.x = -Mathf.Atan2(xt.z, -xt.y) * Mathf.Rad2Deg;
+            euler.z = -Mathf.Atan2(Mathf.Sqrt(xt.y * xt.y + xt.z * xt.z), xt.x) * Mathf.Rad2Deg;
+            euler.y = 0f;
+            //Debug.Log("Rot: " + rot.eulerAngles + "  pos: " + xt + " Euler: " + euler);
+            if (IsAngleApproximatelyZero(euler.z))
+            {
+                //euler.x = Mathf.LerpAngle(servos[ServoPosition.RightShoulderPitch].currentAngle, 0f, 0.5f);    // 前腕がまっすぐに伸びた状態ならば、ひねりは今の姿勢をキープ
+                euler.x = 0f;    // 前腕がまっすぐに伸びた状態ならば、ひねりはなしにする
+            }
+            //Debug.Log("Rot: " + rot + "  TmpPos: " + xt + " Euler: " + euler);
+            invRot = ApplyDirectRotation(invRot, euler.x, servos[ServoPosition.RightUpperArmYaw]);
+            invRot = ApplyDirectRotation(invRot, euler.z, servos[ServoPosition.RightLowerArmPitch]);
 
             // 右手首姿勢を反映
             bone = HumanBodyBones.RightHand;
             tr = sourceHumanoid.GetBoneTransform(bone);
-            rot = invRot * tr.rotation * invOrgRotations[bone];
+            //rot = invRot * tr.rotation * invOrgRotations[bone];
+            rot = invParentRot * tr.rotation * invOrgRotations[bone];
+            //rot = invOrgRotations[bone] * invRot * tr.rotation;
             rot = ApplyPartialRotation(rot, servos[ServoPosition.RightHandYaw]);
 
             // 左上腕姿勢を反映
             bone = HumanBodyBones.LeftUpperArm;
             tr = sourceHumanoid.GetBoneTransform(bone);
-            rot = invRootRot * tr.rotation * invOrgRotations[bone];
-            euler = MathfUtility.QuaternionToEuler(rot, MathfUtility.RotationOrder.XZY);
-            rot = ApplyDirectRotation(rot, euler.x, servos[ServoPosition.LeftShoulderPitch]);
-            rot = ApplyDirectRotation(rot, euler.z, servos[ServoPosition.LeftShoulderRoll]);
-            rot = ApplyDirectRotation(rot, euler.y, servos[ServoPosition.LeftUpperArmYaw]);
-            invRot = Quaternion.Inverse(tr.rotation);
+            rot = invParentRot * tr.rotation * invOrgRotations[bone];
+            xt = rot * Vector3.right;
+            euler.x = Mathf.Atan2(xt.z, xt.y) * Mathf.Rad2Deg;
+            euler.z = Mathf.Atan2(Mathf.Sqrt(xt.y * xt.y + xt.z * xt.z), xt.x) * Mathf.Rad2Deg;
+            euler.y = 0f;
+            //Debug.Log("Rot: " + rot + "  TmpPos: " + xt + " Euler: " + euler);
+            if (IsAngleApproximatelyZero(euler.z))
+            {
+                euler.x = servos[ServoPosition.LeftShoulderPitch].currentAngle;    // 上腕が真横に伸びた状態ならば、肩は今の姿勢をキープ
+            }
+            invRot = Quaternion.identity;
+            invRot = ApplyDirectRotation(invRot, euler.x, servos[ServoPosition.LeftShoulderPitch]);
+            invRot = ApplyDirectRotation(invRot, euler.z, servos[ServoPosition.LeftShoulderRoll]);
 
             // 左前腕姿勢を反映
             bone = HumanBodyBones.LeftLowerArm;
             tr = sourceHumanoid.GetBoneTransform(bone);
-            rot = invRot * tr.rotation * invOrgRotations[bone];
-            rot = ApplyPartialRotation(rot, servos[ServoPosition.LeftLowerArmPitch]);
-            invRot = Quaternion.Inverse(tr.rotation);
+            rot = invRot * invParentRot * tr.rotation * invOrgRotations[bone];
+            xt = rot * Vector3.right;
+            euler.x = Mathf.Atan2(xt.z, xt.y) * Mathf.Rad2Deg;
+            euler.z = Mathf.Atan2(Mathf.Sqrt(xt.y * xt.y + xt.z * xt.z), xt.x) * Mathf.Rad2Deg;
+            euler.y = 0f;
+            //Debug.Log("Rot: " + rot + "  TmpPos: " + xt + " Euler: " + euler);
+            if (IsAngleApproximatelyZero(euler.z))
+            {
+                euler.x = 0f;    // 前腕がまっすぐに伸びた状態ならば、ひねりはなしにする
+            }
+            invRot = ApplyDirectRotation(invRot, euler.x, servos[ServoPosition.LeftUpperArmYaw]);
+            invRot = ApplyDirectRotation(invRot, euler.z, servos[ServoPosition.LeftLowerArmPitch]);
 
             // 左手首姿勢を反映
             bone = HumanBodyBones.LeftHand;
             tr = sourceHumanoid.GetBoneTransform(bone);
-            rot = invRot * tr.rotation * invOrgRotations[bone];
+            //rot = invRot * tr.rotation * invOrgRotations[bone];
+            //rot = invOrgRotations[bone] * invRot * tr.rotation;
+            rot = invParentRot * tr.rotation * invOrgRotations[bone];
             rot = ApplyPartialRotation(rot, servos[ServoPosition.LeftHandYaw]);
 
 
+            // 両脚の親は Hips とする
+            parentTransform = sourceHumanoid.GetBoneTransform(lowerBodyRootBone);
+            invParentRot = Quaternion.Inverse(parentTransform.rotation);
+            
             // 右大腿姿勢を反映
             bone = HumanBodyBones.RightUpperLeg;
             tr = sourceHumanoid.GetBoneTransform(bone);
-            rot = invRootRot * tr.rotation * invOrgRotations[bone];
-            rot = ApplyPartialRotation(rot, servos[ServoPosition.RightHipYaw]);
-            rot = ApplyPartialRotation(rot, servos[ServoPosition.RightHipRoll]);
-            rot = ApplyPartialRotation(rot, servos[ServoPosition.RightUpperLegPitch]);
-            invRot = Quaternion.Inverse(tr.rotation);
+            rot = invParentRot * tr.rotation * invOrgRotations[bone];
+            euler = MathfUtility.QuaternionToEuler(rot, MathfUtility.RotationOrder.YZX);
+            invRot = Quaternion.identity;
+            invRot = ApplyDirectRotation(invRot, euler.y, servos[ServoPosition.RightHipYaw]);
+            invRot = ApplyDirectRotation(invRot, euler.z, servos[ServoPosition.RightHipRoll]);
+            invRot = ApplyDirectRotation(invRot, euler.x, servos[ServoPosition.RightUpperLegPitch]);
 
             // 右脛姿勢を反映
             bone = HumanBodyBones.RightLowerLeg;
             tr = sourceHumanoid.GetBoneTransform(bone);
-            rot = invRot * tr.rotation * invOrgRotations[bone];
-            rot = ApplyPartialRotation(rot, servos[ServoPosition.RightLowerLegPitch]);
-            invRot = Quaternion.Inverse(tr.rotation);
+            rot = invRot * invParentRot * tr.rotation * invOrgRotations[bone];
+            //rot = invOrgRotations[bone] * invRot * tr.rotation;
+            invRot = ApplyPartialRotation(rot, invRot, servos[ServoPosition.RightLowerLegPitch]);
 
             // 右足姿勢を反映
             bone = HumanBodyBones.RightFoot;
             tr = sourceHumanoid.GetBoneTransform(bone);
-            rot = invRot * tr.rotation * invOrgRotations[bone];
+            rot = invRot * invParentRot * tr.rotation * invOrgRotations[bone];
+            //rot = invOrgRotations[bone] * invRot * tr.rotation;
             rot = ApplyPartialRotation(rot, servos[ServoPosition.RightFootPitch]);
             rot = ApplyPartialRotation(rot, servos[ServoPosition.RightFootRoll]);
-            invRot = Quaternion.Inverse(tr.rotation);
 
 
             // 左大腿姿勢を反映
             bone = HumanBodyBones.LeftUpperLeg;
             tr = sourceHumanoid.GetBoneTransform(bone);
-            rot = invRootRot * tr.rotation * invOrgRotations[bone];
-            rot = ApplyPartialRotation(rot, servos[ServoPosition.LeftHipYaw]);
-            rot = ApplyPartialRotation(rot, servos[ServoPosition.LeftHipRoll]);
-            rot = ApplyPartialRotation(rot, servos[ServoPosition.LeftUpperLegPitch]);
-            invRot = Quaternion.Inverse(tr.rotation);
+            rot = invParentRot * tr.rotation * invOrgRotations[bone];
+            euler = MathfUtility.QuaternionToEuler(rot, MathfUtility.RotationOrder.YZX);
+            invRot = Quaternion.identity;
+            invRot = ApplyDirectRotation(invRot, euler.y, servos[ServoPosition.LeftHipYaw]);
+            invRot = ApplyDirectRotation(invRot, euler.z, servos[ServoPosition.LeftHipRoll]);
+            invRot = ApplyDirectRotation(invRot, euler.x, servos[ServoPosition.LeftUpperLegPitch]);
 
             // 左脛姿勢を反映
             bone = HumanBodyBones.LeftLowerLeg;
             tr = sourceHumanoid.GetBoneTransform(bone);
-            rot = invRot * tr.rotation * invOrgRotations[bone];
-            rot = ApplyPartialRotation(rot, servos[ServoPosition.LeftLowerLegPitch]);
-            invRot = Quaternion.Inverse(tr.rotation);
+            rot = invRot * invParentRot * tr.rotation * invOrgRotations[bone];
+            invRot = ApplyPartialRotation(rot, invRot, servos[ServoPosition.LeftLowerLegPitch]);
 
             // 左足姿勢を反映
             bone = HumanBodyBones.LeftFoot;
             tr = sourceHumanoid.GetBoneTransform(bone);
-            rot = invRot * tr.rotation * invOrgRotations[bone];
+            rot = invRot * invParentRot * tr.rotation * invOrgRotations[bone];
             rot = ApplyPartialRotation(rot, servos[ServoPosition.LeftFootPitch]);
             rot = ApplyPartialRotation(rot, servos[ServoPosition.LeftFootRoll]);
-            invRot = Quaternion.Inverse(tr.rotation);
         }
     }
 }
