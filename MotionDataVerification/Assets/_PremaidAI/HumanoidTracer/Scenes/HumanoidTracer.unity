@@ -437,6 +437,19 @@ Animator:
     type: 3}
   m_PrefabInstance: {fileID: 1078877174}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &110599687
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 110599685}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ea1127f288bcec4ea8438c2c9552576, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  animationSpeed: 1
 --- !u!114 &110599688
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1306,6 +1319,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: shapell
       objectReference: {fileID: 0}
+    - target: {fileID: 95359023791774212, guid: 1a7210d21d17c0440bb2cc8bc095fad1,
+        type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: beaff251eafbde049882595b7893dfe3, type: 2}
     - target: {fileID: 4452710319124172, guid: 1a7210d21d17c0440bb2cc8bc095fad1, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.33
@@ -1362,11 +1380,6 @@ PrefabInstance:
       propertyPath: m_LocalScale.z
       value: 0.3
       objectReference: {fileID: 0}
-    - target: {fileID: 95359023791774212, guid: 1a7210d21d17c0440bb2cc8bc095fad1,
-        type: 3}
-      propertyPath: m_Controller
-      value: 
-      objectReference: {fileID: 9100000, guid: beaff251eafbde049882595b7893dfe3, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1a7210d21d17c0440bb2cc8bc095fad1, type: 3}
 --- !u!1 &1099528008

@@ -155,17 +155,49 @@ namespace PreMaid
         public float SetServoValue(float angleEulerDegree)
         {
             float angle = angleEulerDegree % 360f;
+
+            // ±180deg の範囲に直す
             if (angle > 180f) angle -= 360f;
             if (angle <= -180f) angle += 360f;
 
-            angle = Mathf.Clamp(angle, minAngle, maxAngle);
-            targetAngle = angle;
-
-            // maxSpeedが0なら（念のため負でも）ここで瞬間的に目標角にする
+            // maxSpeedが0なら（念のため負でも）角度制限は現在角度に依存しない手法とし、瞬間的に目標角にする
             if (maxSpeed <= 0f)
             {
+                // 角度制限を適用。単純なClampではなく、回転として目標角度が近い方の最大値または最小値によせる
+                //angle = Mathf.Clamp(angle, minAngle, maxAngle);
+                if ((angle < minAngle) || (angle > maxAngle))
+                {
+                    if (Mathf.Abs(angle - minAngle) < Mathf.Abs(maxAngle - angle))
+                    {
+                        angle = minAngle;
+                    }
+                    else
+                    {
+                        angle = maxAngle;
+                    }
+                }
+                targetAngle = angle;
+
                 currentAngle = targetAngle;
                 UpdateCurrentServoTransform();
+            }
+            else
+            {
+                // 角度制限を適用。単純なClampではなく、現在角度から目標角度が近い方の最大値または最小値によせる
+                //  ※現在姿勢に依存しますので、結果的に目標角度に近づけない可能性があります
+                if ((angle < minAngle) || (angle > maxAngle))
+                {
+                    if (Mathf.Abs(currentAngle - minAngle) < Mathf.Abs(maxAngle - currentAngle))
+                    {
+                        angle = minAngle;
+                    }
+                    else
+                    {
+                        angle = maxAngle;
+                    }
+                }
+                targetAngle = angle;
+
             }
             return targetAngle;
         }
