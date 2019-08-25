@@ -18,6 +18,8 @@ MonoBehaviour:
   minAngle: -180
   maxAngle: 128.2
   currentAngle: 0
+  currentServoValue: 0
+  defaultServoPosition: 7500
 --- !u!114 &2118236602
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -36,6 +38,8 @@ MonoBehaviour:
   minAngle: -128.2
   maxAngle: 180
   currentAngle: 0
+  currentServoValue: 0
+  defaultServoPosition: 7500
 --- !u!114 &2126797209
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -54,6 +58,8 @@ MonoBehaviour:
   minAngle: -52
   maxAngle: 16
   currentAngle: 0
+  currentServoValue: 0
+  defaultServoPosition: 7500
 --- !u!114 &596451457
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -72,6 +78,28 @@ MonoBehaviour:
   minAngle: -16
   maxAngle: 52
   currentAngle: 0
+  currentServoValue: 0
+  defaultServoPosition: 7500
+--- !u!114 &1757415973
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8319883246337981314}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70021088b757fcc47973c31c23583194, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ServoID: 13
+  isInverse: 1
+  targetAxis: 2
+  minAngle: -123
+  maxAngle: 13
+  currentAngle: 0
+  currentServoValue: 0
+  defaultServoPosition: 7500
 --- !u!114 &3628035793036374248
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -108,24 +136,6 @@ MonoBehaviour:
   inverse: 1
   defaultAngleDegree: 0
   defaultServoPosition: 0
---- !u!114 &1757415973
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8319883246337981314}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 70021088b757fcc47973c31c23583194, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ServoID: 13
-  isInverse: 1
-  targetAxis: 2
-  minAngle: -123
-  maxAngle: 13
-  currentAngle: 0
 --- !u!114 &1096138884
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -198,6 +208,8 @@ MonoBehaviour:
   minAngle: -24
   maxAngle: 15
   currentAngle: 0
+  currentServoValue: 0
+  defaultServoPosition: 7500
 --- !u!114 &209670167
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -216,6 +228,28 @@ MonoBehaviour:
   minAngle: -60
   maxAngle: 108
   currentAngle: 0
+  currentServoValue: 0
+  defaultServoPosition: 7500
+--- !u!114 &1839760930
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8319883246337981326}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70021088b757fcc47973c31c23583194, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ServoID: 11
+  isInverse: 1
+  targetAxis: 2
+  minAngle: -13
+  maxAngle: 123
+  currentAngle: 0
+  currentServoValue: 0
+  defaultServoPosition: 7500
 --- !u!114 &8319883245948824315
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -252,24 +286,6 @@ MonoBehaviour:
   inverse: 0
   defaultAngleDegree: 0
   defaultServoPosition: 0
---- !u!114 &1839760930
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8319883246337981326}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 70021088b757fcc47973c31c23583194, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ServoID: 11
-  isInverse: 1
-  targetAxis: 2
-  minAngle: -13
-  maxAngle: 123
-  currentAngle: 0
 --- !u!114 &487916938
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -288,6 +304,8 @@ MonoBehaviour:
   minAngle: -30
   maxAngle: 37
   currentAngle: 0
+  currentServoValue: 0
+  defaultServoPosition: 7500
 --- !u!114 &1264430175
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -306,6 +324,8 @@ MonoBehaviour:
   minAngle: -22
   maxAngle: 28.6
   currentAngle: 0
+  currentServoValue: 0
+  defaultServoPosition: 7500
 --- !u!114 &191999087
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -378,6 +398,8 @@ MonoBehaviour:
   minAngle: -15
   maxAngle: 24
   currentAngle: 0
+  currentServoValue: 0
+  defaultServoPosition: 7500
 --- !u!114 &1868979104
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -396,6 +418,8 @@ MonoBehaviour:
   minAngle: -30
   maxAngle: 37
   currentAngle: 0
+  currentServoValue: 0
+  defaultServoPosition: 7500
 --- !u!114 &8319883245948824309
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -417,6 +441,26 @@ MonoBehaviour:
   leftFootTarget: {fileID: 0}
   rightFootTarget: {fileID: 0}
   priorJoint: 2
+--- !u!114 &1437047306
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8319883246337981352}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70021088b757fcc47973c31c23583194, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ServoID: 09
+  isInverse: 1
+  targetAxis: 2
+  minAngle: 4.1
+  maxAngle: 97.3
+  currentAngle: 0
+  currentServoValue: 0
+  defaultServoPosition: 7500
 --- !u!114 &3306996452123487302
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -453,24 +497,26 @@ MonoBehaviour:
   inverse: 1
   defaultAngleDegree: 0
   defaultServoPosition: 0
---- !u!114 &1437047306
+--- !u!114 &1978927935
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8319883246337981352}
+  m_GameObject: {fileID: 8319883246337981356}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 70021088b757fcc47973c31c23583194, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ServoID: 09
+  ServoID: 0B
   isInverse: 1
   targetAxis: 2
-  minAngle: 4.1
-  maxAngle: 97.3
+  minAngle: -93.7
+  maxAngle: -4.1
   currentAngle: 0
+  currentServoValue: 0
+  defaultServoPosition: 7500
 --- !u!114 &3171505662744975655
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -507,42 +553,6 @@ MonoBehaviour:
   inverse: 1
   defaultAngleDegree: 0
   defaultServoPosition: 0
---- !u!114 &1978927935
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8319883246337981356}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 70021088b757fcc47973c31c23583194, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ServoID: 0B
-  isInverse: 1
-  targetAxis: 2
-  minAngle: -93.7
-  maxAngle: -4.1
-  currentAngle: 0
---- !u!114 &1658843089
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8319883246337981362}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7805754224de3294693b7f68b57808f6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  targetServo: 20
-  currentServoValue: 0
-  _axis: 0
-  inverse: 0
-  defaultAngleDegree: 0
-  defaultServoPosition: 0
 --- !u!114 &1182008285
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -561,6 +571,26 @@ MonoBehaviour:
   minAngle: 0
   maxAngle: 82
   currentAngle: 0
+  currentServoValue: 0
+  defaultServoPosition: 7500
+--- !u!114 &1658843089
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8319883246337981362}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7805754224de3294693b7f68b57808f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetServo: 20
+  currentServoValue: 0
+  _axis: 0
+  inverse: 0
+  defaultAngleDegree: 0
+  defaultServoPosition: 0
 --- !u!114 &1285695927
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -579,6 +609,8 @@ MonoBehaviour:
   minAngle: -128.7
   maxAngle: 134.3
   currentAngle: 0
+  currentServoValue: 0
+  defaultServoPosition: 7500
 --- !u!114 &1994892294
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -597,6 +629,8 @@ MonoBehaviour:
   minAngle: -75
   maxAngle: 75
   currentAngle: 0
+  currentServoValue: 0
+  defaultServoPosition: 7500
 --- !u!114 &1164117283
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -633,24 +667,8 @@ MonoBehaviour:
   minAngle: -82
   maxAngle: 0
   currentAngle: 0
---- !u!114 &8319883245948824317
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8319883246337981414}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7805754224de3294693b7f68b57808f6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  targetServo: 23
   currentServoValue: 0
-  _axis: 0
-  inverse: 1
-  defaultAngleDegree: 0
-  defaultServoPosition: 0
+  defaultServoPosition: 7500
 --- !u!114 &2004660656
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -669,6 +687,46 @@ MonoBehaviour:
   minAngle: -203
   maxAngle: 49
   currentAngle: 0
+  currentServoValue: 0
+  defaultServoPosition: 7500
+--- !u!114 &8319883245948824317
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8319883246337981414}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7805754224de3294693b7f68b57808f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetServo: 23
+  currentServoValue: 0
+  _axis: 0
+  inverse: 1
+  defaultAngleDegree: 0
+  defaultServoPosition: 0
+--- !u!114 &594587531
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8319883246337981418}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70021088b757fcc47973c31c23583194, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ServoID: 03
+  isInverse: 0
+  targetAxis: 0
+  minAngle: -10.2
+  maxAngle: 23.6
+  currentAngle: 0
+  currentServoValue: 0
+  defaultServoPosition: 7500
 --- !u!114 &4618424657678325666
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -723,42 +781,6 @@ MonoBehaviour:
   inverse: 0
   defaultAngleDegree: 0
   defaultServoPosition: 0
---- !u!114 &594587531
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8319883246337981418}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 70021088b757fcc47973c31c23583194, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ServoID: 03
-  isInverse: 0
-  targetAxis: 0
-  minAngle: -10.2
-  maxAngle: 23.6
-  currentAngle: 0
---- !u!114 &8319883245948824314
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8319883246337981420}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7805754224de3294693b7f68b57808f6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  targetServo: 21
-  currentServoValue: 0
-  _axis: 0
-  inverse: 0
-  defaultAngleDegree: 0
-  defaultServoPosition: 0
 --- !u!114 &375690541
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -777,6 +799,66 @@ MonoBehaviour:
   minAngle: -49
   maxAngle: 193
   currentAngle: 0
+  currentServoValue: 0
+  defaultServoPosition: 7500
+--- !u!114 &8319883245948824314
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8319883246337981420}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7805754224de3294693b7f68b57808f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetServo: 21
+  currentServoValue: 0
+  _axis: 0
+  inverse: 0
+  defaultAngleDegree: 0
+  defaultServoPosition: 0
+--- !u!114 &803840229
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8319883246337981426}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70021088b757fcc47973c31c23583194, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ServoID: 18
+  isInverse: 1
+  targetAxis: 0
+  minAngle: -18
+  maxAngle: 35
+  currentAngle: 0
+  currentServoValue: 0
+  defaultServoPosition: 7500
+--- !u!114 &803840231
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8319883246337981426}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70021088b757fcc47973c31c23583194, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ServoID: 1C
+  isInverse: 1
+  targetAxis: 2
+  minAngle: -41
+  maxAngle: 10
+  currentAngle: 0
+  currentServoValue: 0
+  defaultServoPosition: 7500
 --- !u!114 &2036430991
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -813,42 +895,6 @@ MonoBehaviour:
   inverse: 1
   defaultAngleDegree: 0
   defaultServoPosition: 0
---- !u!114 &803840229
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8319883246337981426}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 70021088b757fcc47973c31c23583194, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ServoID: 18
-  isInverse: 1
-  targetAxis: 0
-  minAngle: -18
-  maxAngle: 35
-  currentAngle: 0
---- !u!114 &803840231
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8319883246337981426}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 70021088b757fcc47973c31c23583194, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ServoID: 1C
-  isInverse: 1
-  targetAxis: 2
-  minAngle: -41
-  maxAngle: 10
-  currentAngle: 0
 --- !u!114 &777650449
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -903,6 +949,8 @@ MonoBehaviour:
   minAngle: -35
   maxAngle: 18
   currentAngle: 0
+  currentServoValue: 0
+  defaultServoPosition: 7500
 --- !u!114 &1687739239
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -921,6 +969,8 @@ MonoBehaviour:
   minAngle: -10
   maxAngle: 41
   currentAngle: 0
+  currentServoValue: 0
+  defaultServoPosition: 7500
 --- !u!1001 &8319883246338014548
 PrefabInstance:
   m_ObjectHideFlags: 0
