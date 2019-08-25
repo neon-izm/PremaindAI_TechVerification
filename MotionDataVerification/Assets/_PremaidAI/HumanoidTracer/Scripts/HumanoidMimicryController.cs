@@ -20,7 +20,7 @@ namespace PreMaid.HumanoidTracer
         /// <summary>
         /// 元となる動きをするHumanoid
         /// </summary>
-        [Tooltip("このモデルの動作を真似します")]
+        [Tooltip("このモデルの動作を真似します。省略すると自分のAnimatorを使います")]
         public Animator sourceHumanoid;
 
         /// <summary>
@@ -89,10 +89,15 @@ namespace PreMaid.HumanoidTracer
                 // 未指定ならモデルのルートにこのスクリプトがアタッチされているものとする
                 premaidRoot = transform;
             }
-
             if (premaidRoot != null)
             {
                 _joints = premaidRoot.GetComponentsInChildren<ModelJoint>();
+            }
+
+            // 元となるHumanoidが未指定なら、自分自身のAnimatorを真似する
+            if (!sourceHumanoid)
+            {
+                sourceHumanoid = premaidRoot.GetComponent<Animator>();
             }
 
             // ボーンの対応を初期化
