@@ -17,6 +17,14 @@ namespace PreMaid
         [Header("02とか1Cとか当てる")]
         public string ServoID;
 
+        /// <summary>
+        /// 0x02や0x1CなどのサーボID
+        /// 将来的には文字列はやめて数値やenumにした方が良いが、
+        /// 今のところこれまでの互換性のため文字列の方が主
+        /// </summary>
+        [NonSerialized]
+        public int servoNo;
+
         public enum Axis
         {
             X, Y, Z
@@ -58,7 +66,7 @@ namespace PreMaid
         /// 現在の角度指令値[サーボ用単位]
         /// 参照専用
         /// </summary>
-        public float currentServoValue = 0f;
+        public float currentServoValue = 7500f;
 
         /// <summary>
         /// ホームポジションでの角度指令値
@@ -83,6 +91,12 @@ namespace PreMaid
             {
                 return transform.rotation * Quaternion.Inverse(initialLocalRotation);
             }
+        }
+
+        private void Awake()
+        {
+            // サーボIDの数値表現を保持
+            servoNo = Convert.ToInt32(ServoID, 16);
         }
 
         // Start is called before the first frame update
@@ -114,6 +128,9 @@ namespace PreMaid
             // 元のローカル姿勢が正規化されていなくても対応するため、ルートの姿勢を基準にする
             Transform rootTransform = GetModelRootTransform();
             localServoAxis = Quaternion.Inverse(transform.rotation) * (rootTransform.rotation * axis);
+
+            // 初期値設定
+            currentServoValue = defaultServoPosition;
 
             //// 可動範囲測定
             //minAngle = -0f;

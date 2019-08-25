@@ -383,7 +383,7 @@ namespace PreMaid.RemoteController
 
             //パリティビットを計算し直した値にして、文字列を返す
             ret = PreMaidUtility.RewriteXorString(ret);
-
+            Debug.Log(ret);
             sendingQueue.Enqueue(ret); //対象のモーション、今回は1個だけ;
         }
 
