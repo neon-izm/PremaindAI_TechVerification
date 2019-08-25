@@ -184,7 +184,6 @@ namespace PreMaid.HumanoidTracer
             }
             AddInvOriginalRotation(upperBodyRootBone, invRootRot);
             invParentRot = Quaternion.Inverse(parentTransform.rotation);
-            Debug.Log("InvRootRot: " + invRootRot + "  InvParentRot: " + invParentRot);
 
             // 頭部
             AddInvOriginalRotation(HumanBodyBones.Head, invParentRot);
@@ -192,12 +191,12 @@ namespace PreMaid.HumanoidTracer
             // 右腕部
             invRot = AddInvOriginalRotation(HumanBodyBones.RightUpperArm, invParentRot);
             invRot = AddInvOriginalRotation(HumanBodyBones.RightLowerArm, invParentRot);
-            invRot = AddInvOriginalRotation(HumanBodyBones.RightHand, invRot);
+            invRot = AddInvOriginalRotation(HumanBodyBones.RightHand, invParentRot);
 
             // 左腕部
             invRot = AddInvOriginalRotation(HumanBodyBones.LeftUpperArm, invParentRot);
             invRot = AddInvOriginalRotation(HumanBodyBones.LeftLowerArm, invParentRot);
-            invRot = AddInvOriginalRotation(HumanBodyBones.LeftHand, invRot);
+            invRot = AddInvOriginalRotation(HumanBodyBones.LeftHand, invParentRot);
 
             // 下半身の基部
             lowerBodyRootBone = HumanBodyBones.Spine;
@@ -224,11 +223,7 @@ namespace PreMaid.HumanoidTracer
         {
             Transform tr = sourceHumanoid.GetBoneTransform(bone);
             Quaternion rot = invParentRotation * tr.rotation;
-            //Quaternion rot = tr.rotation * invParentRotation;
-            //Quaternion invRot = Quaternion.Inverse(invParentRotation) * Quaternion.Inverse(tr.rotation);
             Quaternion invRot = Quaternion.Inverse(rot);
-            //invRot = Quaternion.Inverse(tr.rotation);
-            //invRot = Quaternion.Inverse(invParentRotation) * tr.rotation;
             invOrgRotations.Add(bone, invRot);
             return Quaternion.Inverse(tr.rotation);
         }
@@ -433,10 +428,9 @@ namespace PreMaid.HumanoidTracer
             // 右手首姿勢を反映
             bone = HumanBodyBones.RightHand;
             tr = sourceHumanoid.GetBoneTransform(bone);
-            //rot = invRot * tr.rotation * invOrgRotations[bone];
-            rot = invParentRot * tr.rotation * invOrgRotations[bone];
-            //rot = invOrgRotations[bone] * invRot * tr.rotation;
-            rot = ApplyPartialRotation(rot, servos[ServoPosition.RightHandYaw]);
+            rot = invRot * invParentRot * tr.rotation * invOrgRotations[bone];
+            //Debug.Log("Rot: " + rot.eulerAngles + "  InvRot: " + invRot);
+            ApplyPartialRotation(rot, servos[ServoPosition.RightHandYaw]);
 
             // 左上腕姿勢を反映
             bone = HumanBodyBones.LeftUpperArm;
@@ -474,10 +468,8 @@ namespace PreMaid.HumanoidTracer
             // 左手首姿勢を反映
             bone = HumanBodyBones.LeftHand;
             tr = sourceHumanoid.GetBoneTransform(bone);
-            //rot = invRot * tr.rotation * invOrgRotations[bone];
-            //rot = invOrgRotations[bone] * invRot * tr.rotation;
-            rot = invParentRot * tr.rotation * invOrgRotations[bone];
-            rot = ApplyPartialRotation(rot, servos[ServoPosition.LeftHandYaw]);
+            rot = invRot * invParentRot * tr.rotation * invOrgRotations[bone];
+            ApplyPartialRotation(rot, servos[ServoPosition.LeftHandYaw]);
 
 
             // 両脚の親は Hips とする
