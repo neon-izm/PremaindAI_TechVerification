@@ -410,7 +410,7 @@ namespace PreMaid
             public ModelJoint kneePitch;        // x3
             public ModelJoint anklePitch;       // x4
             public ModelJoint footRoll;         // x5
-            private Transform footEnd;          // x6
+            private Vector3 footEndPos;         // x6
 
             public Transform footTarget;
 
@@ -425,14 +425,8 @@ namespace PreMaid
             {
                 baseTransform = upperLegYaw.transform.parent;
 
-                if (footRoll.transform.childCount > 0)
-                {
-                    footEnd = footRoll.transform.GetChild(0);   // footRollに子（Foot_endを期待）があればその位置を終端とする
-                }
-                else
-                {
-                    footEnd = footRoll.transform;   // footRollに子が無ければそれが終端とする
-                }
+                footEndPos = footRoll.transform.position;
+                footEndPos.y = baseTransform.position.y;        // 初期状態は水平であるとして、足裏はbaseTransformの高さだとする
 
                 // 目標が無ければ自動生成
                 if (!footTarget)
@@ -440,7 +434,7 @@ namespace PreMaid
                     var obj = new GameObject((isRightSide ? "Right" : "Left") + "FootTarget");
                     footTarget = obj.transform;
                     footTarget.parent = baseTransform;
-                    footTarget.position = footEnd.position;
+                    footTarget.position = footEndPos;
                     footTarget.rotation = baseTransform.rotation;
                 }
 
@@ -451,7 +445,7 @@ namespace PreMaid
                 xo34 = invBaseRotation * (anklePitch.transform.position - kneePitch.transform.position);
                 xo45 = invBaseRotation * (footRoll.transform.position - anklePitch.transform.position);
                 xo15 = invBaseRotation * (footRoll.transform.position - upperLegRoll.transform.position);
-                xo06 = invBaseRotation * (footEnd.position - upperLegYaw.transform.position);
+                xo06 = invBaseRotation * (footEndPos - upperLegYaw.transform.position);
             }
 
             public void ApplyIK()
@@ -531,7 +525,7 @@ namespace PreMaid
 
                 if (footTarget)
                 {
-                    Gizmos.DrawLine(footEnd.position, footTarget.position);
+                    Gizmos.DrawLine(footEndPos, footTarget.position);
                     //Gizmos.DrawCube(footTarget.position, gizmoSize);
 
                     var matrix = Gizmos.matrix;

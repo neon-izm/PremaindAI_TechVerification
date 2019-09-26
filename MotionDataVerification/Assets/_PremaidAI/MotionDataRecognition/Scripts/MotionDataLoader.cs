@@ -215,6 +215,9 @@ namespace PreMaid
                 _joints = premaidRoot.GetComponentsInChildren<ModelJoint>();
             }
 
+            // 動作ファイル再生には、角速度制限は無しにする
+            ModelJoint.SetAllJointsMaxSpeed(0f);
+
             videoPlayer = FindObjectOfType<UnityEngine.Video.VideoPlayer>();
             motionSeekSlider = FindObjectOfType<UnityEngine.UI.Slider>();
         }

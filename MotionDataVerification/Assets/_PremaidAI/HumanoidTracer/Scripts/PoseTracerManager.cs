@@ -5,6 +5,7 @@ using System.IO.Ports;
 using PreMaid.RemoteController;
 using TMPro;
 using UnityEngine;
+using static PreMaid.RemoteController.PreMaidServo;
 
 namespace PreMaid.HumanoidTracer
 {
@@ -22,7 +23,7 @@ namespace PreMaid.HumanoidTracer
 
         [SerializeField] private Animator target;
 
-        [SerializeField] private HumanoidModelJoint[] _joints;
+        [SerializeField] private ModelJoint[] _joints;
 
         [SerializeField] private TMPro.TMP_Dropdown _serialPortsDropdown = null;
 
@@ -34,7 +35,7 @@ namespace PreMaid.HumanoidTracer
         //キーフレームは1秒ごとに打つ
         private float keyFrameTimer = 0f;
 
-        List<PreMaidServo> latestServos = new List<PreMaidServo>();
+        List<ModelJoint> latestServos = new List<ModelJoint>();
 
 
         [SerializeField] private int currentFPS = 0;
@@ -59,26 +60,7 @@ namespace PreMaid.HumanoidTracer
             _serialPortsDropdown.ClearOptions();
             _serialPortsDropdown.AddOptions(serialPortNamesList);
 
-
-            //対象のAnimatorにBoneにHumanoidModelJoint.csのアタッチ漏れがあるかもしれない
-            //なので、一旦全部検索して、見つからなかったサーボ情報はspineに全部動的にアタッチする
-            Transform spineBone = target.GetBoneTransform(HumanBodyBones.Spine);
-            //仮でspineにでも付けておこう
-            if (target != null)
-            {
-                var joints = target.GetComponentsInChildren<HumanoidModelJoint>();
-
-                foreach (PreMaidServo.ServoPosition item in Enum.GetValues(typeof(PreMaidServo.ServoPosition)))
-                {
-                    if (Array.FindIndex(joints, joint => joint.TargetServo == item) == -1)
-                    {
-                        var jointScript = spineBone.gameObject.AddComponent<HumanoidModelJoint>();
-                        jointScript.TargetServo = item;
-                    }
-                }
-            }
-
-            _joints = target.GetComponentsInChildren<HumanoidModelJoint>();
+            _joints = target.GetComponentsInChildren<ModelJoint>();
         }
 
 
@@ -115,18 +97,26 @@ namespace PreMaid.HumanoidTracer
 
             foreach (var VARIABLE in _joints)
             {
-                var mecanimServoValue = VARIABLE.CurrentServoValue();
+                var mecanimServoValue = VARIABLE.currentServoValue;
+                ServoPosition targetServoID = (ServoPosition)VARIABLE.servoNo;
 
-                var servo = servos.Find(x => x.ServoPositionEnum == VARIABLE.TargetServo);
+                var servo = servos.Find(x => x.ServoPositionEnum == targetServoID);
 
                 int premaidServoValue = servo.GetServoValue();
 
-                //20以上サーボの値が変わってたら命令とする
+                // mecanimServoValueがゼロなのは異常
+                if (mecanimServoValue <= 0)
+                {
+                    Debug.Log(string.Format("Servo:{0} Val:{1}", servo.GetServoName(), mecanimServoValue - premaidServoValue));
+                    continue;
+                }
+
+                //閾値よりサーボの値が変わってたら命令とする
                 //50とかでもいいかも
                 if (Mathf.Abs(mecanimServoValue - premaidServoValue) > 10)
                 {
                     servo.SetServoValueSafeClamp((int) mecanimServoValue);
-                    PreMaidServo tmp = new PreMaidServo(VARIABLE.TargetServo);
+                    PreMaidServo tmp = new PreMaidServo(targetServoID);
                     tmp.SetServoValueSafeClamp((int) mecanimServoValue);
                     orders.Add(tmp);
                 }
@@ -159,15 +149,22 @@ namespace PreMaid.HumanoidTracer
 
             foreach (var VARIABLE in _joints)
             {
-                var mecanimServoValue = VARIABLE.CurrentServoValue();
+                var mecanimServoValue = VARIABLE.currentServoValue;
+                ServoPosition targetServoID = (ServoPosition)VARIABLE.servoNo;
 
-                var servo = servos.Find(x => x.ServoPositionEnum == VARIABLE.TargetServo);
+                var servo = servos.Find(x => x.ServoPositionEnum == targetServoID);
 
                 int premaidServoValue = servo.GetServoValue();
 
+                // mecanimServoValueがゼロなのは異常
+                if (mecanimServoValue <= 0)
+                {
+                    Debug.Log(string.Format("Servo:{0} Val:{1}", servo.GetServoName(), mecanimServoValue - premaidServoValue));
+                    continue;
+                }
 
                 servo.SetServoValueSafeClamp((int) mecanimServoValue);
-                PreMaidServo tmp = new PreMaidServo(VARIABLE.TargetServo);
+                PreMaidServo tmp = new PreMaidServo(targetServoID);
                 tmp.SetServoValueSafeClamp((int) mecanimServoValue);
                 orders.Add(tmp);
             }
@@ -187,14 +184,6 @@ namespace PreMaid.HumanoidTracer
             if (_initialized == false)
             {
                 _initialized = true;
-            }
-        }
-
-        private void Update()
-        {
-            if (Input.GetKeyDown(KeyCode.A))
-            {
-                target.SetTrigger("TestMotion");
             }
         }
 

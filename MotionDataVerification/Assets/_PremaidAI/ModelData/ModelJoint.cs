@@ -17,46 +17,67 @@ namespace PreMaid
         [Header("02とか1Cとか当てる")]
         public string ServoID;
 
+        /// <summary>
+        /// 0x02や0x1CなどのサーボID
+        /// 将来的には文字列はやめて数値やenumにした方が良いが、
+        /// 今のところこれまでの互換性のため文字列の方が主
+        /// </summary>
+        [NonSerialized]
+        public int servoNo;
+
         public enum Axis
         {
             X, Y, Z
         }
 
-        [SerializeField] private bool isInverse = false;
+        [SerializeField]
+        public bool isInverse = false;
         //もしかして取り付け軸向きのinverseもenum定義した方がいいかも？
 
-        [SerializeField] private Axis targetAxis = Axis.X;
+        [SerializeField]
+        public Axis targetAxis = Axis.X;
 
         /// <summary>
         /// サーボ可動範囲の最小値[deg]
         /// </summary>
         [SerializeField]
-        private float minAngle = -135f; // 3500
+        public float minAngle = -135f; // 3500
 
         /// <summary>
         /// サーボ可動範囲の最大値[deg]
         /// </summary>
         [SerializeField]
-        private float maxAngle = 135f; // 11500
+        public float maxAngle = 135f; // 11500
 
         /// <summary>
-        /// 現在の角度指令値[deg]
+        /// 最大速度[deg/s]。ゼロだと速度制限なしとする
+        /// </summary>
+        [SerializeField]
+        public float maxSpeed = 180f;
+
+        /// <summary>
+        /// 現在の角度[deg]
         /// 参照専用
         /// </summary>
         [SerializeField]
         public float currentAngle = 0f;
 
         /// <summary>
-        /// サーボでの角度指令値
+        /// 現在の角度指令値[サーボ用単位]
         /// 参照専用
         /// </summary>
-        public float currentServoValue = 0f;
+        public float currentServoValue = 7500f;
 
         /// <summary>
         /// ホームポジションでの角度指令値
         /// </summary>
         [SerializeField]
-        private float defaultServoPosition = 7500f;
+        public float defaultServoPosition = 7500f;
+
+        /// <summary>
+        /// 目標とする角度[deg] maxSpeedを超えない範囲でcurrentAngleがこれに追従する
+        /// </summary>
+        private float targetAngle = 0f;
 
         // 初期ローカル姿勢
         Quaternion initialLocalRotation = Quaternion.identity;
@@ -70,6 +91,12 @@ namespace PreMaid
             {
                 return transform.rotation * Quaternion.Inverse(initialLocalRotation);
             }
+        }
+
+        private void Awake()
+        {
+            // サーボIDの数値表現を保持
+            servoNo = Convert.ToInt32(ServoID, 16);
         }
 
         // Start is called before the first frame update
@@ -102,9 +129,18 @@ namespace PreMaid
             Transform rootTransform = GetModelRootTransform();
             localServoAxis = Quaternion.Inverse(transform.rotation) * (rootTransform.rotation * axis);
 
+            // 初期値設定
+            currentServoValue = defaultServoPosition;
+
             //// 可動範囲測定
             //minAngle = -0f;
             //maxAngle = 0f;
+        }
+
+        private void FixedUpdate()
+        {
+            // maxSpeedが0でなければ、ここでサーボ角を更新
+            if (maxSpeed > 0f) UpdateServo();
         }
 
         /// <summary>
@@ -133,17 +169,83 @@ namespace PreMaid
         /// </summary>
         /// <param name="angleEulerDegree"></param>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
-        public void SetServoValue(float angleEulerDegree)
+        public float SetServoValue(float angleEulerDegree)
         {
-            float targetAngle = angleEulerDegree % 360f;
-            if (targetAngle > 180f) targetAngle -= 360f;
-            if (targetAngle < -180f) targetAngle += 360f;
+            float angle = angleEulerDegree % 360f;
 
-            float angle = Mathf.Clamp(targetAngle, minAngle, maxAngle);
-            currentAngle = targetAngle;
-            currentServoValue = Mathf.Round(angle * 29.6296296296f + defaultServoPosition); //29.6296296296 = 4000/135
+            // ±180deg の範囲に直す
+            if (angle > 180f) angle -= 360f;
+            if (angle <= -180f) angle += 360f;
 
-            transform.localRotation = initialLocalRotation * Quaternion.AngleAxis(angle, localServoAxis);
+            // maxSpeedが0なら（念のため負でも）角度制限は現在角度に依存しない手法とし、瞬間的に目標角にする
+            if (maxSpeed <= 0f)
+            {
+                // 角度制限を適用。単純なClampではなく、回転として目標角度が近い方の最大値または最小値によせる
+                //angle = Mathf.Clamp(angle, minAngle, maxAngle);
+                if ((angle < minAngle) || (angle > maxAngle))
+                {
+                    if (Mathf.Abs(angle - minAngle) < Mathf.Abs(maxAngle - angle))
+                    {
+                        angle = minAngle;
+                    }
+                    else
+                    {
+                        angle = maxAngle;
+                    }
+                }
+                targetAngle = angle;
+
+                currentAngle = targetAngle;
+                UpdateCurrentServoTransform();
+            }
+            else
+            {
+                // 角度制限を適用。単純なClampではなく、現在角度から目標角度が近い方の最大値または最小値によせる
+                //  ※現在姿勢に依存しますので、結果的に目標角度に近づけない可能性があります
+                if ((angle < minAngle) || (angle > maxAngle))
+                {
+                    if (Mathf.Abs(currentAngle - minAngle) < Mathf.Abs(maxAngle - currentAngle))
+                    {
+                        angle = minAngle;
+                    }
+                    else
+                    {
+                        angle = maxAngle;
+                    }
+                }
+                targetAngle = angle;
+
+            }
+            return targetAngle;
+        }
+
+        /// <summary>
+        /// 実際にTranformにcurrentAngleを反映させる
+        /// また、currentServoValueもここで更新
+        /// ※ 本来は currentAngle をプロパティにして set メソッドで行えると良い内容
+        /// </summary>
+        private void UpdateCurrentServoTransform()
+        {
+            currentServoValue = Mathf.Round(currentAngle * 29.6296296296f + defaultServoPosition); //29.6296296296 = 4000/135
+            transform.localRotation = initialLocalRotation * Quaternion.AngleAxis(currentAngle, localServoAxis);
+        }
+
+        /// <summary>
+        /// 最高速度内でサーボ角を更新
+        /// </summary>
+        void UpdateServo()
+        {
+            if (!Mathf.Approximately(targetAngle, currentAngle))
+            {
+                float angle = targetAngle - currentAngle;
+                float speed = Mathf.Abs(angle) / Time.deltaTime;
+                if (speed > maxSpeed)
+                {
+                    angle *= maxSpeed / speed;
+                }
+                currentAngle += angle;
+                UpdateCurrentServoTransform();
+            }
         }
 
         /// <summary>
@@ -154,6 +256,45 @@ namespace PreMaid
         {
             float angle = (servoValue - defaultServoPosition) * 135f / 4000f;
             SetServoValue(angle);
+        }
+
+
+        /// <summary>
+        /// 指定IDのModelJointを取得
+        /// </summary>
+        /// <param name="servoId">"0C"などのサーボID</param>
+        /// <returns></returns>
+        public static ModelJoint GetJointById(string servoId, ref ModelJoint[] joints)
+        {
+            foreach (var joint in joints)
+            {
+                if (joint.ServoID.Equals(servoId)) return joint;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// 指定IDのModelJointを取得
+        /// </summary>
+        /// <param name="servoNo">0x0C などのサーボID</param>
+        /// <returns></returns>
+        public static ModelJoint GetJointById(int servoNo, ref ModelJoint[] joints)
+        {
+            string servoId = servoNo.ToString("X2");
+            return GetJointById(servoId, ref joints);
+        }
+
+        /// <summary>
+        /// 存在するすべてのModelJointの最大角速度を一律にセット
+        /// </summary>
+        /// <param name="speed">最大角速度[deg/s]</param>
+        public static void SetAllJointsMaxSpeed(float speed)
+        {
+            var joints = GameObject.FindObjectsOfType<ModelJoint>();
+            foreach (var joint in joints)
+            {
+                joint.maxSpeed = speed;
+            }
         }
     }
 }

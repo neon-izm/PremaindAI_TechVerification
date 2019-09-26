@@ -239,7 +239,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 164620704322882841}
   m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -0.0175}
+  m_LocalPosition: {x: 0, y: 0.0495, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4103689814223021177}
@@ -294,6 +294,7 @@ MonoBehaviour:
   targetAxis: 0
   minAngle: -18
   maxAngle: 35
+  maxSpeed: 180
   currentAngle: 0
   currentServoValue: 0
   defaultServoPosition: 7500
@@ -346,6 +347,7 @@ MonoBehaviour:
   targetAxis: 2
   minAngle: -41
   maxAngle: 10
+  maxSpeed: 180
   currentAngle: 0
   currentServoValue: 0
   defaultServoPosition: 7500
@@ -398,6 +400,7 @@ MonoBehaviour:
   targetAxis: 0
   minAngle: -16
   maxAngle: 52
+  maxSpeed: 180
   currentAngle: 0
   currentServoValue: 0
   defaultServoPosition: 7500
@@ -450,6 +453,7 @@ MonoBehaviour:
   targetAxis: 0
   minAngle: 0
   maxAngle: 82
+  maxSpeed: 180
   currentAngle: 0
   currentServoValue: 0
   defaultServoPosition: 7500
@@ -502,6 +506,7 @@ MonoBehaviour:
   targetAxis: 1
   minAngle: -30
   maxAngle: 37
+  maxSpeed: 180
   currentAngle: 0
   currentServoValue: 0
   defaultServoPosition: 7500
@@ -555,6 +560,7 @@ MonoBehaviour:
   targetAxis: 1
   minAngle: -75
   maxAngle: 75
+  maxSpeed: 180
   currentAngle: 0
   currentServoValue: 0
   defaultServoPosition: 7500
@@ -608,6 +614,7 @@ MonoBehaviour:
   targetAxis: 0
   minAngle: -10.2
   maxAngle: 23.6
+  maxSpeed: 180
   currentAngle: 0
   currentServoValue: 0
   defaultServoPosition: 7500
@@ -660,6 +667,7 @@ MonoBehaviour:
   targetAxis: 0
   minAngle: -35
   maxAngle: 18
+  maxSpeed: 180
   currentAngle: 0
   currentServoValue: 0
   defaultServoPosition: 7500
@@ -712,6 +720,7 @@ MonoBehaviour:
   targetAxis: 2
   minAngle: -10
   maxAngle: 41
+  maxSpeed: 180
   currentAngle: 0
   currentServoValue: 0
   defaultServoPosition: 7500
@@ -764,6 +773,7 @@ MonoBehaviour:
   targetAxis: 0
   minAngle: -52
   maxAngle: 16
+  maxSpeed: 180
   currentAngle: 0
   currentServoValue: 0
   defaultServoPosition: 7500
@@ -816,6 +826,7 @@ MonoBehaviour:
   targetAxis: 0
   minAngle: -82
   maxAngle: 0
+  maxSpeed: 180
   currentAngle: 0
   currentServoValue: 0
   defaultServoPosition: 7500
@@ -868,6 +879,7 @@ MonoBehaviour:
   targetAxis: 1
   minAngle: -30
   maxAngle: 37
+  maxSpeed: 180
   currentAngle: 0
   currentServoValue: 0
   defaultServoPosition: 7500
@@ -920,6 +932,7 @@ MonoBehaviour:
   targetAxis: 2
   minAngle: -24
   maxAngle: 15
+  maxSpeed: 180
   currentAngle: 0
   currentServoValue: 0
   defaultServoPosition: 7500
@@ -972,6 +985,7 @@ MonoBehaviour:
   targetAxis: 0
   minAngle: -180
   maxAngle: 128.2
+  maxSpeed: 180
   currentAngle: 0
   currentServoValue: 0
   defaultServoPosition: 7500
@@ -1025,6 +1039,7 @@ MonoBehaviour:
   targetAxis: 2
   minAngle: 4.1
   maxAngle: 97.3
+  maxSpeed: 180
   currentAngle: 0
   currentServoValue: 0
   defaultServoPosition: 7500
@@ -1078,6 +1093,7 @@ MonoBehaviour:
   targetAxis: 2
   minAngle: -123
   maxAngle: 13
+  maxSpeed: 180
   currentAngle: 0
   currentServoValue: 0
   defaultServoPosition: 7500
@@ -1131,6 +1147,7 @@ MonoBehaviour:
   targetAxis: 0
   minAngle: -203
   maxAngle: 49
+  maxSpeed: 180
   currentAngle: 0
   currentServoValue: 0
   defaultServoPosition: 7500
@@ -1184,6 +1201,7 @@ MonoBehaviour:
   targetAxis: 2
   minAngle: -93.7
   maxAngle: -4.1
+  maxSpeed: 180
   currentAngle: 0
   currentServoValue: 0
   defaultServoPosition: 7500
@@ -1237,6 +1255,7 @@ MonoBehaviour:
   targetAxis: 0
   minAngle: -60
   maxAngle: 108
+  maxSpeed: 180
   currentAngle: 0
   currentServoValue: 0
   defaultServoPosition: 7500
@@ -1289,6 +1308,7 @@ MonoBehaviour:
   targetAxis: 2
   minAngle: -22
   maxAngle: 28.6
+  maxSpeed: 180
   currentAngle: 0
   currentServoValue: 0
   defaultServoPosition: 7500
@@ -1341,6 +1361,7 @@ MonoBehaviour:
   targetAxis: 0
   minAngle: -128.2
   maxAngle: 180
+  maxSpeed: 180
   currentAngle: 0
   currentServoValue: 0
   defaultServoPosition: 7500
@@ -1393,6 +1414,7 @@ MonoBehaviour:
   targetAxis: 0
   minAngle: -49
   maxAngle: 193
+  maxSpeed: 180
   currentAngle: 0
   currentServoValue: 0
   defaultServoPosition: 7500
@@ -1446,6 +1468,7 @@ MonoBehaviour:
   targetAxis: 0
   minAngle: -128.7
   maxAngle: 134.3
+  maxSpeed: 180
   currentAngle: 0
   currentServoValue: 0
   defaultServoPosition: 7500
@@ -1498,6 +1521,7 @@ MonoBehaviour:
   targetAxis: 2
   minAngle: -13
   maxAngle: 123
+  maxSpeed: 180
   currentAngle: 0
   currentServoValue: 0
   defaultServoPosition: 7500
@@ -2685,6 +2709,7 @@ MonoBehaviour:
   targetAxis: 2
   minAngle: -15
   maxAngle: 24
+  maxSpeed: 180
   currentAngle: 0
   currentServoValue: 0
   defaultServoPosition: 7500
@@ -4427,7 +4452,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8709720631371591161}
   m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0, y: 0, z: -0.0175}
+  m_LocalPosition: {x: -0, y: 0.0495, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4836148959139103882}
